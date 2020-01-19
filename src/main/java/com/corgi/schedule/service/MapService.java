@@ -64,8 +64,9 @@ public class MapService {
                     for (int i = 0; i < total; i++) {
                         JSONObject poi = pois.getJSONObject(i);
                         String adname = poi.getString("adname");
+                        String areaName = poi.getString("name").replaceAll("\\(地铁站\\)", "");
                         String[] location = poi.getString("location").split(",");
-                        CorgiArea area = CorgiArea.builder()
+                        CorgiArea area = CorgiArea.builder().areaName(areaName)
                                 .city(city).adname(adname).type(CorgiArea.STATION)
                                 .lng(Double.valueOf(location[0])).lat(Double.valueOf(location[1]))
                                 .build();
