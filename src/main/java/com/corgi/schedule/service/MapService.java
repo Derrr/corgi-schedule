@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.corgi.entity.CorgiArea;
 import com.corgi.user.api.CorgiAreaService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
@@ -20,6 +21,7 @@ import java.io.IOException;
 /**
  * @author tairanliu
  */
+@Slf4j
 @Service
 public class MapService {
     @Reference
@@ -64,6 +66,11 @@ public class MapService {
                     for (int i = 0; i < total; i++) {
                         JSONObject poi = pois.getJSONObject(i);
                         String adname = poi.getString("adname");
+                        String type = poi.getString("type");
+                        log.info("type="+type);
+                        if(type.contains("出入口")){
+                            continue;
+                        }
                         String areaName = poi.getString("name").replaceAll("\\(地铁站\\)", "");
                         String[] location = poi.getString("location").split(",");
                         CorgiArea area = CorgiArea.builder().areaName(areaName)
