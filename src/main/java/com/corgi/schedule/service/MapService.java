@@ -67,17 +67,22 @@ public class MapService {
                         JSONObject poi = pois.getJSONObject(i);
                         String adname = poi.getString("adname");
                         String type = poi.getString("type");
-                        log.info("type="+type);
-                        if(type.contains("出入口")){
+                        log.info("type=" + type);
+                        if (type.contains("出入口")) {
                             continue;
                         }
                         String areaName = poi.getString("name").replaceAll("\\(地铁站\\)", "");
                         String[] location = poi.getString("location").split(",");
-                        CorgiArea area = CorgiArea.builder().areaName(areaName)
-                                .city(city).adname(adname).type(CorgiArea.STATION)
-                                .lng(Double.valueOf(location[0])).lat(Double.valueOf(location[1]))
-                                .build();
-                        corgiAreaService.addArea(area);
+                        String[] addressArr = poi.getString("address").split(";");
+                        for (int j = 0; j < addressArr.length; j++) {
+                            CorgiArea area = CorgiArea.builder().areaName(areaName)
+                                    .city(city).adname(adname).type(CorgiArea.STATION)
+                                    .lng(Double.valueOf(location[0])).lat(Double.valueOf(location[1]))
+                                    .address(addressArr[j])
+                                    .build();
+                            corgiAreaService.addArea(area);
+                        }
+
                     }
                     if (page * 25 >= count) {
                         return "finish";
