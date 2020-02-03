@@ -3,8 +3,10 @@ package com.corgi.schedule.task;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.entity.CorgiStatistic;
+import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiToolService;
 import com.corgi.user.api.CorgiUserService;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -21,10 +23,11 @@ public class CorgiMonthStatisticTask {
     @Reference
     private CorgiUserService corgiUserService;
     @Reference
-    private CorgiToolService corgiToolService;
+    private CorgiStatisticService corgiStatisticService;
 
     private static SimpleDateFormat mau_sdf = new SimpleDateFormat("yyyy-MM");
 
+    @Async
     @Scheduled(cron = "0 5 0 1 * *")
     public void run() {
         Calendar calendar = Calendar.getInstance();
@@ -40,6 +43,6 @@ public class CorgiMonthStatisticTask {
         long zero = time / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset();
 
         long mau = corgiUserService.countActiveUser(calendar.getTimeInMillis(), zero);
-        corgiToolService.addCount(CorgiStatistic.MAU, month, mau);
+        corgiStatisticService.addCount(CorgiStatistic.MAU, month, mau);
     }
 }
