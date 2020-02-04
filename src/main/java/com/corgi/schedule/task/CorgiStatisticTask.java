@@ -3,15 +3,19 @@ package com.corgi.schedule.task;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.entity.CorgiStatistic;
+import com.corgi.schedule.service.MapService;
 import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiToolService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserDetail;
+import com.corgi.user.entity.UserPosition;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -30,6 +34,8 @@ public class CorgiStatisticTask {
     private CorgiStatisticService corgiStatisticService;
     @Reference
     private CorgiToolService corgiToolService;
+    @Autowired
+    private MapService mapService;
 
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -63,13 +69,40 @@ public class CorgiStatisticTask {
 
     }
 
+    void countUserCity(String date) {
+        int page = 1;
+        int pageSize = 100;
+        HashMap<String, Long> resultMap = new HashMap<>();
+        while (true) {
+            List<UserPosition> userPositions = corgiUserService.getUserPositionByPage(page, pageSize);
+            if (CollectionUtils.isEmpty(userPositions)) {
+                break;
+            }
+            for (UserPosition userPosition : userPositions) {
+                String cityName = mapService.getCity(userPosition.getLat(), userPosition.getLng());
+                if (!StringUtils.isEmpty(cityName)) {
+                    Long count = resultMap.get(cityName);
+                    if (count == null) {
+                        count = 0L;
+                    }
+                    resultMap.put(cityName, ++count);
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(resultMap)) {
+            for (Map.Entry<String, Long> entry : resultMap.entrySet()) {
+                corgiStatisticService.addList(CorgiStatistic.USER_CITY, date, entry.getKey(), entry.getValue());
+            }
+        }
+    }
+
     void countActivityType(String date) {
         List<HashMap> hashMapList = corgiActivityService.groupByActivity("activityType", "0", "9");
         if (!CollectionUtils.isEmpty(hashMapList)) {
             for (HashMap hashMap : hashMapList) {
                 try {
                     log.info(hashMap.toString());
-                    corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("_id"),  Long.valueOf(hashMap.get("count").toString()));
+                    corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("_id"), Long.valueOf(hashMap.get("count").toString()));
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }

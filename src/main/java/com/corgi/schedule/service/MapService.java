@@ -15,6 +15,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
@@ -26,6 +27,73 @@ import java.io.IOException;
 public class MapService {
     @Reference
     CorgiAreaService corgiAreaService;
+
+    public String getCity(Double lat, Double lng) {
+        String location = lng + "," + lat;
+        String error;
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        String result = "";
+        String url = "https://restapi.amap.com/v3/place/around?key=1243993719b451359f144ee24ebcb744&radius=10000&location=" + location;
+        try {
+            // 通过址默认配置创建一个httpClient实例
+            httpClient = HttpClients.createDefault();
+
+            // 创建httpGet远程连接实例
+            HttpGet httpGet = new HttpGet(url);
+            // 设置配置请求参数
+            RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(35000)
+                    .setConnectionRequestTimeout(35000)
+                    .setSocketTimeout(60000)
+                    .build();
+            // 为httpGet实例设置配置
+            httpGet.setConfig(requestConfig);
+            // 执行get请求得到返回对象
+            response = httpClient.execute(httpGet);
+            // 通过返回对象获取返回数据
+            HttpEntity entity = response.getEntity();
+            // 通过EntityUtils中的toString方法将结果转换为字符串
+            result = EntityUtils.toString(entity);
+            JSONObject object = JSONObject.parseObject(result);
+            String status = object.getString("status");
+            if ("1".equals(status)) {
+                JSONArray pois = object.getJSONArray("pois");
+                int total = pois.size();
+                if (total == 0) {
+                    return "";
+                }
+                for (int i = 0; i < total; i++) {
+                    JSONObject poi = pois.getJSONObject(i);
+                    String cityName = poi.getString("cityname");
+                    if (!StringUtils.isEmpty(cityName)) {
+                        return cityName;
+                    }
+                }
+            } else {
+                log.error(object.getString("info"));
+                return "";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // 关闭资源
+            if (null != response) {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (null != httpClient) {
+                try {
+                    httpClient.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return "";
+    }
 
     public String initCity(String city) {
         String error;
