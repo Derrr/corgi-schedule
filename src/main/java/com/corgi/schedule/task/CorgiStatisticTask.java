@@ -66,6 +66,7 @@ public class CorgiStatisticTask {
         countUserPreferGroup(today);
         countUserAge(calendar, today);
         countActivityType(today);
+        countUserCity(today);
 
     }
 
@@ -88,6 +89,7 @@ public class CorgiStatisticTask {
                     resultMap.put(cityName, ++count);
                 }
             }
+            page++;
         }
         if (!CollectionUtils.isEmpty(resultMap)) {
             for (Map.Entry<String, Long> entry : resultMap.entrySet()) {
