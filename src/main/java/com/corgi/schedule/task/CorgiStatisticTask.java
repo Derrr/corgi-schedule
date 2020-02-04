@@ -62,10 +62,10 @@ public class CorgiStatisticTask {
     }
 
     void countActivityType(String date) {
-        List<HashMap> hashMapList = corgiActivityService.groupByActivity("type", "0", "9");
+        List<HashMap> hashMapList = corgiActivityService.groupByActivity("activityType", "0", "9");
         if (!CollectionUtils.isEmpty(hashMapList)) {
             for (HashMap hashMap : hashMapList) {
-                corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("type"), (Long) hashMap.get("count"));
+                corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("activityType"), (Long) hashMap.get("count"));
             }
         }
     }
