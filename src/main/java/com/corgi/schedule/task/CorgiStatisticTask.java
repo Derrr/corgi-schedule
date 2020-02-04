@@ -7,6 +7,7 @@ import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiToolService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserDetail;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.util.*;
 /**
  * @author tairanliu
  */
+@Slf4j
 @Component
 public class CorgiStatisticTask {
     @Reference
@@ -65,7 +67,12 @@ public class CorgiStatisticTask {
         List<HashMap> hashMapList = corgiActivityService.groupByActivity("activityType", "0", "9");
         if (!CollectionUtils.isEmpty(hashMapList)) {
             for (HashMap hashMap : hashMapList) {
-                corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("activityType"), Long.valueOf((String) hashMap.get("count")));
+                try {
+                    log.info(hashMap.toString());
+                    corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("activityType"), Long.valueOf((String) hashMap.get("count")));
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
     }
