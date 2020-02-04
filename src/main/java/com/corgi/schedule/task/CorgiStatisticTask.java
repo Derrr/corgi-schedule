@@ -97,7 +97,7 @@ public class CorgiStatisticTask {
 
         calendar.add(Calendar.YEAR, -18);
         String date18 = activity_sdf.format(calendar.getTime());
-        count = corgiUserService.countBirthday(date18, "");
+        count = corgiUserService.countBirthday(date18, "9");
         corgiStatisticService.updateMap(CorgiStatistic.AGE, date, "-18", count);
 
         calendar.add(Calendar.YEAR, -7);
