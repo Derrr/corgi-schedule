@@ -10,11 +10,10 @@ import com.corgi.user.entity.UserDetail;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
+import java.util.*;
 
 /**
  * @author tairanliu
@@ -58,7 +57,17 @@ public class CorgiStatisticTask {
         countUserGroup(today);
         countUserPreferGroup(today);
         countUserAge(calendar, today);
+        countActivityType(today);
 
+    }
+
+    void countActivityType(String date) {
+        List<HashMap> hashMapList = corgiActivityService.groupByActivity("type", "0", "9");
+        if (!CollectionUtils.isEmpty(hashMapList)) {
+            for (HashMap hashMap : hashMapList) {
+                corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("type"), (Long) hashMap.get("count"));
+            }
+        }
     }
 
     void countSilentUser(Long time, String date) {
