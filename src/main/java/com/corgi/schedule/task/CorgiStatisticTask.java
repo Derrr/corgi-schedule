@@ -64,10 +64,25 @@ public class CorgiStatisticTask {
         countUserRole(today);
         countUserGroup(today);
         countUserPreferGroup(today);
-        countUserAge(calendar, today);
+        Calendar tmp = Calendar.getInstance();
+        tmp.setTimeInMillis(time);
+        countUserAge(tmp, today);
         countActivityType(today);
         countUserCity(today);
 
+        tmp = Calendar.getInstance();
+        tmp.setTimeInMillis(time);
+        countUserStay(calendar, today, zero);
+
+    }
+
+    void countUserStay(Calendar calendar, String date, long zero) {
+        for (int i = 1; i <= 90; i++) {
+            calendar.add(Calendar.DATE, -1);
+            String registerDate = dau_sdf.format(calendar.getTime());
+            long count = corgiUserService.countUserStay(zero, registerDate);
+            corgiStatisticService.addUserStay(date, registerDate, i + "", count);
+        }
     }
 
     void countUserCity(String date) {
