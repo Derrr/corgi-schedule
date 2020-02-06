@@ -2,6 +2,7 @@ package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.common.messages.TraceFollow;
 import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.MapService;
 import com.corgi.user.api.CorgiStatisticService;
@@ -74,6 +75,18 @@ public class CorgiStatisticTask {
         tmp.setTimeInMillis(time);
         countUserStay(calendar, today, zero);
 
+        countUserTrace(today);
+    }
+
+    void countUserTrace(String date) {
+        List<HashMap> traces = corgiStatisticService.countUserTrace(date);
+        Double total = corgiStatisticService.countTotalUserTrace(date);
+        corgiStatisticService.addUserTraceSum(date, TraceFollow.TOTAL, total);
+        if (!CollectionUtils.isEmpty(traces)) {
+            for (HashMap trace : traces) {
+                corgiStatisticService.addUserTraceSum(date, (String) trace.get("type"), Double.parseDouble(trace.get("time") + ""));
+            }
+        }
     }
 
     void countUserStay(Calendar calendar, String date, long zero) {
