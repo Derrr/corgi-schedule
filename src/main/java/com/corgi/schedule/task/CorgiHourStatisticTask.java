@@ -8,16 +8,15 @@ import com.corgi.user.api.CorgiUserService;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
 
 /**
  * @author tairanliu
  */
 @Component
-public class CorgiTimeStatisticTask {
+public class CorgiHourStatisticTask {
     @Reference
     private CorgiUserService corgiUserService;
     @Reference
@@ -30,25 +29,25 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
     @Async
-    @Scheduled(cron = "0 0 0/3 * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void run() {
         Calendar calendar = Calendar.getInstance();
         String date = dau_sdf.format(calendar.getTime());
-        long time = calendar.getTimeInMillis();
 
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         String endHour = hour_sdf.format(calendar.getTime());
+        String endDate = activity_sdf.format(calendar.getTime()) + " " + endHour;
 
 
-        calendar.add(Calendar.HOUR_OF_DAY, -3);
+        calendar.add(Calendar.HOUR_OF_DAY, -1);
         String beginHour = hour_sdf.format(calendar.getTime());
+        String beginDate = activity_sdf.format(calendar.getTime()) + " " + beginHour;
         if (hour == 0) {
             date = dau_sdf.format(calendar.getTime());
         }
-        String key = beginHour + "-" + endHour;
 
-        long count = corgiUserService.countActiveUser(calendar.getTimeInMillis(), time);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVE, date, key, count);
+        long count = corgiActivityService.countRangePublishActivity(beginDate, endDate);
+        corgiStatisticService.addList(CorgiStatistic.PUBLISH, date, beginHour, count);
 
     }
 
