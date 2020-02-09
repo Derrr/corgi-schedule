@@ -132,7 +132,9 @@ public class CorgiStatisticTask {
             for (HashMap hashMap : hashMapList) {
                 try {
                     log.info(hashMap.toString());
-                    corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("_id"), Long.valueOf(hashMap.get("count").toString()));
+                    if (hashMap.get("_id") != null) {
+                        corgiStatisticService.addList(CorgiStatistic.ACTIVITY_TYPE, date, (String) hashMap.get("_id"), Long.valueOf(hashMap.get("count").toString()));
+                    }
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
