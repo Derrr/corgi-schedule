@@ -19,8 +19,8 @@ public class CorgiTestPushTask {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Async
-    @Scheduled(cron = "0 0 10-22 * * *")
+    //@Async
+    //@Scheduled(cron = "0 0 10-22 * * *")
     public void run() {
         for (int i = 1; i < 1000; i++) {
             PushMessage pushMessage = PushMessage.builder()
