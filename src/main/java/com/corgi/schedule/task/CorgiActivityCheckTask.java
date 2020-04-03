@@ -60,7 +60,7 @@ public class CorgiActivityCheckTask {
                     PushMessage message = PushMessage.builder()
                             .sourceUserId(activity.getId())
                             .type(PushMessage.ACTIVITY_DUEL)
-                            .message("哈喽～不要忘了我们的约会，" + time + "，我们在 " + activity.getAddress() + " 不见不散。马上就要开始了，准备出发吧！（此条信息由Corgi运营小哥哥暖心提供）")
+                            .message("嘿，小哥哥！不要忘了我们的约会（" + time + "）我们在（" + activity.getAddress() + "）不见不散。时间快到了，整理好心情，准备出发吧！（此条信息由Corgi运营小哥哥暖心提供）")
                             .build();
                     mqService.sendMessage(message);
                 }
