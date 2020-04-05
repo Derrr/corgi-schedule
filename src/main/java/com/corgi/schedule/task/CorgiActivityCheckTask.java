@@ -96,7 +96,7 @@ public class CorgiActivityCheckTask {
     private void sendMessage(IAcsClient client, CorgiActivity activity, String userId, String telNo, String time) {
         String key = "activity_check_sent_" + activity.getId() + "_" + userId;
         log.info("checking key..." + key + redisTemplate.hasKey(key));
-        if (redisTemplate.hasKey(key)) {
+        if (!redisTemplate.hasKey(key)) {
             CommonRequest request = new CommonRequest();
             request.setMethod(MethodType.POST);
             request.setDomain("dysmsapi.aliyuncs.com");
