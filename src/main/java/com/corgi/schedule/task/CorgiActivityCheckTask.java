@@ -81,26 +81,21 @@ public class CorgiActivityCheckTask {
                         log.error(e.getMessage(), e);
                     }
                     List<UserProfile> userProfiles = corgiUserActivityService.getUsers(activity.getId(), null, UserSignUp.AGREE + "");
-                    try {
-                        UserLogin userLogin = corgiUserService.getUserLogin(activity.getUserId());
-                        sendMessage(client, activity, activity.getUserId(), userLogin.getTelNo(), time);
-                        for (UserProfile userProfile : userProfiles) {
-                            sendMessage(client, activity, userProfile.getUserId(), userProfile.getTelNo(), time);
-                        }
-                    } catch (ServerException e) {
-                        e.printStackTrace();
-                    } catch (ClientException e) {
-                        e.printStackTrace();
+                    UserLogin userLogin = corgiUserService.getUserLogin(activity.getUserId());
+                    sendMessage(client, activity, activity.getUserId(), userLogin.getTelNo(), time);
+                    for (UserProfile userProfile : userProfiles) {
+                        sendMessage(client, activity, userProfile.getUserId(), userProfile.getTelNo(), time);
                     }
+
                 }
             }
         } while (!CollectionUtils.isEmpty(activityList));
 
     }
 
-    private void sendMessage(IAcsClient client, CorgiActivity activity, String userId, String telNo, String time) throws ClientException {
+    private void sendMessage(IAcsClient client, CorgiActivity activity, String userId, String telNo, String time) {
         String key = "activity_check_sent_" + activity.getId() + "_" + userId;
-        log.info("checking key..." + key);
+        log.info("checking key..." + key + redisTemplate.hasKey(key));
         if (redisTemplate.hasKey(key)) {
             CommonRequest request = new CommonRequest();
             request.setMethod(MethodType.POST);
@@ -112,11 +107,15 @@ public class CorgiActivityCheckTask {
             request.putQueryParameter("SignName", "Corgi");
             request.putQueryParameter("TemplateCode", "SMS_187225471");
             request.putQueryParameter("TemplateParam", "{\"time\":\"" + time + "\",\"name\":\"" + activity.getAddress() + "\"}");
-
-            CommonResponse response = client.getCommonResponse(request);
-            log.info(response.getData());
-            redisTemplate.opsForValue().set(key, System.currentTimeMillis(), 2, TimeUnit.HOURS);
-
+            try {
+                CommonResponse response = client.getCommonResponse(request);
+                log.info(response.getData());
+                redisTemplate.opsForValue().set(key, System.currentTimeMillis(), 2, TimeUnit.HOURS);
+            } catch (ServerException e) {
+                log.error(e.getMessage(), e);
+            } catch (ClientException e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 }
