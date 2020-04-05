@@ -54,9 +54,9 @@ public class CorgiActivityCheckTask {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
     private SimpleDateFormat m_sdf = new SimpleDateFormat("HH点mm分");
 
-    @Async
     @Scheduled(cron = "0 * * * * *")
     public void run() {
+        log.info("running activity check...");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, 1);
         String endDate = sdf.format(calendar.getTime());
@@ -70,6 +70,7 @@ public class CorgiActivityCheckTask {
         IAcsClient client = new DefaultAcsClient(profile);
         do {
             activityList = corgiActivityService.searchCorgiActivity(query, page, pageSize);
+            log.info("getting activitys:{}", activityList);
             page++;
             if (activityList != null) {
                 for (CorgiActivity activity : activityList) {
@@ -99,6 +100,7 @@ public class CorgiActivityCheckTask {
 
     private void sendMessage(IAcsClient client, CorgiActivity activity, String userId, String telNo, String time) throws ClientException {
         String key = "activity_check_sent_" + activity.getId() + "_" + userId;
+        log.info("checking key..." + key);
         if (redisTemplate.hasKey(key)) {
             CommonRequest request = new CommonRequest();
             request.setMethod(MethodType.POST);
