@@ -43,7 +43,7 @@ public class ScriptController {
             log.info("getting user id..." + i);
             UserDetail userDetail = corgiUserService.getUserDetail(i + "", "");
             if (userDetail != null && !StringUtils.isEmpty(userDetail.getBirthday())) {
-                log.info("user id:{} birthday:{}" + userDetail.getBirthday());
+                log.info("user id:{} birthday:{}", i, userDetail.getBirthday());
                 String[] dates = userDetail.getBirthday().split("/");
                 if (dates.length != 3) {
                     continue;
@@ -64,7 +64,7 @@ public class ScriptController {
                     UserDetail updateDetail = new UserDetail();
                     updateDetail.setUserId(i + "");
                     updateDetail.setBirthday(year + "/" + month + "/" + day);
-                    log.info("updating user id:{} birthday:{}" + updateDetail.getBirthday());
+                    log.info("updating user id:{} birthday:{}", i, updateDetail.getBirthday());
                     corgiUserService.updateDetail(userDetail);
                 }
             }
