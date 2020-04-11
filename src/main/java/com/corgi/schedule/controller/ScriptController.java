@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.schedule.service.MapService;
 import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
@@ -12,7 +13,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,6 +35,39 @@ public class ScriptController {
         return mapService.initCity(city);
     }
 
+    @GetMapping("repair_birthday")
+    public String repairBirthday() {
+        for (int i = 0; i < 4210; i++) {
+            UserDetail userDetail = corgiUserService.getUserDetail(i + "", "");
+            if (userDetail != null && !StringUtils.isEmpty(userDetail.getBirthday())) {
+                String[] dates = userDetail.getBirthday().split("/");
+                if (dates.length != 3) {
+                    continue;
+                }
+                String year = dates[0];
+                String month = dates[1];
+                String day = dates[2];
+                boolean update = false;
+                if (month.length() == 1) {
+                    month = "0" + month;
+                    update = true;
+                }
+                if (day.length() == 1) {
+                    day = "0" + day;
+                    update = true;
+                }
+                if (update) {
+                    UserDetail updateDetail = new UserDetail();
+                    updateDetail.setUserId(i + "");
+                    updateDetail.setBirthday(year + "/" + month + "/" + day);
+                    corgiUserService.updateDetail(userDetail);
+                }
+            }
+
+        }
+        return "success";
+    }
+
     @GetMapping("refresh_position")
     public String refreshPosition() {
         List<UserPosition> userPositionList;
@@ -45,7 +78,7 @@ public class ScriptController {
             page++;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
-                    redisTemplate.opsForGeo().remove("user",userPosition.getUserId());
+                    redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
                     if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
                         continue;
                     }
