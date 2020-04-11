@@ -65,7 +65,7 @@ public class ScriptController {
                     updateDetail.setUserId(i + "");
                     updateDetail.setBirthday(year + "/" + month + "/" + day);
                     log.info("updating user id:{} birthday:{}", i, updateDetail.getBirthday());
-                    corgiUserService.updateDetail(userDetail);
+                    corgiUserService.updateDetail(updateDetail);
                 }
             }
 
