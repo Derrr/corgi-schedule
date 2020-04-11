@@ -6,6 +6,7 @@ import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,6 +19,7 @@ import java.util.List;
 /**
  * @author tairanliu
  */
+@Slf4j
 @RestController
 @RequestMapping("script")
 public class ScriptController {
@@ -38,8 +40,10 @@ public class ScriptController {
     @GetMapping("repair_birthday")
     public String repairBirthday() {
         for (int i = 0; i < 4210; i++) {
+            log.info("getting user id..." + i);
             UserDetail userDetail = corgiUserService.getUserDetail(i + "", "");
             if (userDetail != null && !StringUtils.isEmpty(userDetail.getBirthday())) {
+                log.info("user id:{} birthday:{}" + userDetail.getBirthday());
                 String[] dates = userDetail.getBirthday().split("/");
                 if (dates.length != 3) {
                     continue;
@@ -60,6 +64,7 @@ public class ScriptController {
                     UserDetail updateDetail = new UserDetail();
                     updateDetail.setUserId(i + "");
                     updateDetail.setBirthday(year + "/" + month + "/" + day);
+                    log.info("updating user id:{} birthday:{}" + updateDetail.getBirthday());
                     corgiUserService.updateDetail(userDetail);
                 }
             }
