@@ -105,7 +105,16 @@
 			<version>1.2.62</version>
 		</dependency>
 	</dependencies>
-
+	<repositories>
+		<repository>
+			<id>nexus-snapshot</id>
+			<url>http://47.111.180.175:8081/repository/maven-public/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
 	<build>
 		<finalName>corgi-schedule</finalName>
 		<plugins>
