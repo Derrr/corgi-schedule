@@ -65,8 +65,9 @@ public class MapService {
                 for (int i = 0; i < total; i++) {
                     JSONObject poi = pois.getJSONObject(i);
                     String cityName = poi.getString("cityname");
-                    if (!StringUtils.isEmpty(cityName)) {
-                        return cityName;
+                    String pname = poi.getString("pname");
+                    if (!StringUtils.isEmpty(cityName) || !StringUtils.isEmpty(pname)) {
+                        return pname + "-" + cityName;
                     }
                 }
             } else {
