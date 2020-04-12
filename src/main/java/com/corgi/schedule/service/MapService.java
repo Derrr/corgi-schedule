@@ -34,7 +34,7 @@ public class MapService {
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         String result = "";
-        String url = "https://restapi.amap.com/v3/place/around?key=1243993719b451359f144ee24ebcb744&radius=10000&location=" + location;
+        String url = "https://restapi.amap.com/v3/place/around?key=cd8a21da1d71462c4ee2856f6bc416e5&radius=10000&location=" + location;
         try {
             // 通过址默认配置创建一个httpClient实例
             httpClient = HttpClients.createDefault();
