@@ -1,12 +1,16 @@
 package com.corgi.schedule.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.common.CorgiQueueName;
+import com.corgi.common.messages.MatchRefresher;
+import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.MapService;
 import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -31,10 +35,20 @@ public class ScriptController {
     private CorgiUserService corgiUserService;
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @GetMapping("init_station")
     public String initStation(@RequestParam("city") String city) {
         return mapService.initCity(city);
+    }
+
+    @GetMapping("refresh_match")
+    public String refreshMatch(@RequestParam("userId") String userId) {
+        MatchRefresher matchRefresher = new MatchRefresher();
+        matchRefresher.setUserId(userId);
+        rabbitTemplate.convertAndSend(CorgiQueueName.REFRESH_MATCH_QUEUE, matchRefresher);
+        return "success";
     }
 
     @GetMapping("repair_birthday")
