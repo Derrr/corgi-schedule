@@ -216,22 +216,22 @@ public class CorgiStatisticTask {
     }
 
     void countUserPreferGroup(String date) {
-        long count = corgiUserService.countPreferGroup("胖熊");
+        long count = corgiUserService.countPreferGroup("偏胖");
         corgiStatisticService.updateMap(CorgiStatistic.PREFER_GROUP, date, "pig", count);
 
-        count = corgiUserService.countPreferGroup("壮熊");
+        count = corgiUserService.countPreferGroup("肉壮");
         corgiStatisticService.updateMap(CorgiStatistic.PREFER_GROUP, date, "bear", count);
 
-        count = corgiUserService.countPreferGroup("狒狒");
+        count = corgiUserService.countPreferGroup("肌肉");
         corgiStatisticService.updateMap(CorgiStatistic.PREFER_GROUP, date, "baboon", count);
 
-        count = corgiUserService.countPreferGroup("野狼");
+        count = corgiUserService.countPreferGroup("精壮");
         corgiStatisticService.updateMap(CorgiStatistic.PREFER_GROUP, date, "wolf", count);
 
-        count = corgiUserService.countPreferGroup("奶狗");
+        count = corgiUserService.countPreferGroup("匀称");
         corgiStatisticService.updateMap(CorgiStatistic.PREFER_GROUP, date, "dog", count);
 
-        count = corgiUserService.countPreferGroup("猴子");
+        count = corgiUserService.countPreferGroup("偏瘦");
         corgiStatisticService.updateMap(CorgiStatistic.PREFER_GROUP, date, "monkey", count);
 
     }
@@ -239,27 +239,27 @@ public class CorgiStatisticTask {
     void countUserGroup(String date) {
         UserDetail userDetail = new UserDetail();
 
-        userDetail.setGroup("胖熊");
+        userDetail.setGroup("偏胖");
         long count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.GROUP, date, "pig", count);
 
-        userDetail.setGroup("壮熊");
+        userDetail.setGroup("肉壮");
         count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.GROUP, date, "bear", count);
 
-        userDetail.setGroup("狒狒");
+        userDetail.setGroup("肌肉");
         count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.GROUP, date, "baboon", count);
 
-        userDetail.setGroup("野狼");
+        userDetail.setGroup("精壮");
         count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.GROUP, date, "wolf", count);
 
-        userDetail.setGroup("奶狗");
+        userDetail.setGroup("匀称");
         count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.GROUP, date, "dog", count);
 
-        userDetail.setGroup("猴子");
+        userDetail.setGroup("偏瘦");
         count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.GROUP, date, "monkey", count);
 
