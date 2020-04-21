@@ -1,8 +1,8 @@
 package com.corgi.schedule.service;
 
+import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.common.messages.TraceFollow;
 import com.corgi.user.api.CorgiStatisticService;
-import jdk.nashorn.internal.ir.annotations.Reference;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -20,6 +20,7 @@ public class TaskService {
     private CorgiStatisticService corgiStatisticService;
 
     public void countUserTrace(String date) {
+        log.info("into count user trace...");
         List<HashMap> traces = corgiStatisticService.countUserTrace(date);
         log.info(traces + "...traces");
         Double total = corgiStatisticService.countTotalUserTrace(date);
