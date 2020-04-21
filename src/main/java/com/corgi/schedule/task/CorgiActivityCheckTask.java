@@ -94,15 +94,19 @@ public class CorgiActivityCheckTask {
     private void sendMessage(IAcsClient client, CorgiActivity activity, String userId, String telNo, String time) {
         String key = "activity_check_sent_" + activity.getId() + "_" + userId;
         if (!redisTemplate.hasKey(key)) {
+            String sign = "SMS_187225471";
+            if(telNo.contains("-")){
+                sign = "SMS_188550914";
+            }
             CommonRequest request = new CommonRequest();
             request.setMethod(MethodType.POST);
             request.setDomain("dysmsapi.aliyuncs.com");
             request.setVersion("2017-05-25");
             request.setAction("SendSms");
             request.putQueryParameter("RegionId", "cn-hangzhou");
-            request.putQueryParameter("PhoneNumbers", telNo);
+            request.putQueryParameter("PhoneNumbers", telNo.replaceAll("-",""));
             request.putQueryParameter("SignName", "Corgi");
-            request.putQueryParameter("TemplateCode", "SMS_187225471");
+            request.putQueryParameter("TemplateCode", sign);
             request.putQueryParameter("TemplateParam", "{\"time\":\"" + time + "\",\"name\":\"" + activity.getAddress() + "\"}");
             try {
                 CommonResponse response = client.getCommonResponse(request);
