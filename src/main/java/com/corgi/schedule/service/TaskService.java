@@ -25,6 +25,7 @@ public class TaskService {
         corgiStatisticService.addUserTraceSum(date, TraceFollow.TOTAL, total);
         if (!CollectionUtils.isEmpty(traces)) {
             for (HashMap trace : traces) {
+                log.info("trace..." + trace);
                 corgiStatisticService.addUserTraceSum(date, (String) trace.get("type"), Double.parseDouble(trace.get("time") + ""));
             }
         }

@@ -57,6 +57,7 @@ public class ScriptController {
 
     @GetMapping("add_user_trace")
     public String addUserTrace(@RequestParam("date") String date){
+        log.info("into add_user_trace....");
         taskService.countUserTrace(date);
         return "success";
     }
