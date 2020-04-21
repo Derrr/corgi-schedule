@@ -58,12 +58,12 @@ public class ScriptController {
     @GetMapping("add_user_trace")
     public String addUserTrace(@RequestParam("date") String date){
         taskService.countUserTrace(date);
-        return "";
+        return "success";
     }
 
     @GetMapping("repair_birthday")
     public String repairBirthday() {
-        for (int i = 0; i < 4210; i++) {
+        for (int i = 0; i < 10; i++) {
             log.info("getting user id..." + i);
             UserDetail userDetail = corgiUserService.getUserDetail(i + "", "");
             if (userDetail != null && !StringUtils.isEmpty(userDetail.getBirthday())) {
