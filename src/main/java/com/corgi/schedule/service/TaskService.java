@@ -21,6 +21,7 @@ public class TaskService {
 
     public void countUserTrace(String date) {
         List<HashMap> traces = corgiStatisticService.countUserTrace(date);
+        log.info(traces + "...traces");
         Double total = corgiStatisticService.countTotalUserTrace(date);
         corgiStatisticService.addUserTraceSum(date, TraceFollow.TOTAL, total);
         if (!CollectionUtils.isEmpty(traces)) {
