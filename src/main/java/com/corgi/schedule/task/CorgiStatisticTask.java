@@ -5,6 +5,7 @@ import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.common.messages.TraceFollow;
 import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.MapService;
+import com.corgi.schedule.service.TaskService;
 import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiToolService;
 import com.corgi.user.api.CorgiUserService;
@@ -37,6 +38,8 @@ public class CorgiStatisticTask {
     private CorgiToolService corgiToolService;
     @Autowired
     private MapService mapService;
+    @Autowired
+    private TaskService taskService;
 
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
@@ -78,15 +81,8 @@ public class CorgiStatisticTask {
         countUserTrace(today);
     }
 
-    void countUserTrace(String date) {
-        List<HashMap> traces = corgiStatisticService.countUserTrace(date);
-        Double total = corgiStatisticService.countTotalUserTrace(date);
-        corgiStatisticService.addUserTraceSum(date, TraceFollow.TOTAL, total);
-        if (!CollectionUtils.isEmpty(traces)) {
-            for (HashMap trace : traces) {
-                corgiStatisticService.addUserTraceSum(date, (String) trace.get("type"), Double.parseDouble(trace.get("time") + ""));
-            }
-        }
+    public void countUserTrace(String date) {
+        taskService.countUserTrace(date);
     }
 
     void countUserStay(Calendar calendar, String date, long zero) {

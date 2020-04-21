@@ -5,6 +5,8 @@ import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.MapService;
+import com.corgi.schedule.service.TaskService;
+import com.corgi.schedule.task.CorgiStatisticTask;
 import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserDetail;
@@ -37,6 +39,8 @@ public class ScriptController {
     private RedisTemplate redisTemplate;
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private TaskService taskService;
 
     @GetMapping("init_station")
     public String initStation(@RequestParam("city") String city) {
@@ -49,6 +53,12 @@ public class ScriptController {
         matchRefresher.setUserId(userId);
         rabbitTemplate.convertAndSend(CorgiQueueName.REFRESH_MATCH_QUEUE, matchRefresher);
         return "success";
+    }
+
+    @GetMapping("add_user_trace")
+    public String addUserTrace(@RequestParam("date") String date){
+        taskService.countUserTrace(date);
+        return "";
     }
 
     @GetMapping("repair_birthday")
