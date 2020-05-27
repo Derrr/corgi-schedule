@@ -68,6 +68,8 @@ public class CorgiSystemMessageTask {
         if (!CollectionUtils.isEmpty(systemMessageList)) {
             for (SystemMessage systemMessage : systemMessageList) {
                 sendMessages(systemMessage);
+                systemMessage.setStatus(SystemMessage.STATUS_SENT);
+                corgiSystemMessageService.updateSystemMessage(systemMessage);
             }
         }
     }
