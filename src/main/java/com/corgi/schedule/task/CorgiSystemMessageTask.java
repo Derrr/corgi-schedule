@@ -67,9 +67,9 @@ public class CorgiSystemMessageTask {
         List<SystemMessage> systemMessageList = corgiSystemMessageService.getSystemMessagesByTime(System.currentTimeMillis());
         if (!CollectionUtils.isEmpty(systemMessageList)) {
             for (SystemMessage systemMessage : systemMessageList) {
-                sendMessages(systemMessage);
                 systemMessage.setStatus(SystemMessage.STATUS_SENT);
                 corgiSystemMessageService.updateSystemMessage(systemMessage);
+                sendMessages(systemMessage);
             }
         }
     }
