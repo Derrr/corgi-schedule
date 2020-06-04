@@ -91,7 +91,7 @@ public class CorgiSystemMessageTask {
                     MessageRecord messageRecord = new MessageRecord();
                     messageRecord.setMessageId(systemMessage.getId());
                     messageRecord.setStatus("sending");
-                    messageRecord.setNickName(userProfile.getNickname());
+                    messageRecord.setNickname(userProfile.getNickname());
                     messageRecord.setUserId(userProfile.getUserId());
                     corgiSystemMessageService.addMessageRecord(messageRecord);
                 });
