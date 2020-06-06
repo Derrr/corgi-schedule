@@ -3,12 +3,14 @@ package com.corgi.schedule.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
+import com.corgi.schedule.service.HxPushMessageService;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.MapService;
 import com.corgi.schedule.service.TaskService;
 import com.corgi.schedule.task.CorgiStatisticTask;
 import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.SystemMessage;
 import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,10 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author tairanliu
@@ -35,6 +40,8 @@ public class ScriptController {
     private CorgiUserMatchService corgiUserMatchService;
     @Reference
     private CorgiUserService corgiUserService;
+    @Autowired
+    private HxPushMessageService hxPushMessageService;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -52,6 +59,20 @@ public class ScriptController {
         MatchRefresher matchRefresher = new MatchRefresher();
         matchRefresher.setUserId(userId);
         rabbitTemplate.convertAndSend(CorgiQueueName.REFRESH_MATCH_QUEUE, matchRefresher);
+        return "success";
+    }
+
+    @PostMapping("push_message")
+    public String pushMessage(@RequestBody HashMap hashMap) {
+        String userId = (String) hashMap.get("userId");
+        String content = (String) hashMap.get("content");
+        HashMap extra = (HashMap) hashMap.get("extra");
+        SystemMessage systemMessage = new SystemMessage();
+        systemMessage.setContent(content);
+        if (extra != null) {
+            extra = new HashMap();
+        }
+        hxPushMessageService.sendMessage(systemMessage, Arrays.asList(userId), extra);
         return "success";
     }
 
