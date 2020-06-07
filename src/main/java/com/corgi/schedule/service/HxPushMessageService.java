@@ -2,6 +2,7 @@ package com.corgi.schedule.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.corgi.user.entity.SystemMessage;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -13,6 +14,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -30,6 +32,7 @@ public class HxPushMessageService {
     private String appName = "corgi";
     private static final String HOST = "https://a1.easemob.com/";
     private static final String MESSAGE_URL = "/messages";
+    private static final String TOKEN_URL = "/token";
     private final static PoolingHttpClientConnectionManager poolConnManager = new PoolingHttpClientConnectionManager();
     public static ThreadLocal<String> RESULT = new ThreadLocal<>();
 
@@ -49,11 +52,11 @@ public class HxPushMessageService {
     }
 
     public boolean sendMessage(SystemMessage systemMessage, List<String> userIds) {
-        return sendMessage(systemMessage, userIds, new HashMap());
+        return !"false".equals(sendMessage(systemMessage, userIds, new HashMap()));
     }
 
 
-    public boolean sendMessage(SystemMessage systemMessage, List<String> userIds, HashMap msg) {
+    public String sendMessage(SystemMessage systemMessage, List<String> userIds, HashMap msg) {
         String url = HOST + orgName + "/" + appName + MESSAGE_URL;
         HashMap message = new HashMap();
         message.put("target_type", "users");
@@ -61,10 +64,27 @@ public class HxPushMessageService {
         msg.put("msg", systemMessage.getContent());
         msg.put("type", "txt");
         message.put("msg", msg);
-        return this.postJson(url, message);
+        String token = getToken();
+        JSONObject object = JSONObject.parseObject(token);
+        try {
+            String accessToken = object.getString("access_token");
+            return this.postJson(url, message, accessToken);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+        return "false";
     }
 
-    public boolean postJson(String url, HashMap message) {
+    public String getToken() {
+        String url = HOST + orgName + "/" + appName + TOKEN_URL;
+        HashMap message = new HashMap();
+        message.put("grant_type", "client_credentials");
+        message.put("client_id", "YXA6NW6WhxTlSd6PW28d8s2geQ");
+        message.put("client_secret", "YXA6bXC8NAPVUHKlxTlhCSSZOVwyiAQ");
+        return this.postJson(url, message, null);
+    }
+
+    public String postJson(String url, HashMap message, String token) {
         String result = null;
         CloseableHttpClient httpClient = getCloseableHttpClient();
         HttpPost httpPost = new HttpPost(url);
@@ -73,6 +93,9 @@ public class HxPushMessageService {
 
             httpPost.setHeader("Accept", "application/json;charset=UTF-8");
             httpPost.setHeader("Content-Type", "application/json");
+            if (!StringUtils.isEmpty(token)) {
+                httpPost.setHeader("Authorization", "Bearer " + token);
+            }
 
             StringEntity stringEntity = new StringEntity(JSONObject.toJSONString(message));
             stringEntity.setContentType("application/json;charset=UTF-8");
@@ -80,13 +103,13 @@ public class HxPushMessageService {
             httpPost.setEntity(stringEntity);
             response = httpClient.execute(httpPost);
             if (response != null && response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                result = EntityUtils.toString(response.getEntity(), Charset.defaultCharset());
                 log.info("请求成功：{}", result);
                 response.getEntity().getContent().close();
-                return true;
+                return result;
             } else if (response != null) {
                 result = EntityUtils.toString(response.getEntity(), Charset.defaultCharset());
                 log.error("请求 {} 获取失败, 状态异常：{} 返回结果: {}", url, response.getStatusLine().getStatusCode(), result);
-
             }
 
         } catch (IOException e) {
@@ -108,6 +131,6 @@ public class HxPushMessageService {
             }
         }
         RESULT.set(result);
-        return false;
+        return "false";
     }
 }
