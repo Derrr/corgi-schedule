@@ -56,14 +56,16 @@ public class HxPushMessageService {
     }
 
 
-    public String sendMessage(SystemMessage systemMessage, List<String> userIds, HashMap msg) {
+    public String sendMessage(SystemMessage systemMessage, List<String> userIds, HashMap extra) {
         String url = HOST + orgName + "/" + appName + MESSAGE_URL;
         HashMap message = new HashMap();
         message.put("target_type", "users");
         message.put("target", userIds);
+        HashMap msg = new HashMap();
         msg.put("msg", systemMessage.getContent());
         msg.put("type", "txt");
         message.put("msg", msg);
+        message.put("ext", extra);
         String token = getToken();
         JSONObject object = JSONObject.parseObject(token);
         try {
