@@ -70,7 +70,7 @@ public class ScriptController {
         SystemMessage systemMessage = new SystemMessage();
         systemMessage.setContent(content);
         log.info("extra: {} ", extra);
-        if (extra != null) {
+        if (extra == null) {
             extra = new HashMap();
         }
         hxPushMessageService.sendMessage(systemMessage, Arrays.asList(userId), extra);
