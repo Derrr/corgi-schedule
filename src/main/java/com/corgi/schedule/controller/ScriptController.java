@@ -69,6 +69,7 @@ public class ScriptController {
         HashMap extra = (HashMap) hashMap.get("extra");
         SystemMessage systemMessage = new SystemMessage();
         systemMessage.setContent(content);
+        log.info("extra: {} ", extra);
         if (extra != null) {
             extra = new HashMap();
         }
