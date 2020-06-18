@@ -72,7 +72,7 @@ public class CorgiStatisticTask {
         tmp.setTimeInMillis(time);
         countUserAge(tmp, today);
         countActivityType(today);
-        countUserCity(today);
+        //countUserCity(today);
 
         tmp = Calendar.getInstance();
         tmp.setTimeInMillis(time);
@@ -91,34 +91,6 @@ public class CorgiStatisticTask {
             String registerDate = dau_sdf.format(calendar.getTime());
             long count = corgiUserService.countUserStay(zero, registerDate);
             corgiStatisticService.addUserStay(date, registerDate, i + "", count);
-        }
-    }
-
-    void countUserCity(String date) {
-        int page = 1;
-        int pageSize = 100;
-        HashMap<String, Long> resultMap = new HashMap<>();
-        while (true) {
-            List<UserPosition> userPositions = corgiUserService.getUserPositionByPage(page, pageSize);
-            if (CollectionUtils.isEmpty(userPositions)) {
-                break;
-            }
-            for (UserPosition userPosition : userPositions) {
-                String cityName = mapService.getCity(userPosition.getLat(), userPosition.getLng());
-                if (!StringUtils.isEmpty(cityName)) {
-                    Long count = resultMap.get(cityName);
-                    if (count == null) {
-                        count = 0L;
-                    }
-                    resultMap.put(cityName, ++count);
-                }
-            }
-            page++;
-        }
-        if (!CollectionUtils.isEmpty(resultMap)) {
-            for (Map.Entry<String, Long> entry : resultMap.entrySet()) {
-                corgiStatisticService.addList(CorgiStatistic.USER_CITY, date, entry.getKey(), entry.getValue());
-            }
         }
     }
 

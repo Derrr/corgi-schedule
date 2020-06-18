@@ -98,7 +98,7 @@ public class HxPushMessageService {
             if (!StringUtils.isEmpty(token)) {
                 httpPost.setHeader("Authorization", "Bearer " + token);
             }
-
+            log.info("request: {} ", JSONObject.toJSONString(message));
             StringEntity stringEntity = new StringEntity(JSONObject.toJSONString(message));
             stringEntity.setContentType("application/json;charset=UTF-8");
 
