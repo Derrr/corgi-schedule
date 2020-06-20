@@ -44,24 +44,27 @@ public class CorgiSystemMessageTask {
     private HxPushMessageService hxPushMessageService;
 
     @Async
-    @Scheduled(cron = "0 0/10 * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void run() {
+        log.info("start sending...");
         List<SystemMessage> systemMessageList = corgiSystemMessageService.getSystemMessagesByTime(System.currentTimeMillis());
+        log.info("sending {} ",systemMessageList.size());
         if (!CollectionUtils.isEmpty(systemMessageList)) {
             for (SystemMessage systemMessage : systemMessageList) {
-                systemMessage.setStatus(SystemMessage.STATUS_SENT);
+                systemMessage.setStatus("sending");
                 corgiSystemMessageService.updateSystemMessage(systemMessage);
+            }
+            for (SystemMessage systemMessage : systemMessageList) {
+                log.info("sending {} ",systemMessage.getContent());
                 sendMessages(systemMessage);
             }
         }
     }
 
     public void sendMessages(SystemMessage systemMessage) {
-        systemMessage.setStatus(SystemMessage.STATUS_SENT);
-        corgiSystemMessageService.updateSystemMessage(systemMessage);
         List<MessageRule> messageRules = corgiSystemMessageService.getMessageRule(systemMessage.getId());
         int page = 1;
-        int pageSize = 500;
+        int pageSize = 1;
         if (!CollectionUtils.isEmpty(messageRules)) {
             UserDetail userDetail = getUserQuery(messageRules);
             do {
@@ -100,6 +103,8 @@ public class CorgiSystemMessageTask {
                 break;
             } while (true);
         }
+        systemMessage.setStatus(SystemMessage.STATUS_SENT);
+        corgiSystemMessageService.updateSystemMessage(systemMessage);
     }
 
     public UserDetail getUserQuery(List<MessageRule> messageRules) {
