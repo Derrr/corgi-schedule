@@ -88,6 +88,7 @@ public class CorgiSystemMessageTask {
                         messageRecord.setMessageId(systemMessage.getId());
                         messageRecord.setStatus("success");
                         messageRecord.setUserId(userProfile.getUserId());
+                        corgiSystemMessageService.updateMessageRecord(messageRecord);
                     });
                 } else {
                     userProfiles.forEach(userProfile -> {
@@ -96,6 +97,7 @@ public class CorgiSystemMessageTask {
                         messageRecord.setStatus("failed");
                         messageRecord.setReason(HxPushMessageService.RESULT.get());
                         messageRecord.setUserId(userProfile.getUserId());
+                        corgiSystemMessageService.updateMessageRecord(messageRecord);
                     });
                 }
                 page++;
