@@ -51,8 +51,10 @@ public class CorgiSystemMessageTask {
         log.info("sending {} ",systemMessageList.size());
         if (!CollectionUtils.isEmpty(systemMessageList)) {
             for (SystemMessage systemMessage : systemMessageList) {
-                systemMessage.setStatus("sending");
-                corgiSystemMessageService.updateSystemMessage(systemMessage);
+                SystemMessage updateMessage = new SystemMessage();
+                updateMessage.setId(systemMessage.getId());
+                updateMessage.setStatus("sending");
+                corgiSystemMessageService.updateSystemMessage(updateMessage);
             }
             for (SystemMessage systemMessage : systemMessageList) {
                 log.info("sending {} ",systemMessage.getContent());
@@ -103,8 +105,10 @@ public class CorgiSystemMessageTask {
                 break;
             } while (true);
         }
-        systemMessage.setStatus(SystemMessage.STATUS_SENT);
-        corgiSystemMessageService.updateSystemMessage(systemMessage);
+        SystemMessage updateMessage = new SystemMessage();
+        updateMessage.setId(systemMessage.getId());
+        updateMessage.setStatus(SystemMessage.STATUS_SENT);
+        corgiSystemMessageService.updateSystemMessage(updateMessage);
     }
 
     public UserDetail getUserQuery(List<MessageRule> messageRules) {
