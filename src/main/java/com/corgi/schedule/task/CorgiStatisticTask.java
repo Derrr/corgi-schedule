@@ -78,7 +78,7 @@ public class CorgiStatisticTask {
         tmp.setTimeInMillis(time);
         countUserStay(calendar, today, zero);
 
-        countUserTrace(today);
+        //countUserTrace(today);
     }
 
     public void countUserTrace(String date) {
