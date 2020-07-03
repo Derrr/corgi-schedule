@@ -73,7 +73,7 @@ public class CorgiSystemMessageTask {
             UserDetail userDetail = getUserQuery(messageRules);
             do {
                 List<UserProfile> userProfiles;
-                if (StringUtils.isEmpty(userDetail.getNickname())) {
+                if (!StringUtils.isEmpty(userDetail.getNickname())) {
                     userProfiles = corgiUserService.searchUsers(userDetail, null, 1, 100);
                     for (UserProfile userProfile : userProfiles) {
                         if (userDetail.getNickname().equals(userProfile.getNickname())) {
