@@ -21,10 +21,12 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +50,7 @@ public class CorgiSystemMessageTask {
     public void run() {
         log.info("start sending...");
         List<SystemMessage> systemMessageList = corgiSystemMessageService.getSystemMessagesByTime(System.currentTimeMillis());
-        log.info("sending {} ",systemMessageList.size());
+        log.info("sending {} ", systemMessageList.size());
         if (!CollectionUtils.isEmpty(systemMessageList)) {
             for (SystemMessage systemMessage : systemMessageList) {
                 SystemMessage updateMessage = new SystemMessage();
@@ -57,7 +59,7 @@ public class CorgiSystemMessageTask {
                 corgiSystemMessageService.updateSystemMessage(updateMessage);
             }
             for (SystemMessage systemMessage : systemMessageList) {
-                log.info("sending {} ",systemMessage.getContent());
+                log.info("sending {} ", systemMessage.getContent());
                 sendMessages(systemMessage);
             }
         }
@@ -70,7 +72,18 @@ public class CorgiSystemMessageTask {
         if (!CollectionUtils.isEmpty(messageRules)) {
             UserDetail userDetail = getUserQuery(messageRules);
             do {
-                List<UserProfile> userProfiles = corgiUserService.searchUsers(userDetail, null, page, pageSize);
+                List<UserProfile> userProfiles;
+                if (StringUtils.isEmpty(userDetail.getNickname())) {
+                    userProfiles = corgiUserService.searchUsers(userDetail, null, 1, 100);
+                    for (UserProfile userProfile : userProfiles) {
+                        if (userDetail.getNickname().equals(userProfile.getNickname())) {
+                            userProfiles = Arrays.asList(userProfile);
+                            break;
+                        }
+                    }
+                } else {
+                    userProfiles = corgiUserService.searchUsers(userDetail, null, page, pageSize);
+                }
                 if (CollectionUtils.isEmpty(userProfiles)) {
                     break;
                 }
