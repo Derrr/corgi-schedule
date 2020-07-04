@@ -3,6 +3,7 @@ package com.corgi.schedule.controller;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
+import com.corgi.common.messages.PushMessage;
 import com.corgi.schedule.service.HxPushMessageService;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.MapService;
@@ -48,6 +49,8 @@ public class ScriptController {
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private TaskService taskService;
+    @Autowired
+    private MQService mqService;
 
     @GetMapping("init_station")
     public String initStation(@RequestParam("city") String city) {
@@ -76,6 +79,27 @@ public class ScriptController {
         hxPushMessageService.sendMessage(systemMessage, Arrays.asList(userId), extra);
         return "success";
     }
+
+
+    @PostMapping("push_mq_message")
+    public String pushMQMessage(@RequestBody HashMap hashMap) {
+        String userId = (String) hashMap.get("userId");
+        String content = (String) hashMap.get("content");
+        HashMap extra = (HashMap) hashMap.get("extra");
+        if (extra == null) {
+            extra = new HashMap();
+        }
+
+        SystemMessage systemMessage = new SystemMessage();
+        systemMessage.setContent(content);
+        PushMessage pushMessage = new PushMessage();
+        pushMessage.setTargetUserId(userId);
+        pushMessage.setMessage(content);
+        pushMessage.setExtra(extra);
+        mqService.sendMessage(pushMessage);
+        return "success";
+    }
+
 
     @GetMapping("add_user_trace")
     public String addUserTrace(@RequestParam("date") String date) {
