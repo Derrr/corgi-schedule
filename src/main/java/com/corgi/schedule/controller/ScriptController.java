@@ -94,7 +94,9 @@ public class ScriptController {
         SystemMessage systemMessage = new SystemMessage();
         systemMessage.setContent(content);
         PushMessage pushMessage = new PushMessage();
+        pushMessage.setSourceUserId("1");
         pushMessage.setTargetUserId(userId);
+        pushMessage.setType(type);
         pushMessage.setMessage(content);
         pushMessage.setExtra(extra);
         mqService.sendMessage(pushMessage);
