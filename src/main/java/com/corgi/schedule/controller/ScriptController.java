@@ -86,6 +86,7 @@ public class ScriptController {
         String userId = (String) hashMap.get("userId");
         String content = (String) hashMap.get("content");
         HashMap extra = (HashMap) hashMap.get("extra");
+        String type = (String) hashMap.get("type");
         if (extra == null) {
             extra = new HashMap();
         }
