@@ -58,7 +58,9 @@ public class HxPushMessageService {
     public String sendMessage(SystemMessage systemMessage, List<String> userIds, HashMap extra) {
         String url = HOST + orgName + "/" + appName + MESSAGE_URL;
         HashMap message = new HashMap();
-        extra.put("em_apns_ext", "自定义推送显示");
+        HashMap apnsContent = new HashMap();
+        apnsContent.put("em_push_content","自定义推送显示");
+        extra.put("em_apns_ext", apnsContent);
         message.put("target_type", "users");
         message.put("target", userIds);
         HashMap msg = new HashMap();
