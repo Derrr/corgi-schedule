@@ -69,7 +69,11 @@ public class HxPushMessageService {
         message.put("target_type", "users");
         message.put("target", userIds);
         HashMap msg = new HashMap();
-        msg.put("msg", systemMessage.getContent());
+        try {
+            msg.put("msg",new String(systemMessage.getContent().getBytes(),"UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         msg.put("type", "txt");
         message.put("msg", msg);
         message.put("ext", extra);
