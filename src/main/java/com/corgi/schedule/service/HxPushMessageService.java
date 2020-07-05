@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.List;
@@ -59,7 +60,11 @@ public class HxPushMessageService {
         String url = HOST + orgName + "/" + appName + MESSAGE_URL;
         HashMap message = new HashMap();
         HashMap apnsContent = new HashMap();
-        apnsContent.put("em_push_content","自定义推送显示");
+        try {
+            apnsContent.put("em_push_content",new String("自定义推送显示".getBytes(),"UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         extra.put("em_apns_ext", apnsContent);
         message.put("target_type", "users");
         message.put("target", userIds);
