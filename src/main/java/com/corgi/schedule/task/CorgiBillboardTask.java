@@ -63,12 +63,14 @@ public class CorgiBillboardTask {
         UserDetail searchUser = new UserDetail();
         searchUser.setRole("1");
         List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 72);
+        int total = 0;
         int i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (userIds.contains(userProfile.getUserId())) {
                 continue;
             }
             i++;
+            total++;
             if (i >= 2) {
                 break;
             }
@@ -76,12 +78,14 @@ public class CorgiBillboardTask {
             corgiBillboardService.addBillboard(userProfile, date, "fans1");
         }
         searchUser.setRole("0");
+        i = 0;
         userProfiles = corgiBillboardService.getPopularUser(searchUser, 74);
         for (UserProfile userProfile : userProfiles) {
             if (userIds.contains(userProfile.getUserId())) {
                 continue;
             }
             i++;
+            total++;
             if (i >= 2) {
                 break;
             }
@@ -95,6 +99,7 @@ public class CorgiBillboardTask {
                 continue;
             }
             i++;
+            total++;
             userIds.add(userProfile.getUserId());
             corgiBillboardService.addBillboard(userProfile, date, "follow");
             if (i >= 2) {
@@ -108,23 +113,24 @@ public class CorgiBillboardTask {
                 continue;
             }
             i++;
+            total++;
             userIds.add(userProfile.getUserId());
             corgiBillboardService.addBillboard(userProfile, date, "active");
             if (i >= 4) {
                 break;
             }
         }
-        if (userIds.size() < 10) {
+        if (total < 10) {
             searchUser.setRole(null);
             userProfiles = corgiBillboardService.getPopularUser(searchUser, 80);
             for (UserProfile userProfile : userProfiles) {
                 if (userIds.contains(userProfile.getUserId())) {
                     continue;
                 }
-                i++;
+                total++;
                 userIds.add(userProfile.getUserId());
                 corgiBillboardService.addBillboard(userProfile, date, "fanstotal");
-                if (userIds.size() >= 10) {
+                if (total >= 10) {
                     break;
                 }
             }
