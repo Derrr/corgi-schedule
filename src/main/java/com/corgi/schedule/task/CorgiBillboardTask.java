@@ -69,6 +69,9 @@ public class CorgiBillboardTask {
                 continue;
             }
             i++;
+            if (i >= 2) {
+                break;
+            }
             userIds.add(userProfile.getUserId());
             corgiBillboardService.addBillboard(userProfile, date, "fans1");
         }
@@ -79,6 +82,9 @@ public class CorgiBillboardTask {
                 continue;
             }
             i++;
+            if (i >= 2) {
+                break;
+            }
             userIds.add(userProfile.getUserId());
             corgiBillboardService.addBillboard(userProfile, date, "fans0");
         }
