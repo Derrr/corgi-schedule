@@ -71,11 +71,11 @@ public class CorgiBillboardTask {
             }
             i++;
             total++;
+            userIds.add(userProfile.getUserId());
+            corgiBillboardService.addBillboard(userProfile, date, "fans1");
             if (i >= 2) {
                 break;
             }
-            userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "fans1");
         }
         searchUser.setRole("0");
         i = 0;
@@ -86,11 +86,11 @@ public class CorgiBillboardTask {
             }
             i++;
             total++;
+            userIds.add(userProfile.getUserId());
+            corgiBillboardService.addBillboard(userProfile, date, "fans0");
             if (i >= 2) {
                 break;
             }
-            userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "fans0");
         }
         userProfiles = corgiBillboardService.getPassionUser(searchUser, 76);
         i = 0;
