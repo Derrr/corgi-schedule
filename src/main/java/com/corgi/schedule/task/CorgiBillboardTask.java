@@ -100,7 +100,7 @@ public class CorgiBillboardTask {
                 }
                 i++;
                 userIds.add(userProfile.getUserId());
-                corgiBillboardService.addBillboard(userProfile, date, "active");
+                corgiBillboardService.addBillboard(userProfile, date, "fanstotal");
                 if (userIds.size() >= 10) {
                     break;
                 }
