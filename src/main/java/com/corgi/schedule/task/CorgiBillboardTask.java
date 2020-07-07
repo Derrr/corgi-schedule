@@ -44,8 +44,8 @@ public class CorgiBillboardTask {
     private CorgiBillboardService corgiBillboardService;
 
     @Async
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
-    //@Scheduled(cron = "0 55 23 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 55 23 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
