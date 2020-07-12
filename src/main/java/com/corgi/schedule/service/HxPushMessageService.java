@@ -65,7 +65,7 @@ public class HxPushMessageService {
         HashMap message = new HashMap();
         HashMap apnsContent = new HashMap();
         try {
-            apnsContent.put("em_push_content", new String("自定义推送显示".getBytes(), "UTF-8"));
+            apnsContent.put("em_push_content", new String(systemMessage.getContent().getBytes(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
