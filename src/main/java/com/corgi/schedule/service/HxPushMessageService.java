@@ -57,20 +57,25 @@ public class HxPushMessageService {
 
 
     public String sendMessage(SystemMessage systemMessage, List<String> userIds, HashMap extra) {
+        String from = systemMessage.getFrom();
+        if (StringUtils.isEmpty(from)) {
+            from = "corgihelper";
+        }
         String url = HOST + orgName + "/" + appName + MESSAGE_URL;
         HashMap message = new HashMap();
         HashMap apnsContent = new HashMap();
         try {
-            apnsContent.put("em_push_content",new String("自定义推送显示".getBytes(),"UTF-8"));
+            apnsContent.put("em_push_content", new String("自定义推送显示".getBytes(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         extra.put("em_apns_ext", apnsContent);
         message.put("target_type", "users");
         message.put("target", userIds);
+        message.put("from", from);
         HashMap msg = new HashMap();
         try {
-            msg.put("msg",new String(systemMessage.getContent().getBytes(),"UTF-8"));
+            msg.put("msg", new String(systemMessage.getContent().getBytes(), "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
