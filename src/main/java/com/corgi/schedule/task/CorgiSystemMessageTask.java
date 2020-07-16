@@ -68,7 +68,7 @@ public class CorgiSystemMessageTask {
     public void sendMessages(SystemMessage systemMessage) {
         List<MessageRule> messageRules = corgiSystemMessageService.getMessageRule(systemMessage.getId());
         int page = 1;
-        int pageSize = 1;
+        int pageSize = 100;
         if (!CollectionUtils.isEmpty(messageRules)) {
             UserDetail userDetail = getUserQuery(messageRules);
             do {
