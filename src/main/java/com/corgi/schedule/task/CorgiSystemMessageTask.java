@@ -129,6 +129,7 @@ public class CorgiSystemMessageTask {
 
     public UserDetail getUserQuery(List<MessageRule> messageRules) {
         UserDetail userDetail = new UserDetail();
+        userDetail.setVersion("1.4.4");
         for (MessageRule messageRule : messageRules) {
             if ("nickname".equals(messageRule.getRuleKey())) {
                 userDetail.setNickname(messageRule.getRuleValue());
