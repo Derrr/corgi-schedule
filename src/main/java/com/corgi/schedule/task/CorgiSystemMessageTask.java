@@ -87,6 +87,8 @@ public class CorgiSystemMessageTask {
                 if (CollectionUtils.isEmpty(userProfiles)) {
                     break;
                 }
+                log.info("sending user profiles... {} ", userProfiles.size());
+                List<String> userIds = new ArrayList<>();
                 userProfiles.forEach(userProfile -> {
                     MessageRecord messageRecord = new MessageRecord();
                     messageRecord.setMessageId(systemMessage.getId());
@@ -94,8 +96,10 @@ public class CorgiSystemMessageTask {
                     messageRecord.setNickname(userProfile.getNickname());
                     messageRecord.setUserId(userProfile.getUserId());
                     corgiSystemMessageService.addMessageRecord(messageRecord);
+                    log.info("prepare sending to... {} ", userProfile.getNickname());
+                    userIds.add("corgi" + userProfile.getUserId());
                 });
-                if (hxPushMessageService.sendMessage(systemMessage, Arrays.asList("corgi" + userProfiles.get(0).getUserId()))) {
+                if (hxPushMessageService.sendMessage(systemMessage, userIds)) {
                     userProfiles.forEach(userProfile -> {
                         MessageRecord messageRecord = new MessageRecord();
                         messageRecord.setMessageId(systemMessage.getId());
@@ -114,10 +118,7 @@ public class CorgiSystemMessageTask {
                     });
                 }
                 page++;
-                if (userProfiles.size() < pageSize) {
-                    break;
-                }
-                break;
+                //break;
             } while (true);
         }
         SystemMessage updateMessage = new SystemMessage();
