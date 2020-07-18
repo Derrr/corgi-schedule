@@ -153,6 +153,7 @@ public class ScriptController {
         int page = 1;
         int pageSize = 1000;
         Long minUptime = 999999999999999999L;
+        Long maxUptime = 0L;
         long peopleCount = 0;
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
@@ -177,13 +178,16 @@ public class ScriptController {
                             minUptime = uptime;
                         }
                         log.info("exist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
+                    } else if (userPosition.getUptime() > maxUptime) {
+                        maxUptime = userPosition.getUptime();
+                        log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
                     }
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
-        log.info("min uptime ..... {} , {}", minUptime, peopleCount);
-        return minUptime + "-" + peopleCount;
+        log.info("min: {} count: {} max: {}", minUptime, peopleCount, maxUptime);
+        return minUptime + "-" + peopleCount + "-" + maxUptime;
     }
 
     @GetMapping("clear_keys")
