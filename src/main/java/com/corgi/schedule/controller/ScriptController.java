@@ -153,6 +153,7 @@ public class ScriptController {
         int page = 1;
         int pageSize = 1000;
         Long minUptime = 999999999999999999L;
+        long peopleCount = 0;
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
@@ -170,6 +171,7 @@ public class ScriptController {
                     }
                     List<Point> points = redisTemplate.opsForGeo().position("user", userPosition.getUserId());
                     if (!CollectionUtils.isEmpty(points)) {
+                        peopleCount++;
                         Long uptime = userPosition.getUptime();
                         if (uptime < minUptime) {
                             minUptime = uptime;
@@ -180,8 +182,8 @@ public class ScriptController {
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
-        log.info("min uptime ..... {}", minUptime);
-        return minUptime+"";
+        log.info("min uptime ..... {} , {}", minUptime, peopleCount);
+        return minUptime + "-" + peopleCount;
     }
 
     @GetMapping("clear_keys")
