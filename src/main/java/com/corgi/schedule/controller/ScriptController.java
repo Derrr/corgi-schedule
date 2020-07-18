@@ -152,6 +152,7 @@ public class ScriptController {
         List<UserPosition> userPositionList;
         int page = 1;
         int pageSize = 1000;
+        Long minUptime = 999999999999999999L;
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
@@ -167,10 +168,19 @@ public class ScriptController {
                     if (StringUtils.isEmpty(userPosition.getUserId())) {
                         continue;
                     }
+                    List<Point> points = redisTemplate.opsForGeo().position("user", userPosition.getUserId());
+                    if (!CollectionUtils.isEmpty(points)) {
+                        Long uptime = userPosition.getUptime();
+                        if (uptime < minUptime) {
+                            minUptime = uptime;
+                        }
+                        log.info("exist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
+                    }
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
+        log.info("min uptime ..... {}", minUptime);
         return "success";
     }
 
