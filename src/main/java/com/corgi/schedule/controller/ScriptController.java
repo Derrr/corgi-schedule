@@ -181,7 +181,7 @@ public class ScriptController {
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
         log.info("min uptime ..... {}", minUptime);
-        return "success";
+        return minUptime+"";
     }
 
     @GetMapping("clear_keys")
