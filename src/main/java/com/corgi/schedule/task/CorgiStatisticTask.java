@@ -275,7 +275,7 @@ public class CorgiStatisticTask {
         long postLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_IMAGE);
         corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likecount", postLikeCount);
 
-        long postLikeUserCount = corgiLikeService.countUserLikeByDate(date, CorgiActivity.CAT_IMAGE);
+        long postLikeUserCount = corgiLikeService.countLikeUserByDate(date, CorgiActivity.CAT_IMAGE);
         corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likeuser", postLikeUserCount);
 
         //统计面基
@@ -304,7 +304,7 @@ public class CorgiStatisticTask {
         long meetLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_ACTIVITY);
         corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likecount", meetLikeCount);
 
-        long meetLikeUserCount = corgiLikeService.countUserLikeByDate(date, CorgiActivity.CAT_ACTIVITY);
+        long meetLikeUserCount = corgiLikeService.countLikeUserByDate(date, CorgiActivity.CAT_ACTIVITY);
         corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likeuser", meetLikeUserCount);
 
 
