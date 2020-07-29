@@ -50,8 +50,8 @@ public class CorgiStatisticTask {
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     @Async
-    //@Scheduled(cron = "0 59 23 * * *")
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 59 23 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         Calendar calendar = Calendar.getInstance();
         Long time = calendar.getTimeInMillis();
@@ -60,28 +60,28 @@ public class CorgiStatisticTask {
         String activityToday = activity_sdf.format(date);
         long zero = time / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset();
 
-//        long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
-//        corgiStatisticService.addCount(CorgiStatistic.DAU, today, dau);
-//
-//        long register = corgiUserService.countRegisterUser(today);
-//        corgiStatisticService.addCount(CorgiStatistic.REGISTER, today, register);
+        long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
+        corgiStatisticService.addCount(CorgiStatistic.DAU, today, dau);
+
+        long register = corgiUserService.countRegisterUser(today);
+        corgiStatisticService.addCount(CorgiStatistic.REGISTER, today, register);
 
         //long activity = corgiActivityService.countPublishActivity(activityToday);
         //corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
 
         countActivity(today, activityToday);
-//        countSilentUser(zero, today);
-//        countUserRole(today);
-//        countUserGroup(today);
-//        countUserPreferGroup(today);
-//        Calendar tmp = Calendar.getInstance();
-//        tmp.setTimeInMillis(time);
-//        countUserAge(tmp, today);
-//        countActivityType(today);
-//
-//        tmp = Calendar.getInstance();
-//        tmp.setTimeInMillis(time);
-//        countUserStay(calendar, today, zero);
+        countSilentUser(zero, today);
+        countUserRole(today);
+        countUserGroup(today);
+        countUserPreferGroup(today);
+        Calendar tmp = Calendar.getInstance();
+        tmp.setTimeInMillis(time);
+        countUserAge(tmp, today);
+        countActivityType(today);
+
+        tmp = Calendar.getInstance();
+        tmp.setTimeInMillis(time);
+        countUserStay(calendar, today, zero);
 
     }
 
