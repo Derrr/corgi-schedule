@@ -2,13 +2,12 @@ package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.TraceFollow;
 import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.MapService;
 import com.corgi.schedule.service.TaskService;
-import com.corgi.user.api.CorgiStatisticService;
-import com.corgi.user.api.CorgiToolService;
-import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.api.*;
 import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +32,15 @@ public class CorgiStatisticTask {
     @Reference
     private CorgiActivityService corgiActivityService;
     @Reference
+    private CorgiUserActivityService corgiUserActivityService;
+    @Reference
     private CorgiStatisticService corgiStatisticService;
     @Reference
     private CorgiToolService corgiToolService;
+    @Reference
+    private CorgiCommentService corgiCommentService;
+    @Reference
+    private CorgiLikeService corgiLikeService;
     @Autowired
     private MapService mapService;
     @Autowired
@@ -45,8 +50,8 @@ public class CorgiStatisticTask {
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     @Async
-    @Scheduled(cron = "0 59 23 * * *")
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 59 23 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         Calendar calendar = Calendar.getInstance();
         Long time = calendar.getTimeInMillis();
@@ -55,34 +60,29 @@ public class CorgiStatisticTask {
         String activityToday = activity_sdf.format(date);
         long zero = time / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset();
 
-        long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
-        corgiStatisticService.addCount(CorgiStatistic.DAU, today, dau);
+//        long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
+//        corgiStatisticService.addCount(CorgiStatistic.DAU, today, dau);
+//
+//        long register = corgiUserService.countRegisterUser(today);
+//        corgiStatisticService.addCount(CorgiStatistic.REGISTER, today, register);
 
-        long register = corgiUserService.countRegisterUser(today);
-        corgiStatisticService.addCount(CorgiStatistic.REGISTER, today, register);
+        //long activity = corgiActivityService.countPublishActivity(activityToday);
+        //corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
 
-        long activity = corgiActivityService.countPublishActivity(activityToday);
-        corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
+        countActivity(today, activityToday);
+//        countSilentUser(zero, today);
+//        countUserRole(today);
+//        countUserGroup(today);
+//        countUserPreferGroup(today);
+//        Calendar tmp = Calendar.getInstance();
+//        tmp.setTimeInMillis(time);
+//        countUserAge(tmp, today);
+//        countActivityType(today);
+//
+//        tmp = Calendar.getInstance();
+//        tmp.setTimeInMillis(time);
+//        countUserStay(calendar, today, zero);
 
-        countSilentUser(zero, today);
-        countUserRole(today);
-        countUserGroup(today);
-        countUserPreferGroup(today);
-        Calendar tmp = Calendar.getInstance();
-        tmp.setTimeInMillis(time);
-        countUserAge(tmp, today);
-        countActivityType(today);
-        //countUserCity(today);
-
-        tmp = Calendar.getInstance();
-        tmp.setTimeInMillis(time);
-        countUserStay(calendar, today, zero);
-
-        //countUserTrace(today);
-    }
-
-    public void countUserTrace(String date) {
-        taskService.countUserTrace(date);
     }
 
     void countUserStay(Calendar calendar, String date, long zero) {
@@ -255,6 +255,58 @@ public class CorgiStatisticTask {
         userDetail.setRole("0");
         count = corgiUserService.countUsers(userDetail);
         corgiStatisticService.updateMap(CorgiStatistic.ROLE, date, "bottom", count);
+
+    }
+
+    void countActivity(String date, String activityDate) {
+        //统计动态
+        long postCount = corgiUserActivityService.countActivity(date, CorgiActivity.CAT_IMAGE);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "count", postCount);
+
+        long postUserCount = corgiUserActivityService.countActivityUser(date, CorgiActivity.CAT_IMAGE);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "usercount", postUserCount);
+
+        long postCommentCount = corgiCommentService.countCommentByDate(date, CorgiActivity.CAT_IMAGE);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "commentcount", postCommentCount);
+
+        long postCommentUserCount = corgiCommentService.countCommentUserByDate(date, CorgiActivity.CAT_IMAGE);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "commentuser", postCommentUserCount);
+
+        long postLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_IMAGE);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likecount", postLikeCount);
+
+        long postLikeUserCount = corgiLikeService.countUserLikeByDate(date, CorgiActivity.CAT_IMAGE);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likeuser", postLikeUserCount);
+
+        //统计面基
+        long meetCount = corgiUserActivityService.countActivity(date, CorgiActivity.CAT_ACTIVITY);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "count", meetCount);
+
+        long meetUserCount = corgiUserActivityService.countActivityUser(date, CorgiActivity.CAT_ACTIVITY);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "usercount", meetUserCount);
+
+        CorgiActivity countActivity = new CorgiActivity();
+        countActivity.setCategory(CorgiActivity.CAT_ACTIVITY);
+        countActivity.setStatus(CorgiActivity.FULL);
+        countActivity.setUpdateTime(activityDate);
+        long fullCount = corgiActivityService.countCorgiActivity(countActivity);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "fullcount", fullCount);
+
+        long signUpCount = corgiUserActivityService.countSignUpUser(date);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "signcount", signUpCount);
+
+        long meetCommentCount = corgiCommentService.countCommentByDate(date, CorgiActivity.CAT_ACTIVITY);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "commentcount", meetCommentCount);
+
+        long meetCommentUserCount = corgiCommentService.countCommentUserByDate(date, CorgiActivity.CAT_ACTIVITY);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "commentuser", meetCommentUserCount);
+
+        long meetLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_ACTIVITY);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likecount", meetLikeCount);
+
+        long meetLikeUserCount = corgiLikeService.countUserLikeByDate(date, CorgiActivity.CAT_ACTIVITY);
+        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likeuser", meetLikeUserCount);
+
 
     }
 }
