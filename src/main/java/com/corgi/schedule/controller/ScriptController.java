@@ -9,8 +9,11 @@ import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.MapService;
 import com.corgi.schedule.service.TaskService;
 import com.corgi.schedule.task.CorgiStatisticTask;
+import com.corgi.user.api.CorgiAreaService;
+import com.corgi.user.api.CorgiBarService;
 import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.BarProfile;
 import com.corgi.user.entity.SystemMessage;
 import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
@@ -41,6 +44,8 @@ public class ScriptController {
     private CorgiUserMatchService corgiUserMatchService;
     @Reference
     private CorgiUserService corgiUserService;
+    @Reference
+    private CorgiBarService corgiBarService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -195,6 +200,18 @@ public class ScriptController {
     @GetMapping("clear_keys")
     public String clearKeys() {
         corgiUserMatchService.clearMatch();
+        return "success";
+    }
+
+    @GetMapping("init_bar_city")
+    public String initBarCity() {
+        List<BarProfile> barProfiles = corgiBarService.getBarListByCity(null);
+        for (BarProfile bar : barProfiles) {
+            if (StringUtils.isEmpty(bar.getCity())) {
+                bar.setCity(mapService.getCity(bar.getLat(), bar.getLng()));
+                corgiBarService.updateBarProfile(bar);
+            }
+        }
         return "success";
     }
 }
