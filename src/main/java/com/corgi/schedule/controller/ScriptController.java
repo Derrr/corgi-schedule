@@ -207,10 +207,9 @@ public class ScriptController {
     public String initBarCity() {
         List<BarProfile> barProfiles = corgiBarService.getBarListByCity(null);
         for (BarProfile bar : barProfiles) {
-            if (StringUtils.isEmpty(bar.getCity())) {
-                bar.setCity(mapService.getCity(bar.getLat(), bar.getLng()));
-                corgiBarService.updateBarProfile(bar);
-            }
+            String[] cityArr = mapService.getCity(bar.getLat(), bar.getLng()).split("-");
+            bar.setCity(cityArr[cityArr.length - 1]);
+            corgiBarService.updateBarProfile(bar);
         }
         return "success";
     }
