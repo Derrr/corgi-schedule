@@ -1,6 +1,8 @@
 package com.corgi.schedule.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.common.messages.PushMessage;
@@ -46,6 +48,8 @@ public class ScriptController {
     private CorgiUserService corgiUserService;
     @Reference
     private CorgiBarService corgiBarService;
+    @Reference
+    private CorgiActivityService corgiActivityService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -213,4 +217,25 @@ public class ScriptController {
         }
         return "success";
     }
+
+    @GetMapping("init_business_city")
+    public String initBusinessCity() {
+        List<BarProfile> barProfiles = corgiBarService.getBarListByCity(null);
+        for (BarProfile bar : barProfiles) {
+            CorgiActivity query = new CorgiActivity();
+            query.setCategory(CorgiActivity.CAT_BUSINESS);
+            List<CorgiActivity> corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 1000);
+            for (CorgiActivity business : corgiActivities) {
+                if (StringUtils.isEmpty(business.getCity())) {
+                    BarProfile barProfile = corgiBarService.getBarProfile(business.getUserId());
+                    if (barProfile != null && !StringUtils.isEmpty(barProfile.getCity())) {
+                        business.setCity(barProfile.getCity());
+                        corgiActivityService.updateCorgiActivity(business);
+                    }
+                }
+            }
+        }
+        return "success";
+    }
+
 }
