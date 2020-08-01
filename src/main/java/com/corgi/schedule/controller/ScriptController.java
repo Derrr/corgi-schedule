@@ -226,6 +226,7 @@ public class ScriptController {
             query.setCategory(CorgiActivity.CAT_BUSINESS);
             List<CorgiActivity> corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 1000);
             for (CorgiActivity business : corgiActivities) {
+                log.info(business+"");
                 if (StringUtils.isEmpty(business.getCity())) {
                     BarProfile barProfile = corgiBarService.getBarProfile(business.getUserId());
                     if (barProfile != null && !StringUtils.isEmpty(barProfile.getCity())) {
