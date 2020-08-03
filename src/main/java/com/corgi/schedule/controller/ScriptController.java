@@ -218,22 +218,35 @@ public class ScriptController {
         return "success";
     }
 
+    @GetMapping("clear_business_activity")
+    public String clearBusinessActivity() {
+        CorgiActivity query = new CorgiActivity();
+        query.setCategory(CorgiActivity.CAT_BUSINESS);
+        List<CorgiActivity> corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 2000);
+        for (CorgiActivity business : corgiActivities) {
+            log.info("business .. {} ", business);
+            BarProfile barProfile = corgiBarService.getBarProfile(business.getUserId());
+            log.info(" bar ... {} ", barProfile);
+            if (barProfile == null) {
+                corgiActivityService.removeActivity(business.getId());
+            }
+        }
+        return "success";
+    }
+
     @GetMapping("init_business_city")
     public String initBusinessCity() {
-        List<BarProfile> barProfiles = corgiBarService.getBarListByCity(null);
-        for (BarProfile bar : barProfiles) {
-            CorgiActivity query = new CorgiActivity();
-            query.setCategory(CorgiActivity.CAT_BUSINESS);
-            List<CorgiActivity> corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 1000);
-            for (CorgiActivity business : corgiActivities) {
-                log.info("business .. {} ", business);
-                if (StringUtils.isEmpty(business.getCity())) {
-                    BarProfile barProfile = corgiBarService.getBarProfile(business.getUserId());
-                    log.info(" bar ... {} ", barProfile);
-                    if (barProfile != null && !StringUtils.isEmpty(barProfile.getCity())) {
-                        business.setCity(barProfile.getCity());
-                        corgiActivityService.updateCorgiActivity(business);
-                    }
+        CorgiActivity query = new CorgiActivity();
+        query.setCategory(CorgiActivity.CAT_BUSINESS);
+        List<CorgiActivity> corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 1000);
+        for (CorgiActivity business : corgiActivities) {
+            log.info("business .. {} ", business);
+            if (StringUtils.isEmpty(business.getCity())) {
+                BarProfile barProfile = corgiBarService.getBarProfile(business.getUserId());
+                log.info(" bar ... {} ", barProfile);
+                if (barProfile != null && !StringUtils.isEmpty(barProfile.getCity())) {
+                    business.setCity(barProfile.getCity());
+                    corgiActivityService.updateCorgiActivity(business);
                 }
             }
         }
