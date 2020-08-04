@@ -57,7 +57,9 @@ public class CorgiBillboardTask {
         String pastDate = sdf.format(calendar.getTime());
         List<UserProfile> pastUsers = corgiBillboardService.getPastBillboard(pastDate);
         for (UserProfile userProfile : pastUsers) {
-            userIds.add(userProfile.getUserId());
+            if (!"8".equals(userProfile.getUserId())) {
+                userIds.add(userProfile.getUserId());
+            }
         }
 
         UserDetail searchUser = new UserDetail();
