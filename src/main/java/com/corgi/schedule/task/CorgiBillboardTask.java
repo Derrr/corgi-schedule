@@ -49,6 +49,7 @@ public class CorgiBillboardTask {
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
+        userIds.add("8");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -57,9 +58,7 @@ public class CorgiBillboardTask {
         String pastDate = sdf.format(calendar.getTime());
         List<UserProfile> pastUsers = corgiBillboardService.getPastBillboard(pastDate);
         for (UserProfile userProfile : pastUsers) {
-            if (!"8".equals(userProfile.getUserId())) {
-                userIds.add(userProfile.getUserId());
-            }
+            userIds.add(userProfile.getUserId());
         }
 
         UserDetail searchUser = new UserDetail();
