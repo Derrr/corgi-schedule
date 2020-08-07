@@ -72,10 +72,10 @@ public class CorgiSystemMessageTask {
         if (!CollectionUtils.isEmpty(messageRules)) {
             UserDetail userDetail = getUserQuery(messageRules);
             do {
-                List<UserProfile> userProfiles;
+                List<UserProfile> userProfiles = new ArrayList<>();
                 if (!StringUtils.isEmpty(userDetail.getNickname())) {
-                    userProfiles = corgiUserService.searchUsers(userDetail, null, page, pageSize);
-                    for (UserProfile userProfile : userProfiles) {
+                    List<UserProfile> userProfilesTmp = corgiUserService.searchUsers(userDetail, null, page, pageSize);
+                    for (UserProfile userProfile : userProfilesTmp) {
                         if (userDetail.getNickname().equals(userProfile.getNickname())) {
                             userProfiles = Arrays.asList(userProfile);
                             break;
