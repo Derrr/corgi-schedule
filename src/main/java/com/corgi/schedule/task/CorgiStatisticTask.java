@@ -60,8 +60,8 @@ public class CorgiStatisticTask {
         String activityToday = activity_sdf.format(date);
         long zero = time / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset();
 
-        long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
-        corgiStatisticService.addCount(CorgiStatistic.DAU, today, dau);
+//        long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
+//        corgiStatisticService.addCount(CorgiStatistic.DAU, today, dau);
 
         long register = corgiUserService.countRegisterUser(today);
         corgiStatisticService.addCount(CorgiStatistic.REGISTER, today, register);
@@ -70,7 +70,7 @@ public class CorgiStatisticTask {
         //corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
 
         countActivity(today, activityToday);
-        countSilentUser(zero, today);
+        //countSilentUser(zero, today);
         countUserRole(today);
         countUserGroup(today);
         countUserPreferGroup(today);
