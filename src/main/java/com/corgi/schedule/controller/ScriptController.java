@@ -6,15 +6,13 @@ import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.common.messages.PushMessage;
+import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.HxPushMessageService;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.MapService;
 import com.corgi.schedule.service.TaskService;
 import com.corgi.schedule.task.CorgiStatisticTask;
-import com.corgi.user.api.CorgiAreaService;
-import com.corgi.user.api.CorgiBarService;
-import com.corgi.user.api.CorgiUserMatchService;
-import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.api.*;
 import com.corgi.user.entity.BarProfile;
 import com.corgi.user.entity.SystemMessage;
 import com.corgi.user.entity.UserDetail;
@@ -28,6 +26,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +49,8 @@ public class ScriptController {
     private CorgiBarService corgiBarService;
     @Reference
     private CorgiActivityService corgiActivityService;
+    @Reference
+    private CorgiStatisticService corgiStatisticService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -249,6 +250,30 @@ public class ScriptController {
                     corgiActivityService.updateCorgiActivity(business);
                 }
             }
+        }
+        return "success";
+    }
+
+    @GetMapping("count_activity_publish")
+    public String countActivity() {
+        String dateMonthSeven = "2020/07/";
+        String dateMonthSeven1 = "2020-07-";
+        String dateMonthEight = "2020/08/";
+        String dateMonthEight1 = "2020-08-";
+        for (int i = 28; i <= 31; i++) {
+            String date = dateMonthSeven + i;
+            long activity = corgiActivityService.countPublishActivity(date);
+            corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, dateMonthSeven1 + i, activity);
+        }
+        for (int i = 1; i <= 9; i++) {
+            String date = dateMonthEight + "0" + i;
+            long activity = corgiActivityService.countPublishActivity(date);
+            corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, dateMonthEight1 + "0" + i, activity);
+        }
+        for (int i = 10; i <= 18; i++) {
+            String date = dateMonthEight + i;
+            long activity = corgiActivityService.countPublishActivity(date);
+            corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, dateMonthEight1 + i, activity);
         }
         return "success";
     }
