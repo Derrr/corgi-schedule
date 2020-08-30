@@ -50,10 +50,11 @@ public class CorgiStatisticTask {
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     @Async
-    @Scheduled(cron = "0 59 23 * * *")
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 59 23 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         Calendar calendar = Calendar.getInstance();
+        calendar.add(-2, Calendar.HOUR);
         Long time = calendar.getTimeInMillis();
         Date date = calendar.getTime();
         String today = dau_sdf.format(date);

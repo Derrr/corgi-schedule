@@ -47,15 +47,15 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
-    //@Scheduled(cron = "0 55 23 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 55 23 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
         userIds.add("8");
 
         Calendar calendar = Calendar.getInstance();
-        //calendar.add(Calendar.DATE, 1);
+        calendar.add(Calendar.DATE, 1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -7);
