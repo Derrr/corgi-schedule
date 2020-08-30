@@ -43,19 +43,19 @@ import java.util.concurrent.TimeUnit;
 public class CorgiBillboardTask {
     @Reference
     private CorgiBillboardService corgiBillboardService;
-    @Reference
+    @Autowired
     private StringRedisTemplate redisTemplate;
 
     @Async
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    @Scheduled(cron = "0 55 23 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 55 23 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
         userIds.add("8");
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 1);
+        //calendar.add(Calendar.DATE, 1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -7);
@@ -77,6 +77,7 @@ public class CorgiBillboardTask {
 
             i++;
             total++;
+            log.info("fan1..." + userProfile.getUserId());
             userIds.add(userProfile.getUserId());
             corgiBillboardService.addBillboard(userProfile, date, "fans1");
             if (i >= 2) {
@@ -144,10 +145,10 @@ public class CorgiBillboardTask {
     }
 
     private boolean checkUser(List<String> userIds, String userId) {
-        if(userIds.contains(userId)){
+        if (userIds.contains(userId)) {
             return true;
         }
-        if(redisTemplate.hasKey("billboard_block_".concat(userId))){
+        if (redisTemplate.hasKey("billboard_block_".concat(userId))) {
             return true;
         }
         return false;
