@@ -54,7 +54,7 @@ public class CorgiStatisticTask {
     @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(-2, Calendar.HOUR);
+        calendar.add(Calendar.HOUR, -2);
         Long time = calendar.getTimeInMillis();
         Date date = calendar.getTime();
         String today = dau_sdf.format(date);
