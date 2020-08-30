@@ -22,6 +22,7 @@ import com.corgi.user.entity.UserSignUp;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -42,6 +43,8 @@ import java.util.concurrent.TimeUnit;
 public class CorgiBillboardTask {
     @Reference
     private CorgiBillboardService corgiBillboardService;
+    @Reference
+    private StringRedisTemplate redisTemplate;
 
     @Async
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
@@ -50,6 +53,7 @@ public class CorgiBillboardTask {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
         userIds.add("8");
+
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -63,13 +67,14 @@ public class CorgiBillboardTask {
 
         UserDetail searchUser = new UserDetail();
         searchUser.setRole("1");
-        List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 72);
+        List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
         int total = 0;
         int i = 0;
         for (UserProfile userProfile : userProfiles) {
-            if (userIds.contains(userProfile.getUserId())) {
+            if (checkUser(userIds, userProfile.getUserId())) {
                 continue;
             }
+
             i++;
             total++;
             userIds.add(userProfile.getUserId());
@@ -80,9 +85,9 @@ public class CorgiBillboardTask {
         }
         searchUser.setRole("0");
         i = 0;
-        userProfiles = corgiBillboardService.getPopularUser(searchUser, 74);
+        userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
         for (UserProfile userProfile : userProfiles) {
-            if (userIds.contains(userProfile.getUserId())) {
+            if (checkUser(userIds, userProfile.getUserId())) {
                 continue;
             }
             i++;
@@ -93,10 +98,10 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-        userProfiles = corgiBillboardService.getPassionUser(searchUser, 76);
+        userProfiles = corgiBillboardService.getPassionUser(searchUser, 100);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
-            if (userIds.contains(userProfile.getUserId())) {
+            if (checkUser(userIds, userProfile.getUserId())) {
                 continue;
             }
             i++;
@@ -107,10 +112,10 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-        userProfiles = corgiBillboardService.getActiveUser(searchUser, 80);
+        userProfiles = corgiBillboardService.getActiveUser(searchUser, 100);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
-            if (userIds.contains(userProfile.getUserId())) {
+            if (checkUser(userIds, userProfile.getUserId())) {
                 continue;
             }
             i++;
@@ -123,9 +128,9 @@ public class CorgiBillboardTask {
         }
         if (total < 10) {
             searchUser.setRole(null);
-            userProfiles = corgiBillboardService.getPopularUser(searchUser, 80);
+            userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
             for (UserProfile userProfile : userProfiles) {
-                if (userIds.contains(userProfile.getUserId())) {
+                if (checkUser(userIds, userProfile.getUserId())) {
                     continue;
                 }
                 total++;
@@ -136,5 +141,15 @@ public class CorgiBillboardTask {
                 }
             }
         }
+    }
+
+    private boolean checkUser(List<String> userIds, String userId) {
+        if(userIds.contains(userId)){
+            return true;
+        }
+        if(redisTemplate.hasKey("billboard_block_".concat(userId))){
+            return true;
+        }
+        return false;
     }
 }
