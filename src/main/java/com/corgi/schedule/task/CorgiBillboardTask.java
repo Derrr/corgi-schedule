@@ -55,7 +55,7 @@ public class CorgiBillboardTask {
         userIds.add("8");
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 1);
+        calendar.add(Calendar.DATE, 2);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -7);
