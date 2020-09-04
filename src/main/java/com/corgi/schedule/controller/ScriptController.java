@@ -6,17 +6,12 @@ import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.common.messages.PushMessage;
+import com.corgi.entity.CorgiPic;
 import com.corgi.entity.CorgiStatistic;
-import com.corgi.schedule.service.HxPushMessageService;
-import com.corgi.schedule.service.MQService;
-import com.corgi.schedule.service.MapService;
-import com.corgi.schedule.service.TaskService;
+import com.corgi.schedule.service.*;
 import com.corgi.schedule.task.CorgiStatisticTask;
 import com.corgi.user.api.*;
-import com.corgi.user.entity.BarProfile;
-import com.corgi.user.entity.SystemMessage;
-import com.corgi.user.entity.UserDetail;
-import com.corgi.user.entity.UserPosition;
+import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +41,8 @@ public class ScriptController {
     @Reference
     private CorgiUserService corgiUserService;
     @Reference
+    private CorgiPicService corgiPicService;
+    @Reference
     private CorgiBarService corgiBarService;
     @Reference
     private CorgiActivityService corgiActivityService;
@@ -61,6 +58,8 @@ public class ScriptController {
     private TaskService taskService;
     @Autowired
     private MQService mqService;
+    @Autowired
+    private FaceDetectedService faceDetectedService;
 
     @GetMapping("init_station")
     public String initStation(@RequestParam("city") String city) {
@@ -275,6 +274,50 @@ public class ScriptController {
             long activity = corgiActivityService.countPublishActivity(date);
             corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, dateMonthEight1 + i, activity);
         }
+        return "success";
+    }
+
+    @GetMapping("init_avatar")
+    public String initAvatar() {
+        List<UserPosition> userPositionList;
+        int page = 1;
+        int pageSize = 1000;
+        do {
+            userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
+            page++;
+            if (userPositionList != null) {
+                for (UserPosition userPosition : userPositionList) {
+                    redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
+                    if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
+                        continue;
+                    }
+                    if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
+                        continue;
+                    }
+                    if (StringUtils.isEmpty(userPosition.getUserId())) {
+                        continue;
+                    }
+                    String userId = userPosition.getUserId();
+                    UserDetail userDetail = corgiUserService.getUserDetail(userId, null);
+                    if (userDetail != null) {
+                        List<UserPic> userPics = corgiPicService.getUserPic(userId);
+                        if (!CollectionUtils.isEmpty(userPics)
+                                && userPics.get(0) != null
+                                && CorgiPic.NEED_CHECK.equals(userPics.get(0).getStatus())) {
+                            UserPic userPic = userPics.get(0);
+                            faceDetectedService.checkFace(userPic, userPic.getUserId());
+                            UserDetail updateDetail = new UserDetail();
+                            updateDetail.setAvatar(userPic.getPicUrl());
+                            updateDetail.setAvatarDataId(userPic.getDataId());
+                            //updateDetail.setAvatarCheckStatus(userPic.getStatus());
+                            updateDetail.setUserId(userPic.getUserId());
+                            corgiUserService.updateDetail(userDetail);
+                            redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
+                        }
+                    }
+                }
+            }
+        } while (!CollectionUtils.isEmpty(userPositionList));
         return "success";
     }
 

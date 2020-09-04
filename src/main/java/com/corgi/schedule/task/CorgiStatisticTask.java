@@ -41,6 +41,8 @@ public class CorgiStatisticTask {
     private CorgiCommentService corgiCommentService;
     @Reference
     private CorgiLikeService corgiLikeService;
+    @Reference
+    private CorgiPushLogService corgiPushLogService;
     @Autowired
     private MapService mapService;
     @Autowired
@@ -67,6 +69,7 @@ public class CorgiStatisticTask {
         long register = corgiUserService.countRegisterUser(today);
         corgiStatisticService.addCount(CorgiStatistic.REGISTER, today, register);
 
+
         //long activity = corgiActivityService.countPublishActivity(activityToday);
         //corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
 
@@ -84,6 +87,13 @@ public class CorgiStatisticTask {
         tmp.setTimeInMillis(time);
         countUserStay(calendar, today, zero);
 
+    }
+
+    void countPushLog(String date) {
+        Long total = corgiPushLogService.countTotalPush(date);
+        Long useful = corgiPushLogService.countUsefulPush(date);
+        corgiStatisticService.updateMap("log", date, "total", total);
+        corgiStatisticService.updateMap("log", date, "useful", useful);
     }
 
     void countUserStay(Calendar calendar, String date, long zero) {
