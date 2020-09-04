@@ -38,6 +38,8 @@ public class FaceDetectedService {
 
     String REGION_ID = "cn-shanghai";
 
+    private static final String NO_FACE = "no_face";
+
     private IAcsClient managementClient;
 
     private Random random = new Random(System.currentTimeMillis());
@@ -64,7 +66,7 @@ public class FaceDetectedService {
             DetectFaceAttributesResponse.Data data = response.getData();
             log.info(JSONObject.toJSONString(data));
             if (CollectionUtils.isEmpty(data.getFaceInfos())) {
-                pic.setStatus(UserDetail.NO_FACE);
+                pic.setStatus(NO_FACE);
                 addCheckPic(pic, sourceId, CheckPic.AVATAR);
                 return pic;
             }
@@ -73,17 +75,17 @@ public class FaceDetectedService {
                     return pic;
                 }
             }
-            pic.setStatus(UserDetail.NO_FACE);
+            pic.setStatus(NO_FACE);
             addCheckPic(pic, sourceId, CheckPic.AVATAR);
         } catch (ServerException e) {
             log.error(e.getMessage(), e);
-            pic.setStatus(UserDetail.NO_FACE);
+            pic.setStatus(NO_FACE);
             addCheckPic(pic, sourceId, CheckPic.AVATAR);
         } catch (ClientException e) {
             log.error("ErrCode:" + e.getErrCode());
             log.error("ErrMsg:" + e.getErrMsg());
             log.error("RequestId:" + e.getRequestId());
-            pic.setStatus(UserDetail.NO_FACE);
+            pic.setStatus(NO_FACE);
             addCheckPic(pic, sourceId, CheckPic.AVATAR);
         }
         return pic;
