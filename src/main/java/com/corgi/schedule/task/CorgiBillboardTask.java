@@ -151,6 +151,9 @@ public class CorgiBillboardTask {
         if (redisTemplate.hasKey("billboard_block_".concat(userId))) {
             return true;
         }
+        if (userId.startsWith("B")) {
+            return true;
+        }
         return false;
     }
 }
