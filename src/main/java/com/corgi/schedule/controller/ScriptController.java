@@ -299,7 +299,7 @@ public class ScriptController {
                     }
                     String userId = userPosition.getUserId();
                     UserDetail userDetail = corgiUserService.getUserDetail(userId, null);
-                    if (userDetail != null) {
+                    if (userDetail != null && StringUtils.isEmpty(userDetail.getAvatarCheckStatus())) {
                         List<UserPic> userPics = corgiPicService.getUserPic(userId);
                         if (!CollectionUtils.isEmpty(userPics)
                                 && userPics.get(0) != null
