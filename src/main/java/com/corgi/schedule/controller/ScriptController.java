@@ -303,13 +303,13 @@ public class ScriptController {
                         List<UserPic> userPics = corgiPicService.getUserPic(userId);
                         if (!CollectionUtils.isEmpty(userPics)
                                 && userPics.get(0) != null
-                                && CorgiPic.NEED_CHECK.equals(userPics.get(0).getStatus())) {
+                                && !CorgiPic.NEED_CHECK.equals(userPics.get(0).getStatus())) {
                             UserPic userPic = userPics.get(0);
                             faceDetectedService.checkFace(userPic, userPic.getUserId());
                             UserDetail updateDetail = new UserDetail();
                             updateDetail.setAvatar(userPic.getPicUrl());
                             updateDetail.setAvatarDataId(userPic.getDataId());
-                            //updateDetail.setAvatarCheckStatus(userPic.getStatus());
+                            updateDetail.setAvatarCheckStatus(userPic.getStatus());
                             updateDetail.setUserId(userPic.getUserId());
                             corgiUserService.updateDetail(userDetail);
                             redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
