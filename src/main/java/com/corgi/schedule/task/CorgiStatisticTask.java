@@ -73,6 +73,7 @@ public class CorgiStatisticTask {
         //long activity = corgiActivityService.countPublishActivity(activityToday);
         //corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
 
+        countPushLog(today);
         countActivity(today, activityToday);
         //countSilentUser(zero, today);
         countUserRole(today);
