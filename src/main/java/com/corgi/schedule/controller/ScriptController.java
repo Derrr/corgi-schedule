@@ -287,16 +287,11 @@ public class ScriptController {
             page++;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
-                    redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
-                    if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
-                        continue;
-                    }
-                    if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
-                        continue;
-                    }
+                    log.info("check user ... " + userPosition.getUserId());
                     if (StringUtils.isEmpty(userPosition.getUserId())) {
                         continue;
                     }
+                    redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
                     String userId = userPosition.getUserId();
                     UserDetail userDetail = corgiUserService.getUserDetail(userId, null);
                     if (userDetail != null && StringUtils.isEmpty(userDetail.getAvatarCheckStatus())) {
@@ -306,12 +301,19 @@ public class ScriptController {
                                 && !CorgiPic.NEED_CHECK.equals(userPics.get(0).getStatus())) {
                             UserPic userPic = userPics.get(0);
                             faceDetectedService.checkFace(userPic, userPic.getUserId());
+                            log.info("check result ... " + userPic.getStatus());
                             UserDetail updateDetail = new UserDetail();
                             updateDetail.setAvatar(userPic.getPicUrl());
                             updateDetail.setAvatarDataId(userPic.getDataId());
                             updateDetail.setAvatarCheckStatus(userPic.getStatus());
                             updateDetail.setUserId(userPic.getUserId());
                             corgiUserService.updateDetail(userDetail);
+                            if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
+                                continue;
+                            }
+                            if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
+                                continue;
+                            }
                             redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
                         }
                     }
