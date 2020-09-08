@@ -6,6 +6,7 @@ import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.common.messages.PushMessage;
+import com.corgi.entity.CheckPic;
 import com.corgi.entity.CorgiPic;
 import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.*;
@@ -296,17 +297,29 @@ public class ScriptController {
                     UserDetail userDetail = corgiUserService.getUserDetail(userId, null);
                     if (userDetail != null && StringUtils.isEmpty(userDetail.getAvatarCheckStatus())) {
                         List<UserPic> userPics = corgiPicService.getUserPic(userId);
+                        List<CheckPic> checkPics = corgiPicService.getCheckPicBySourceId(CheckPic.AVATAR, userId);
                         if (!CollectionUtils.isEmpty(userPics)
                                 && userPics.get(0) != null
                                 && !CorgiPic.NEED_CHECK.equals(userPics.get(0).getStatus())) {
                             UserPic userPic = userPics.get(0);
-                            faceDetectedService.checkFace(userPic, userPic.getUserId());
-                            log.info("check result ... " + userPic.getStatus());
+                            userPic.setStatus(CorgiPic.NORMAL);
+                            if (checkPics.size() > 0) {
+                                for (CheckPic checkPic : checkPics) {
+                                    if (checkPic.getPicUrl().equals(userPic.getPicUrl())) {
+                                        userPic.setStatus(checkPic.getStatus());
+                                        userPic.setDataId(checkPic.getDataId());
+                                    }
+                                }
+                            }
+//                            if (needCheck) {
+//                                faceDetectedService.checkFace(userPic, userPic.getUserId());
+//                                log.info("check result ... " + userPic.getStatus());
+//                            }
                             UserDetail updateDetail = new UserDetail();
                             updateDetail.setAvatar(userPic.getPicUrl());
                             updateDetail.setAvatarDataId(userPic.getDataId());
                             updateDetail.setAvatarCheckStatus(userPic.getStatus());
-                            updateDetail.setUserId(userPic.getUserId());
+                            updateDetail.setUserId(userId);
                             corgiUserService.updateDetail(userDetail);
                             if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
                                 continue;
