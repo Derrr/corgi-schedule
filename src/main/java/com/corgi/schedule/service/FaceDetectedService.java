@@ -61,6 +61,7 @@ public class FaceDetectedService {
         request.setMaterialValue(pic.getPicUrl());
         pic.setDataId(getDataId());
         pic.setStatus(CorgiPic.NORMAL);
+
         try {
             DetectFaceAttributesResponse response = managementClient.getAcsResponse(request);
             DetectFaceAttributesResponse.Data data = response.getData();
