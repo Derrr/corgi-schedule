@@ -320,7 +320,7 @@ public class ScriptController {
                             updateDetail.setAvatarDataId(userPic.getDataId());
                             updateDetail.setAvatarCheckStatus(userPic.getStatus());
                             updateDetail.setUserId(userId);
-                            corgiUserService.updateDetail(userDetail);
+                            corgiUserService.updateDetail(updateDetail);
                             if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
                                 continue;
                             }
