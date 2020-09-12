@@ -278,6 +278,14 @@ public class ScriptController {
         return "success";
     }
 
+    @GetMapping("check_avatar")
+    public String checkAvatar(@RequestParam("avatar") String avatar) {
+        CorgiPic pic = new CorgiPic();
+        pic.setPicUrl(avatar);
+        faceDetectedService.checkFace(pic, "1");
+        return "success";
+    }
+
     @GetMapping("init_avatar")
     public String initAvatar() {
         List<UserPosition> userPositionList;
