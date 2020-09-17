@@ -60,11 +60,21 @@ public class CorgiBillboardTask {
         String date = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -7);
         String pastDate = sdf.format(calendar.getTime());
+        calendar.add(Calendar.DATE, -23);
+        String pastPopularDate = sdf.format(calendar.getTime());
         List<UserProfile> pastUsers = corgiBillboardService.getPastBillboard(pastDate);
+        List<UserProfile> pastPopularUsers = corgiBillboardService.getPastBillboard(pastPopularDate);
         for (UserProfile userProfile : pastUsers) {
             userIds.add(userProfile.getUserId());
         }
 
+        for (UserProfile userProfile : pastPopularUsers) {
+            if (userIds.contains(userProfile.getUserId())) {
+                continue;
+            }
+            userIds.add(userProfile.getUserId());
+        }
+        
         UserDetail searchUser = new UserDetail();
         searchUser.setRole("1");
         List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
