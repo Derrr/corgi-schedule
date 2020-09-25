@@ -171,6 +171,7 @@ public class ScriptController {
             page++;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
+                    log.info("checking ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
                     if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
                         continue;

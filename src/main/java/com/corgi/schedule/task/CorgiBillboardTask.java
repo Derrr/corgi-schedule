@@ -74,7 +74,7 @@ public class CorgiBillboardTask {
             }
             userIds.add(userProfile.getUserId());
         }
-        
+
         UserDetail searchUser = new UserDetail();
         searchUser.setRole("1");
         List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
