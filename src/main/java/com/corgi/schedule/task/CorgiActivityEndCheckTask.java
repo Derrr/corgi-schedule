@@ -97,7 +97,7 @@ public class CorgiActivityEndCheckTask {
         SystemMessage systemMessage = new SystemMessage();
         systemMessage.setContent("活动结束了，快分享美好瞬间吧！");
         HashMap extra = new HashMap();
-        extra.put("type", "902");
+        extra.put("type", "903");
         extra.put("activityId", activityId);
         extra.put("aId", activityId);
         extra.put("title", activity.getTitle());
