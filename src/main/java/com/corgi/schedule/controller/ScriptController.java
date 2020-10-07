@@ -347,7 +347,7 @@ public class ScriptController {
     @GetMapping("init_recommend")
     public String initRecommend() {
         int page = 1;
-        int pageSize = 1000;
+        int pageSize = 10;
         do {
             List<UserPosition> positions = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
@@ -359,6 +359,7 @@ public class ScriptController {
                 calculater.setUserId(position.getUserId());
                 mqService.sendCaculater(calculater);
             }
+            break;
         } while (true);
         return "success";
     }
