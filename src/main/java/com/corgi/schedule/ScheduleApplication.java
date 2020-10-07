@@ -27,4 +27,9 @@ public class ScheduleApplication {
 		return new Queue(CorgiQueueName.PUSH_MESSAGE_QUEUE);
 	}
 
+	@Bean
+	public Queue userRecommednQueue() {
+		return new Queue(CorgiQueueName.USER_RECOMMEND_QUEUE);
+	}
+
 }

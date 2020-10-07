@@ -6,6 +6,7 @@ import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.common.messages.PushMessage;
+import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.entity.CheckPic;
 import com.corgi.entity.CorgiPic;
 import com.corgi.entity.CorgiStatistic;
@@ -340,6 +341,25 @@ public class ScriptController {
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
+        return "success";
+    }
+
+    @GetMapping("init_recommend")
+    public String initRecommend() {
+        int page = 1;
+        int pageSize = 1000;
+        do {
+            List<UserPosition> positions = corgiUserService.getUserPositionByPage(page, pageSize);
+            page++;
+            if (CollectionUtils.isEmpty(positions)) {
+                break;
+            }
+            for (UserPosition position : positions) {
+                RecommendCalculater calculater = new RecommendCalculater();
+                calculater.setUserId(position.getUserId());
+                mqService.sendCaculater(calculater);
+            }
+        } while (true);
         return "success";
     }
 
