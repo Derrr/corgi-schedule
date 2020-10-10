@@ -134,6 +134,9 @@ public class CorgiSystemMessageTask {
             if ("nickname".equals(messageRule.getRuleKey())) {
                 userDetail.setNickname(messageRule.getRuleValue());
             } else if ("userId".equals(messageRule.getRuleKey())) {
+                if (messageRule.getRuleValue() == null) {
+                    messageRule.setRuleValue("null");
+                }
                 userDetail.setUserId(messageRule.getRuleValue());
             }
         }
