@@ -50,7 +50,7 @@ public class ScriptController {
     private CorgiActivityService corgiActivityService;
     @Reference
     private CorgiStatisticService corgiStatisticService;
-    @Reference
+    @Reference(retries = 1, timeout = 100000)
     private CorgiUserRecommendService corgiUserRecommendService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
