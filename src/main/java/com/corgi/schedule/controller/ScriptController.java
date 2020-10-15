@@ -50,6 +50,8 @@ public class ScriptController {
     private CorgiActivityService corgiActivityService;
     @Reference
     private CorgiStatisticService corgiStatisticService;
+    @Reference
+    private CorgiUserRecommendService corgiUserRecommendService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -363,4 +365,9 @@ public class ScriptController {
         return "success";
     }
 
+    @GetMapping("init_influencer_billboard")
+    public String initInfluencerBillboard() {
+        corgiUserRecommendService.initInfluencer();
+        return "success";
+    }
 }
