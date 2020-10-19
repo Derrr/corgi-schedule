@@ -187,7 +187,7 @@ public class ScriptController {
                     if (StringUtils.isEmpty(userPosition.getUserId())) {
                         continue;
                     }
-
+                    log.info("checking ... " + userPosition.getUserId());
                     if (!CollectionUtils.isEmpty(points)) {
                         peopleCount++;
                         Long uptime = userPosition.getUptime();
@@ -201,6 +201,7 @@ public class ScriptController {
                         noPeopleCount++;
                         log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
                     }
+                    log.info("adding ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
                 }
             }
