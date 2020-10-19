@@ -172,6 +172,7 @@ public class ScriptController {
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
+            log.info("page ={}, size={} ", page, userPositionList.size());
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
                     log.info("checking ... " + userPosition.getUserId() + " page = " + page);
