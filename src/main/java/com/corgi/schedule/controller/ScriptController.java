@@ -163,7 +163,7 @@ public class ScriptController {
     @GetMapping("refresh_position")
     public String refreshPosition() {
         List<UserPosition> userPositionList;
-        int page = 1;
+        int page = 65;
         int pageSize = 1000;
         Long minUptime = 999999999999999999L;
         Long maxUptime = 0L;
