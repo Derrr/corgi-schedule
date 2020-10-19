@@ -174,7 +174,7 @@ public class ScriptController {
             page++;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
-                    log.info("checking ... " + userPosition.getUserId());
+                    //log.info("checking ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
                     if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
                         continue;
@@ -192,7 +192,7 @@ public class ScriptController {
                         if (uptime < minUptime) {
                             minUptime = uptime;
                         }
-                        log.info("exist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
+                        //log.info("exist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
                     } else if (userPosition.getUptime() > maxUptime) {
                         maxUptime = userPosition.getUptime();
                         noPeopleCount++;
