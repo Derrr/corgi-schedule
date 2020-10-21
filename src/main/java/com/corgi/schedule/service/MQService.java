@@ -20,7 +20,7 @@ public class MQService {
         rabbitTemplate.convertAndSend(CorgiQueueName.PUSH_MESSAGE_QUEUE, pushMessage);
     }
 
-    public void sendCaculater(RecommendCalculater calculater) {
+    public void sendCalculater(RecommendCalculater calculater) {
         rabbitTemplate.convertAndSend(CorgiQueueName.USER_RECOMMEND_QUEUE, calculater);
     }
 

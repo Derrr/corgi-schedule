@@ -165,7 +165,7 @@ public class ScriptController {
         List<UserPosition> userPositionList;
         int page = 65;
         int pageSize = 1000;
-        Long minUptime = 999999999999999999L;
+        Long minUptime = 0L;
         Long maxUptime = 0L;
         long peopleCount = 0;
         long noPeopleCount = 0;
@@ -191,7 +191,7 @@ public class ScriptController {
                     if (!CollectionUtils.isEmpty(points)) {
                         peopleCount++;
                         Long uptime = userPosition.getUptime();
-                        if (uptime < minUptime) {
+                        if (uptime < minUptime || minUptime == 0L) {
                             minUptime = uptime;
                         }
                     } else {
@@ -352,20 +352,7 @@ public class ScriptController {
 
     @GetMapping("init_recommend")
     public String initRecommend() {
-        int page = 1;
-        int pageSize = 1000;
-        do {
-            List<UserPosition> positions = corgiUserService.getUserPositionByPage(page, pageSize);
-            page++;
-            if (CollectionUtils.isEmpty(positions)) {
-                break;
-            }
-            for (UserPosition position : positions) {
-                RecommendCalculater calculater = new RecommendCalculater();
-                calculater.setUserId(position.getUserId());
-                mqService.sendCaculater(calculater);
-            }
-        } while (true);
+        taskService.calculateRecommend();
         return "success";
     }
 
