@@ -165,10 +165,7 @@ public class ScriptController {
         List<UserPosition> userPositionList;
         int page = 65;
         int pageSize = 1000;
-        Long minUptime = 0L;
-        Long maxUptime = 0L;
-        long peopleCount = 0;
-        long noPeopleCount = 0;
+        int noPeopleCount = 0;
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
@@ -188,16 +185,7 @@ public class ScriptController {
                         continue;
                     }
                     log.info("checking ... " + userPosition.getUserId());
-                    if (!CollectionUtils.isEmpty(points)) {
-                        peopleCount++;
-                        Long uptime = userPosition.getUptime();
-                        if (uptime < minUptime || minUptime == 0L) {
-                            minUptime = uptime;
-                        }
-                    } else {
-                        if (userPosition.getUptime() > maxUptime) {
-                            maxUptime = userPosition.getUptime();
-                        }
+                    if (CollectionUtils.isEmpty(points)) {
                         noPeopleCount++;
                         log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
                     }
@@ -206,8 +194,8 @@ public class ScriptController {
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
-        log.info("min: {} count: {} max: {} no: {}", minUptime, peopleCount, maxUptime, noPeopleCount);
-        return minUptime + "-" + peopleCount + "-" + maxUptime + "-" + noPeopleCount;
+        log.info("no: {}", noPeopleCount);
+        return "" + noPeopleCount;
     }
 
     @GetMapping("clear_keys")
@@ -319,14 +307,6 @@ public class ScriptController {
                                 && !CorgiPic.NEED_CHECK.equals(userPics.get(0).getStatus())) {
                             UserPic userPic = userPics.get(0);
                             userPic.setStatus(CorgiPic.NORMAL);
-//                            if (checkPics.size() > 0) {
-//                                for (CheckPic checkPic : checkPics) {
-//                                    if (checkPic.getPicUrl().equals(userPic.getPicUrl())) {
-//                                        userPic.setStatus(checkPic.getStatus());
-//                                        userPic.setDataId(checkPic.getDataId());
-//                                    }
-//                                }
-//                            }
                             faceDetectedService.checkFace(userPic, userPic.getUserId());
                             log.info("check result ... " + userPic.getStatus());
                             UserDetail updateDetail = new UserDetail();
