@@ -138,6 +138,8 @@ public class CorgiSystemMessageTask {
                     messageRule.setRuleValue("null");
                 }
                 userDetail.setUserId(messageRule.getRuleValue());
+            } else if ("avatarStatus".equals(messageRule.getRuleKey())) {
+                userDetail.setAvatarStatus(messageRule.getRuleValue());
             }
         }
         return userDetail;
