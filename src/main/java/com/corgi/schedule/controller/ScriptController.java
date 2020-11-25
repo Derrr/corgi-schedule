@@ -78,6 +78,12 @@ public class ScriptController {
         return "success";
     }
 
+    @GetMapping("refresh_activity")
+    public String refreshActivity() {
+        corgiActivityService.refreshActivity();
+        return "success";
+    }
+
     @PostMapping("push_message")
     public String pushMessage(@RequestBody HashMap hashMap) {
         String userId = (String) hashMap.get("userId");
