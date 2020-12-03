@@ -169,7 +169,7 @@ public class ScriptController {
     @GetMapping("refresh_position")
     public String refreshPosition() {
         List<UserPosition> userPositionList;
-        int page = 65;
+        int page = 1;
         int pageSize = 1000;
         int noPeopleCount = 0;
         do {
@@ -194,6 +194,12 @@ public class ScriptController {
                     if (CollectionUtils.isEmpty(points)) {
                         noPeopleCount++;
                         log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
+                    } else {
+                        Point point = points.get(0);
+                        if (point == null || point.getX() == 0 || point.getY() == 0) {
+                            noPeopleCount++;
+                            log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
+                        }
                     }
                     log.info("adding ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
