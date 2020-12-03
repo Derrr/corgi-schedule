@@ -172,6 +172,8 @@ public class ScriptController {
         int page = 1;
         int pageSize = 1000;
         int noPeopleCount = 0;
+        long maxUpdateTime = 0L;
+        long minUpdateTime = Long.MAX_VALUE;
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
@@ -193,12 +195,33 @@ public class ScriptController {
                     log.info("checking ... " + userPosition.getUserId());
                     if (CollectionUtils.isEmpty(points)) {
                         noPeopleCount++;
+                        if (userPosition.getUptime() > maxUpdateTime) {
+                            maxUpdateTime = userPosition.getUptime();
+                        }
+                        if (userPosition.getUptime() < minUpdateTime) {
+                            minUpdateTime = userPosition.getUptime();
+                        }
                         log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
                     } else {
                         Point point = points.get(0);
-                        if (point == null || point.getX() == 0 || point.getY() == 0) {
+                        if (point == null) {
                             noPeopleCount++;
+                            if (userPosition.getUptime() > maxUpdateTime) {
+                                maxUpdateTime = userPosition.getUptime();
+                            }
+                            if (userPosition.getUptime() < minUpdateTime) {
+                                minUpdateTime = userPosition.getUptime();
+                            }
                             log.info("unexist userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
+                        } else if (point.getX() == 0 || point.getY() == 0) {
+                            noPeopleCount++;
+                            if (userPosition.getUptime() > maxUpdateTime) {
+                                maxUpdateTime = userPosition.getUptime();
+                            }
+                            if (userPosition.getUptime() < minUpdateTime) {
+                                minUpdateTime = userPosition.getUptime();
+                            }
+                            log.info("0-0 userid: {} , uptime: {} ", userPosition.getUserId(), userPosition.getUptime());
                         }
                     }
                     log.info("adding ... " + userPosition.getUserId());
@@ -206,7 +229,7 @@ public class ScriptController {
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
-        log.info("no: {}", noPeopleCount);
+        log.info("no: {} max: {} min:{}", noPeopleCount, maxUpdateTime, minUpdateTime);
         return "" + noPeopleCount;
     }
 
