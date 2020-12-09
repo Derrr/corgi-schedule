@@ -192,6 +192,9 @@ public class ScriptController {
                     if (StringUtils.isEmpty(userPosition.getUserId())) {
                         continue;
                     }
+                    if (userPosition.getUptime() == null) {
+                        continue;
+                    }
                     log.info("checking ... " + userPosition.getUserId());
                     if (CollectionUtils.isEmpty(points)) {
                         noPeopleCount++;
