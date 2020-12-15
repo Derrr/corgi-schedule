@@ -66,11 +66,7 @@ public class HxPushMessageService {
         HashMap apnsContent = new HashMap();
         String content = systemMessage.getContent();
         try {
-            if ("905".equals(systemMessage.getType())) {
-                content = new String(systemMessage.getTitle().getBytes(), "UTF-8");
-            } else {
-                content = new String(systemMessage.getContent().getBytes(), "UTF-8");
-            }
+            content = new String(systemMessage.getContent().getBytes(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
