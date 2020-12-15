@@ -64,21 +64,31 @@ public class HxPushMessageService {
         String url = HOST + orgName + "/" + appName + MESSAGE_URL;
         HashMap message = new HashMap();
         HashMap apnsContent = new HashMap();
+        String content = systemMessage.getContent();
         try {
-            apnsContent.put("em_push_content", new String(systemMessage.getContent().getBytes(), "UTF-8"));
+            if ("905".equals(systemMessage.getType())) {
+                content = new String(systemMessage.getTitle().getBytes(), "UTF-8");
+            } else {
+                content = new String(systemMessage.getContent().getBytes(), "UTF-8");
+            }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
+        apnsContent.put("em_push_content", content);
+
+        extra.put("type", systemMessage.getType());
         extra.put("em_apns_ext", apnsContent);
+        extra.put("title", systemMessage.getTitle());
+        extra.put("desc", systemMessage.getContent());
+        extra.put("picUrl", systemMessage.getPicUrl());
+        extra.put("urlType", systemMessage.getUrlType());
+        extra.put("url", systemMessage.getUrl());
+
         message.put("target_type", "users");
         message.put("target", userIds);
         message.put("from", from);
         HashMap msg = new HashMap();
-        try {
-            msg.put("msg", new String(systemMessage.getContent().getBytes(), "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        msg.put("msg", content);
         msg.put("type", "txt");
         message.put("msg", msg);
         message.put("ext", extra);
