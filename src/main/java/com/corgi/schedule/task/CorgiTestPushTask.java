@@ -8,6 +8,7 @@ import com.corgi.user.entity.UserLogin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,8 @@ public class CorgiTestPushTask {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     //@Async
     //@Scheduled(cron = "0 0 10-22 * * *")
@@ -31,6 +34,5 @@ public class CorgiTestPushTask {
                     .build();
             rabbitTemplate.convertAndSend(CorgiQueueName.PUSH_MESSAGE_QUEUE, pushMessage);
         }
-
     }
 }
