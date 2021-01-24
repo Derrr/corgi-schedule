@@ -99,28 +99,28 @@ public class CorgiFakeTask {
         double likeChance = 0.0;
         if (hasBoard && hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 300;
-            followChance = fakeFollowerCount / DAY_MINUTE;
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
 
             fakeLikeCount = 50;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 100;
-            followChance = fakeFollowerCount / (5 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (35 * DAY_MINUTE);
 
             fakeLikeCount = 30;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasBoard && hasFace) {
             fakeFollowerCount = 100;
-            followChance = fakeFollowerCount / DAY_MINUTE;
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
         } else if (!StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 50;
-            followChance = fakeFollowerCount / DAY_MINUTE;
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
 
             fakeLikeCount = 10;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace) {
             fakeFollowerCount = 50;
-            followChance = fakeFollowerCount / DAY_MINUTE;
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
         }
 
         if (Math.random() < followChance && corgiFakeService.countFakeFollower(profile.getUserId()) < fakeFollowerCount) {
@@ -153,19 +153,19 @@ public class CorgiFakeTask {
         double likeChance = 0.0;
         if (hasBoard && hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 400;
-            followChance = fakeFollowerCount / DAY_MINUTE;
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
 
             fakeLikeCount = 50;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 300;
-            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (210 * DAY_MINUTE);
 
             fakeLikeCount = 30;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasBoard && hasFace) {
             fakeFollowerCount = 200;
-            followChance = fakeFollowerCount / DAY_MINUTE;
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
         } else if (!StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 150;
             followChance = fakeFollowerCount / (30 * DAY_MINUTE);
@@ -174,7 +174,7 @@ public class CorgiFakeTask {
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace) {
             fakeFollowerCount = 100;
-            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (90 * DAY_MINUTE);
         }
 
         if (Math.random() < followChance && corgiFakeService.countFakeFollower(profile.getUserId()) < fakeFollowerCount) {
@@ -196,7 +196,7 @@ public class CorgiFakeTask {
         Integer countFollow = corgiFakeService.countFakeFollower(profile.getUserId());
         if (hasBoard && hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 10300;
-            followChance = 10000 / (30 * DAY_MINUTE);
+            followChance = 10000 / (210 * DAY_MINUTE);
             if (countFollow < 300) {
                 followChance += 300 / DAY_MINUTE;
             }
@@ -205,13 +205,13 @@ public class CorgiFakeTask {
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 10000;
-            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (210 * DAY_MINUTE);
 
             fakeLikeCount = 50;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace) {
             fakeFollowerCount = 1000;
-            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (210 * DAY_MINUTE);
         }
 
         if (countFollow < fakeFollowerCount
