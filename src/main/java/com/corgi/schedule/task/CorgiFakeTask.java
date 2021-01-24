@@ -105,7 +105,7 @@ public class CorgiFakeTask {
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 100;
-            followChance = fakeFollowerCount / (35 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
 
             fakeLikeCount = 30;
             likeChance = fakeLikeCount / DAY_MINUTE;
@@ -159,7 +159,7 @@ public class CorgiFakeTask {
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 300;
-            followChance = fakeFollowerCount / (210 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
 
             fakeLikeCount = 30;
             likeChance = fakeLikeCount / DAY_MINUTE;
@@ -196,22 +196,22 @@ public class CorgiFakeTask {
         Integer countFollow = corgiFakeService.countFakeFollower(profile.getUserId());
         if (hasBoard && hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 10300;
-            followChance = 10000 / (210 * DAY_MINUTE);
+            followChance = 10000 / (90 * DAY_MINUTE);
             if (countFollow < 300) {
-                followChance += 300 / DAY_MINUTE;
+                followChance += 300 / (7 * DAY_MINUTE);
             }
 
             fakeLikeCount = 100;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 10000;
-            followChance = fakeFollowerCount / (210 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (90 * DAY_MINUTE);
 
             fakeLikeCount = 50;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace) {
             fakeFollowerCount = 1000;
-            followChance = fakeFollowerCount / (210 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (90 * DAY_MINUTE);
         }
 
         if (countFollow < fakeFollowerCount
