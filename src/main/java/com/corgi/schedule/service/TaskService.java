@@ -4,15 +4,17 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.common.messages.TraceFollow;
 import com.corgi.user.api.CorgiStatisticService;
+import com.corgi.user.api.CorgiUserFollowService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserPosition;
+import com.corgi.user.entity.UserProfile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author tairanliu
@@ -23,7 +25,7 @@ public class TaskService {
     @Reference
     private CorgiStatisticService corgiStatisticService;
     @Reference
-    private CorgiUserService corgiUserService;
+    private CorgiUserFollowService corgiUserFollowService;
     @Autowired
     private MQService mqService;
 
@@ -41,19 +43,31 @@ public class TaskService {
         }
     }
 
-    public void calculateRecommend(){
+    public void calculateRecommend() {
         int page = 1;
         int pageSize = 1000;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String time = sdf.format(calendar.getTime());
+        List<String> refreshedUsers = new ArrayList<>();
         do {
-            List<UserPosition> positions = corgiUserService.getUserPositionByPage(page, pageSize);
+            List<UserProfile> profiles = corgiUserFollowService.getAllFollowUserByPage(page, pageSize);
             page++;
-            if (CollectionUtils.isEmpty(positions)) {
+            if (CollectionUtils.isEmpty(profiles)) {
                 break;
             }
-            for (UserPosition position : positions) {
+            for (UserProfile profile : profiles) {
+                if (time.compareTo(profile.getCreateTime()) > 0) {
+                    return;
+                }
+                if (refreshedUsers.contains(profile.getUserId())) {
+                    continue;
+                }
                 RecommendCalculater calculater = new RecommendCalculater();
-                calculater.setUserId(position.getUserId());
+                calculater.setUserId(profile.getUserId());
                 mqService.sendCalculater(calculater);
+                refreshedUsers.add(profile.getUserId());
             }
         } while (true);
     }

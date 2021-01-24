@@ -48,6 +48,7 @@ public class CorgiFakeTask {
     @Async
     @Scheduled(cron = "0 0 9-22 * * *")
     public void run() {
+        log.info("creating fake");
         int page = 1;
         int pageSize = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
