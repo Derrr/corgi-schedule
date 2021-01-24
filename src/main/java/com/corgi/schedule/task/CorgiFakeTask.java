@@ -50,7 +50,7 @@ public class CorgiFakeTask {
     public void run() {
         log.info("creating fake");
         int page = 1;
-        int pageSize = 1000;
+        int pageSize = 100;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         UserDetail userDetail = null;
         for (int i = 0; i < 100; i++) {
