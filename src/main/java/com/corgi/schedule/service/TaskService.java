@@ -66,6 +66,7 @@ public class TaskService {
                 }
                 RecommendCalculater calculater = new RecommendCalculater();
                 calculater.setUserId(profile.getUserId());
+                log.info("recommend..." + calculater.getUserId());
                 mqService.sendCalculater(calculater);
                 refreshedUsers.add(profile.getUserId());
             }
