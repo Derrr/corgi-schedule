@@ -99,28 +99,28 @@ public class CorgiFakeTask {
         double likeChance = 0.0;
         if (hasBoard && hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 300;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
 
             fakeLikeCount = 50;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 100;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
 
             fakeLikeCount = 30;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasBoard && hasFace) {
             fakeFollowerCount = 100;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
         } else if (!StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 50;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
 
             fakeLikeCount = 10;
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasFace) {
             fakeFollowerCount = 50;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
         }
 
         if (Math.random() < followChance && corgiFakeService.countFakeFollower(profile.getUserId()) < fakeFollowerCount) {
@@ -149,11 +149,11 @@ public class CorgiFakeTask {
         }
         String activityId = corgiFakeService.getLastActivity(profile.getUserId(), publishTime);
         boolean hasBoard = corgiBillboardService.countOnBoard(profile.getUserId()) > 0;
-        double followChance = fakeFollowerCount / (2 * DAY_MINUTE);
+        double followChance = fakeFollowerCount / (20 * DAY_MINUTE);
         double likeChance = 0.0;
         if (hasBoard && hasFace && !StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 400;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
 
             fakeLikeCount = 50;
             likeChance = fakeLikeCount / DAY_MINUTE;
@@ -165,7 +165,7 @@ public class CorgiFakeTask {
             likeChance = fakeLikeCount / DAY_MINUTE;
         } else if (hasBoard && hasFace) {
             fakeFollowerCount = 200;
-            followChance = fakeFollowerCount / (7 * DAY_MINUTE);
+            followChance = fakeFollowerCount / (30 * DAY_MINUTE);
         } else if (!StringUtils.isEmpty(activityId)) {
             fakeFollowerCount = 150;
             followChance = fakeFollowerCount / (30 * DAY_MINUTE);
@@ -198,7 +198,7 @@ public class CorgiFakeTask {
             fakeFollowerCount = 10300;
             followChance = 10000 / (90 * DAY_MINUTE);
             if (countFollow < 300) {
-                followChance += 300 / (7 * DAY_MINUTE);
+                followChance += 300 / (30 * DAY_MINUTE);
             }
 
             fakeLikeCount = 100;
