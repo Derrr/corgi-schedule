@@ -29,7 +29,7 @@ import java.util.List;
 @Component
 @Slf4j
 public class CorgiRecommendTask {
-    @Reference(retries = 1, timeout = 100000)
+    @Reference(retries = 1, timeout = 300000)
     private CorgiUserRecommendService corgiUserRecommendService;
     @Autowired
     private MQService mqService;
