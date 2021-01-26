@@ -47,15 +47,15 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
-    //@Scheduled(cron = "0 0 20 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 0 20 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
         userIds.add("8");
 
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 0);
+        calendar.add(Calendar.DATE, 3);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -7);
@@ -89,7 +89,7 @@ public class CorgiBillboardTask {
             total++;
             log.info("fan1..." + userProfile.getUserId());
             userIds.add(userProfile.getUserId());
-            //corgiBillboardService.addBillboard(userProfile, date, "fans1");
+            corgiBillboardService.addBillboard(userProfile, date, "fans1");
             if (i >= 2) {
                 break;
             }
@@ -104,7 +104,7 @@ public class CorgiBillboardTask {
             i++;
             total++;
             userIds.add(userProfile.getUserId());
-            //corgiBillboardService.addBillboard(userProfile, date, "fans0");
+            corgiBillboardService.addBillboard(userProfile, date, "fans0");
             if (i >= 2) {
                 break;
             }
