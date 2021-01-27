@@ -20,6 +20,14 @@ public class MQService {
         rabbitTemplate.convertAndSend(CorgiQueueName.PUSH_MESSAGE_QUEUE, pushMessage);
     }
 
+    public void sendBillboardMessage(PushMessage pushMessage) {
+        rabbitTemplate.convertAndSend(CorgiQueueName.ONBOARD_QUEUE, pushMessage);
+    }
+
+    public void sendInfluencerLeftMessage(PushMessage pushMessage) {
+        rabbitTemplate.convertAndSend(CorgiQueueName.INFLUENCER_LEFT_QUEUE, pushMessage);
+    }
+
     public void sendCalculater(RecommendCalculater calculater) {
         rabbitTemplate.convertAndSend(CorgiQueueName.USER_RECOMMEND_QUEUE, calculater);
     }

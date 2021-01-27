@@ -11,6 +11,7 @@ import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
+import com.corgi.common.messages.PushMessage;
 import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiBillboardService;
 import com.corgi.user.api.CorgiUserActivityService;
@@ -32,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -43,6 +45,8 @@ import java.util.concurrent.TimeUnit;
 public class CorgiBillboardTask {
     @Reference
     private CorgiBillboardService corgiBillboardService;
+    @Autowired
+    private MQService mqService;
     @Autowired
     private StringRedisTemplate redisTemplate;
 
@@ -151,6 +155,19 @@ public class CorgiBillboardTask {
                     break;
                 }
             }
+        }
+    }
+
+    @Async
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 0 8 * * *")
+    public void notice() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(new Date());
+        List<UserProfile> userProfiles = corgiBillboardService.getBillboard(date);
+        for (UserProfile userProfile : userProfiles) {
+            mqService.sendMessage(PushMessage.builder()
+                    .targetUserId(userProfile.getUserId()).build());
         }
     }
 
