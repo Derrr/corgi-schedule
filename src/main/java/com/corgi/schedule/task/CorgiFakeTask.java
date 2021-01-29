@@ -106,9 +106,11 @@ public class CorgiFakeTask {
     }
 
     private void newCorgier(UserProfile profile, UserDetail userDetail, Boolean hasBoard) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
         boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), sdf.format(new Date()));
+        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), sdf.format(calendar.getTime()));
         double followChance = 10.0 / (30.0 * DAY_MINUTE);
         double likeChance = 0.0;
         if (hasFace) {
@@ -119,7 +121,7 @@ public class CorgiFakeTask {
         }
         if (!StringUtils.isEmpty(activityId)) {
             likeChance = 20.0 / DAY_MINUTE;
-            Calendar calendar = Calendar.getInstance();
+            calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -7);
             if (sdf.format(calendar.getTime()).compareTo(profile.getCreateTime()) < 0) {
                 followChance += 10.0 / DAY_MINUTE;
@@ -149,7 +151,11 @@ public class CorgiFakeTask {
             e.printStackTrace();
             return;
         }
-        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), today);
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+
+        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), sdf1.format(calendar.getTime()));
         double followChance = 0.0;
         double likeChance = 0.0;
 
@@ -187,10 +193,11 @@ public class CorgiFakeTask {
     }
 
     private void influencer(UserProfile profile, UserDetail userDetail, Boolean hasBoard) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String today = sdf.format(new Date());
         boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), today);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), sdf.format(calendar.getTime()));
         double followChance = 0.0;
         double likeChance = 0.0;
         Integer fakeFollower = corgiFakeService.countFakeFollower(profile.getUserId());
