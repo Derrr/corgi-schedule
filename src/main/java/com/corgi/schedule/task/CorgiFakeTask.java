@@ -201,13 +201,16 @@ public class CorgiFakeTask {
         boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
         String activityId = getLastActivity(profile.getUserId(), lastDay);
         double followChance = 0.0;
+        Integer fakeFollowers = corgiFakeService.countFakeFollower(profile.getUserId());
         double likeChance = 0.0;
-        followChance = 100 / (30 * DAY_MINUTE);
-        if (hasFace) {
-            followChance += 200 / (30 * DAY_MINUTE);
-        }
-        if (!StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
-            followChance += 400 / (30 * DAY_MINUTE);
+        if (fakeFollowers < 700) {
+            followChance = 100 / (30 * DAY_MINUTE);
+            if (hasFace) {
+                followChance += 200 / (30 * DAY_MINUTE);
+            }
+            if (!StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
+                followChance += 400 / (30 * DAY_MINUTE);
+            }
         }
         if (hasBoard) {
             followChance += 100 / DAY_MINUTE;
