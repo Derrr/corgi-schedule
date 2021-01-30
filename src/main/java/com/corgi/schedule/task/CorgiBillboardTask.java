@@ -166,7 +166,7 @@ public class CorgiBillboardTask {
         String date = sdf.format(new Date());
         List<UserProfile> userProfiles = corgiBillboardService.getBillboard(date);
         for (UserProfile userProfile : userProfiles) {
-            mqService.sendMessage(PushMessage.builder()
+            mqService.sendBillboardMessage(PushMessage.builder()
                     .targetUserId(userProfile.getUserId()).build());
         }
     }
