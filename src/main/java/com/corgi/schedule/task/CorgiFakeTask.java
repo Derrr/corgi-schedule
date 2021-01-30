@@ -13,6 +13,7 @@ import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tairanliu
@@ -41,9 +43,13 @@ public class CorgiFakeTask {
     @Reference
     private CorgiVlogService corgiVlogService;
     @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
     private MQService mqService;
 
     private static final Double DAY_MINUTE = 13 * 60.0;
+
+    private static final String LAST_ACTIVITY = "last_activity_";
 
 
     @Async
@@ -112,7 +118,7 @@ public class CorgiFakeTask {
 
     private void newCorgier(UserProfile profile, UserDetail userDetail, Boolean hasBoard, String lastDay) {
         boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), lastDay);
+        String activityId = getLastActivity(profile.getUserId(), lastDay);
         double followChance = 10.0 / (30.0 * DAY_MINUTE);
         double likeChance = 0.0;
         if (hasFace) {
@@ -121,12 +127,12 @@ public class CorgiFakeTask {
         if (hasBoard) {
             followChance += 100.0 / DAY_MINUTE;
         }
-        if (!StringUtils.isEmpty(activityId)) {
+        if (!"-1".equals(activityId)) {
             likeChance = 20.0 / DAY_MINUTE;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -7);
-            if (sdf.format(calendar.getTime()).compareTo(profile.getFollowTime()) < 0) {
+            if (sdf.format(calendar.getTime()).compareTo(profile.getCreateTime()) < 0) {
                 followChance += 10.0 / DAY_MINUTE;
             }
         }
@@ -154,7 +160,7 @@ public class CorgiFakeTask {
             e.printStackTrace();
             return;
         }
-        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), lastDay);
+        String activityId = getLastActivity(profile.getUserId(), lastDay);
         double followChance = 0.0;
         double likeChance = 0.0;
 
@@ -164,7 +170,7 @@ public class CorgiFakeTask {
             } else {
                 followChance = 10.0 / (30.0 * DAY_MINUTE);
             }
-            if (!StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
+            if (!"-1".equals(activityId) || !StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
                 followChance += 30.0 / (30.0 * DAY_MINUTE);
             }
         }
@@ -179,7 +185,7 @@ public class CorgiFakeTask {
         if (hasBoard) {
             followChance += 100.0 / DAY_MINUTE;
         }
-        if (!StringUtils.isEmpty(activityId)) {
+        if (!"-1".equals(activityId)) {
             likeChance = 15.0 / DAY_MINUTE;
         }
 
@@ -193,24 +199,21 @@ public class CorgiFakeTask {
 
     private void influencer(UserProfile profile, UserDetail userDetail, Boolean hasBoard, String lastDay) {
         boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        String activityId = corgiFakeService.getLastActivity(profile.getUserId(), lastDay);
+        String activityId = getLastActivity(profile.getUserId(), lastDay);
         double followChance = 0.0;
         double likeChance = 0.0;
-        Integer fakeFollower = corgiFakeService.countFakeFollower(profile.getUserId());
-        if (fakeFollower < 700) {
-            followChance = 100 / (30 * DAY_MINUTE);
-            if (hasFace) {
-                followChance += 200 / (30 * DAY_MINUTE);
-            }
-            if (!StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
-                followChance += 400 / (30 * DAY_MINUTE);
-            }
+        followChance = 100 / (30 * DAY_MINUTE);
+        if (hasFace) {
+            followChance += 200 / (30 * DAY_MINUTE);
+        }
+        if (!StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
+            followChance += 400 / (30 * DAY_MINUTE);
         }
         if (hasBoard) {
             followChance += 100 / DAY_MINUTE;
         }
 
-        if (!StringUtils.isEmpty(activityId)) {
+        if (!"-1".equals(activityId)) {
             likeChance = 40 / DAY_MINUTE;
         }
 
@@ -259,6 +262,20 @@ public class CorgiFakeTask {
                         .build());
             }
         }
+    }
+
+    private String getLastActivity(String userId, String lastDay) {
+        String activityId = redisTemplate.opsForValue().get(LAST_ACTIVITY.concat(userId));
+        if (StringUtils.isEmpty(activityId)) {
+            activityId = corgiFakeService.getLastActivity(userId, lastDay);
+            if (StringUtils.isEmpty(activityId)) {
+                activityId = "-1";
+                redisTemplate.opsForValue().set(LAST_ACTIVITY.concat(userId), activityId, 1L, TimeUnit.HOURS);
+            } else {
+                redisTemplate.opsForValue().set(LAST_ACTIVITY.concat(userId), activityId, 1L, TimeUnit.DAYS);
+            }
+        }
+        return activityId;
     }
 
 }

@@ -42,7 +42,8 @@ public class CorgiRecommendTask {
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         log.info("refreshing recommend...........");
-        taskService.calculateRecommend();
         corgiUserRecommendService.initInfluencer();
+        taskService.calculateRecommend();
+
     }
 }
