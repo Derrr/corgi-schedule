@@ -3,9 +3,11 @@ package com.corgi.schedule.service;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.common.messages.TraceFollow;
+import com.corgi.user.api.CorgiLikeService;
 import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiUserFollowService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.ActivityLike;
 import com.corgi.user.entity.UserPosition;
 import com.corgi.user.entity.UserProfile;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,8 @@ public class TaskService {
     private CorgiStatisticService corgiStatisticService;
     @Reference
     private CorgiUserFollowService corgiUserFollowService;
+    @Reference
+    private CorgiLikeService corgiLikeService;
     @Autowired
     private MQService mqService;
 
@@ -43,7 +47,35 @@ public class TaskService {
         }
     }
 
-
+    public void calculateRecommendActivity(){
+        int page = 1;
+        int pageSize = 1000;
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String time = sdf.format(calendar.getTime());
+        List<String> refreshedUsers = new ArrayList<>();
+        do {
+            List<ActivityLike> likes = corgiLikeService.getLikeByPage(page, pageSize);
+            page++;
+            if (CollectionUtils.isEmpty(likes)) {
+                break;
+            }
+            for (ActivityLike like : likes) {
+                if (time.compareTo(like.getCtime()) > 0) {
+                    return;
+                }
+                if (refreshedUsers.contains(like.getLikeUserId())) {
+                    continue;
+                }
+                RecommendCalculater calculater = new RecommendCalculater();
+                calculater.setUserId(like.getLikeUserId());
+                log.info("recommend activity..." + calculater.getUserId());
+                mqService.sendActivityCalculater(calculater);
+                refreshedUsers.add(like.getLikeUserId());
+            }
+        } while (true);
+    }
 
     public void calculateRecommend() {
         int page = 1;

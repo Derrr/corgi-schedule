@@ -44,6 +44,7 @@ public class CorgiRecommendTask {
         log.info("refreshing recommend...........");
         corgiUserRecommendService.initInfluencer();
         taskService.calculateRecommend();
+        taskService.calculateRecommendActivity();
 
     }
 }
