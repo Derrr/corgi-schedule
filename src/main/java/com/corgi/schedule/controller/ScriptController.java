@@ -440,9 +440,6 @@ public class ScriptController {
                                 && !CorgiPic.NEED_CHECK.equals(userDetail.getAvatarCheckStatus())) {
                             UserDetail queryDetail = new UserDetail();
                             queryDetail.setUserId(userId);
-                            UserProfile userProfile = corgiUserService.searchUsers(queryDetail, null, 1, 1).get(0);
-                            UserPosition position = corgiUserService.getUserPosition(userId);
-                            log.info("register time: {} version: {} ", userProfile.getCreateTime(), position.getVersion());
                             UserPic userPic = new UserPic();
                             userPic.setStatus(UserPic.NORMAL);
                             userPic.setPicUrl(userDetail.getAvatar());
