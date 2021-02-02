@@ -417,4 +417,42 @@ public class ScriptController {
         } while (!CollectionUtils.isEmpty(userPositionList));
         return "success";
     }
+
+    @GetMapping("init_user_pic_with_detail")
+    public String initUserPicDetail() {
+        List<UserProfile> userPositionList;
+        int page = 1;
+        int pageSize = 1000;
+        do {
+            userPositionList = corgiUserService.getBasicUserDetailByPage(page, pageSize);
+            page++;
+            if (userPositionList != null) {
+                for (UserProfile userPosition : userPositionList) {
+                    log.info("check user ... " + userPosition.getUserId());
+                    if (StringUtils.isEmpty(userPosition.getUserId())) {
+                        continue;
+                    }
+                    String userId = userPosition.getUserId();
+                    UserDetail userDetail = corgiUserService.getUserDetail(userId, null);
+                    if (userDetail != null && !StringUtils.isEmpty(userDetail.getAvatarCheckStatus()) && !StringUtils.isEmpty(userDetail.getAvatar())) {
+                        List<UserPic> userPics = corgiPicService.getUserPic(userId);
+                        if (CollectionUtils.isEmpty(userPics)
+                                && !CorgiPic.NEED_CHECK.equals(userDetail.getAvatarCheckStatus())) {
+                            UserDetail queryDetail = new UserDetail();
+                            queryDetail.setUserId(userId);
+                            UserProfile userProfile = corgiUserService.searchUsers(queryDetail, null, 1, 1).get(0);
+                            UserPosition position = corgiUserService.getUserPosition(userId);
+                            log.info("register time: {} version: {} ", userProfile.getCreateTime(), position.getVersion());
+                            UserPic userPic = new UserPic();
+                            userPic.setStatus(UserPic.NORMAL);
+                            userPic.setPicUrl(userDetail.getAvatar());
+                            userPic.setUserId(userId);
+                            corgiPicService.addUserPic(userPic);
+                        }
+                    }
+                }
+            }
+        } while (!CollectionUtils.isEmpty(userPositionList));
+        return "success";
+    }
 }
