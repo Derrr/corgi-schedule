@@ -39,7 +39,7 @@ public class CorgiCleanUserTask {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<String> userIds = corgiUserService.getUnregisterUsers(sdf.format(calendar.getTime()));
         if (userIds.size() > 1000) {
-            log.error(" too many unregister users! ");
+            log.error(" too many unregister users:{}! ", userIds.size());
             return;
         }
         for (String userId : userIds) {
