@@ -43,8 +43,10 @@ public class CorgiCleanUserTask {
             return;
         }
         for (String userId : userIds) {
-            corgiUserService.deleteUser(userId);
-            corgiActivityService.deleteUserActivity(userId);
+            if (userId != null) {
+                corgiUserService.deleteUser(userId);
+                corgiActivityService.deleteUserActivity(userId);
+            }
         }
     }
 }
