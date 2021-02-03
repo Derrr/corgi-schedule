@@ -59,7 +59,7 @@ public class CorgiBillboardTask {
         userIds.add("8");
 
         Calendar calendar = Calendar.getInstance();
-        //calendar.add(Calendar.DATE, 3);
+        calendar.add(Calendar.DATE, 1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -7);
