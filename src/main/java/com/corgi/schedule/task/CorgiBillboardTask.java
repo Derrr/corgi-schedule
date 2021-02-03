@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class CorgiBillboardTask {
-    @Reference(retries = 1, timeout = 100000)
+    @Reference(retries = 1, timeout = 60000)
     private CorgiBillboardService corgiBillboardService;
     @Autowired
     private MQService mqService;
