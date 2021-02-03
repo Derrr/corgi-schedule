@@ -51,8 +51,8 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    @Scheduled(cron = "0 0 20 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 20 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
@@ -81,38 +81,38 @@ public class CorgiBillboardTask {
 
         UserDetail searchUser = new UserDetail();
         searchUser.setRole("1");
-        List<UserProfile> userProfiles;// = corgiBillboardService.getPopularUser(searchUser, 100);
-        int total = 4;
+        List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
+        int total = 0;
         int i = 0;
-//        for (UserProfile userProfile : userProfiles) {
-//            if (checkUser(userIds, userProfile.getUserId())) {
-//                continue;
-//            }
-//
-//            i++;
-//            total++;
-//            log.info("fan1..." + userProfile.getUserId());
-//            userIds.add(userProfile.getUserId());
-//            corgiBillboardService.addBillboard(userProfile, date, "fans1");
-//            if (i >= 2) {
-//                break;
-//            }
-//        }
-//        searchUser.setRole("0");
-//        i = 0;
-//        userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
-//        for (UserProfile userProfile : userProfiles) {
-//            if (checkUser(userIds, userProfile.getUserId())) {
-//                continue;
-//            }
-//            i++;
-//            total++;
-//            userIds.add(userProfile.getUserId());
-//            corgiBillboardService.addBillboard(userProfile, date, "fans0");
-//            if (i >= 2) {
-//                break;
-//            }
-//        }
+        for (UserProfile userProfile : userProfiles) {
+            if (checkUser(userIds, userProfile.getUserId())) {
+                continue;
+            }
+
+            i++;
+            total++;
+            log.info("fan1..." + userProfile.getUserId());
+            userIds.add(userProfile.getUserId());
+            corgiBillboardService.addBillboard(userProfile, date, "fans1");
+            if (i >= 2) {
+                break;
+            }
+        }
+        searchUser.setRole("0");
+        i = 0;
+        userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
+        for (UserProfile userProfile : userProfiles) {
+            if (checkUser(userIds, userProfile.getUserId())) {
+                continue;
+            }
+            i++;
+            total++;
+            userIds.add(userProfile.getUserId());
+            corgiBillboardService.addBillboard(userProfile, date, "fans0");
+            if (i >= 2) {
+                break;
+            }
+        }
         userProfiles = corgiBillboardService.getPassionUser(searchUser, 100);
         i = 0;
         for (UserProfile userProfile : userProfiles) {

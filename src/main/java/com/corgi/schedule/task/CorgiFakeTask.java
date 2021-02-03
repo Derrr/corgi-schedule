@@ -38,7 +38,7 @@ public class CorgiFakeTask {
     private CorgiFakeService corgiFakeService;
     @Reference
     private CorgiUserService corgiUserService;
-    @Reference
+    @Reference(retries = 1, timeout = 300000)
     private CorgiBillboardService corgiBillboardService;
     @Reference
     private CorgiVlogService corgiVlogService;
