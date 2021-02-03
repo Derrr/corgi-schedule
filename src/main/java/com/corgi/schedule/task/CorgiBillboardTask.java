@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 @Slf4j
 public class CorgiBillboardTask {
-    @Reference
+    @Reference(retries = 1, timeout = 100000)
     private CorgiBillboardService corgiBillboardService;
     @Autowired
     private MQService mqService;
@@ -113,7 +113,7 @@ public class CorgiBillboardTask {
 //                break;
 //            }
 //        }
-        userProfiles = corgiBillboardService.getPassionUser(searchUser, 10);
+        userProfiles = corgiBillboardService.getPassionUser(searchUser, 100);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
@@ -127,7 +127,7 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-        userProfiles = corgiBillboardService.getActiveUser(searchUser, 10);
+        userProfiles = corgiBillboardService.getActiveUser(searchUser, 100);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
