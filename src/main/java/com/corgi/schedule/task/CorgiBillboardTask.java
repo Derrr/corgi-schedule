@@ -113,7 +113,7 @@ public class CorgiBillboardTask {
 //                break;
 //            }
 //        }
-        userProfiles = corgiBillboardService.getPassionUser(searchUser, 100);
+        userProfiles = corgiBillboardService.getPassionUser(searchUser, 10);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
@@ -127,7 +127,7 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-        userProfiles = corgiBillboardService.getActiveUser(searchUser, 100);
+        userProfiles = corgiBillboardService.getActiveUser(searchUser, 10);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
