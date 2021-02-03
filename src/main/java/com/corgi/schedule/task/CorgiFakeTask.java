@@ -177,8 +177,6 @@ public class CorgiFakeTask {
 
         if (profile.getTime() != null && System.currentTimeMillis() - 24 * 1000 * 3600 > profile.getTime()) {
             if (hasFace) {
-                followChance += 2.0 / DAY_MINUTE;
-            } else {
                 followChance += 1.0 / DAY_MINUTE;
             }
         }
