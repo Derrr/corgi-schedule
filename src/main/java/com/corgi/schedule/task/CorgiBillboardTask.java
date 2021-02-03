@@ -50,7 +50,7 @@ public class CorgiBillboardTask {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    @Async
+    //@Async
     @Scheduled(fixedRate = 24 * 3600 * 1000)
     //@Scheduled(cron = "0 0 20 * * *")
     public void run() {
