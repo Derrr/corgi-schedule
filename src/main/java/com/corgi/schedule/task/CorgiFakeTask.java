@@ -103,7 +103,7 @@ public class CorgiFakeTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0/1 1,16-24 * * *")
+    @Scheduled(cron = "0 0/1 16-24 * * *")
     public void process() {
         log.info("creating fake like");
         int page = 1;
