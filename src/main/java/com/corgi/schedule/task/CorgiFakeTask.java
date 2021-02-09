@@ -1,14 +1,13 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.activity.api.CorgiActivityFeedService;
+import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
 import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
-import com.corgi.user.api.CorgiBillboardService;
-import com.corgi.user.api.CorgiFakeService;
-import com.corgi.user.api.CorgiUserService;
-import com.corgi.user.api.CorgiVlogService;
+import com.corgi.user.api.*;
 import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -22,10 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,6 +38,10 @@ public class CorgiFakeTask {
     private CorgiBillboardService corgiBillboardService;
     @Reference
     private CorgiVlogService corgiVlogService;
+    @Reference
+    private CorgiToolService corgiToolService;
+    @Reference
+    private CorgiActivityFeedService corgiActivityFeedService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -96,6 +96,56 @@ public class CorgiFakeTask {
                     oldCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
                 } else {
                     newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
+                }
+            }
+        } while (true);
+
+    }
+
+    @Async
+    @Scheduled(cron = "0 0/1 1,16-24 * * *")
+    public void process() {
+        log.info("creating fake like");
+        int page = 1;
+        int pageSize = 1000;
+        UserDetail userDetail = null;
+        for (int i = 0; i < 100; i++) {
+            String userId = corgiFakeService.selectFakeUser();
+            userDetail = corgiUserService.getUserDetailBasic(userId);
+            if (userDetail != null) {
+                break;
+            }
+        }
+        if (userDetail == null) {
+            return;
+        }
+        corgiFakeService.updateFakeTime(userDetail.getUserId());
+        do {
+            List<String> activityIds = corgiToolService.getActivityIdsByTopic("24", page, pageSize);
+            page++;
+            if (CollectionUtils.isEmpty(activityIds)) {
+                break;
+            }
+            for (String activityId : activityIds) {
+                CorgiActivity corgiActivity = corgiActivityFeedService.getActivityById(activityId);
+                if (corgiActivity != null && corgiActivity.getUserId() != null) {
+                    String userId = corgiActivity.getUserId();
+                    Double likeChance = 0.0;
+                    if ("276".equals(userId)) {
+                        likeChance = 7.0 / 60;
+                    }
+                    if ("1638".equals(userId)) {
+                        likeChance = 10.0 / 60;
+                    }
+                    if ("5973".equals(userId)) {
+                        likeChance = 5.0 / 60;
+                    }
+                    if ("54879".equals(userId)) {
+                        likeChance = 9.0 / 60;
+                    }
+                    if (Math.random() < likeChance) {
+                        likeActivity(userDetail, activityId, userId);
+                    }
                 }
             }
         } while (true);
