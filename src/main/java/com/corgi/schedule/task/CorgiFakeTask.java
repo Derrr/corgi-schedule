@@ -135,7 +135,7 @@ public class CorgiFakeTask {
                         likeChance = 7.0 / 60;
                     }
                     if ("1638".equals(userId)) {
-                        likeChance = 10.0 / 60;
+                        likeChance = 4.0 / 60;
                     }
                     if ("5973".equals(userId)) {
                         likeChance = 5.0 / 60;
