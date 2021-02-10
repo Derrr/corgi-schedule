@@ -28,7 +28,7 @@ public class CorgiTopicTask {
 
 
     @Async
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0 22,23 * * *")
     //@Scheduled(fixedRate = 3600 * 1000)
     public void run() {
         int page = 1;

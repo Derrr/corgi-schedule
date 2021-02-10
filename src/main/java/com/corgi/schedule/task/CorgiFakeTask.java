@@ -102,56 +102,6 @@ public class CorgiFakeTask {
 
     }
 
-    @Async
-    @Scheduled(cron = "0 0/1 16-23 * * *")
-    public void process() {
-        log.info("creating fake like");
-        int page = 1;
-        int pageSize = 1000;
-        UserDetail userDetail = null;
-        for (int i = 0; i < 100; i++) {
-            String userId = corgiFakeService.selectFakeUser();
-            userDetail = corgiUserService.getUserDetailBasic(userId);
-            if (userDetail != null) {
-                break;
-            }
-        }
-        if (userDetail == null) {
-            return;
-        }
-        corgiFakeService.updateFakeTime(userDetail.getUserId());
-        do {
-            List<String> activityIds = corgiToolService.getActivityIdsByTopic("24", page, pageSize);
-            page++;
-            if (CollectionUtils.isEmpty(activityIds)) {
-                break;
-            }
-            for (String activityId : activityIds) {
-                CorgiActivity corgiActivity = corgiActivityFeedService.getActivityById(activityId);
-                if (corgiActivity != null && corgiActivity.getUserId() != null) {
-                    String userId = corgiActivity.getUserId();
-                    Double likeChance = 0.0;
-                    if ("276".equals(userId)) {
-                        likeChance = 7.0 / 60;
-                    }
-                    if ("1638".equals(userId)) {
-                        likeChance = 4.0 / 60;
-                    }
-                    if ("5973".equals(userId)) {
-                        likeChance = 5.0 / 60;
-                    }
-                    if ("54879".equals(userId)) {
-                        likeChance = 9.0 / 60;
-                    }
-                    if (Math.random() < likeChance) {
-                        likeActivity(userDetail, activityId, userId);
-                    }
-                }
-            }
-        } while (true);
-
-    }
-
     private Boolean hasOnBoard(List<UserProfile> billboardUsers, UserProfile user) {
         if (billboardUsers.size() == 0) {
             return false;
