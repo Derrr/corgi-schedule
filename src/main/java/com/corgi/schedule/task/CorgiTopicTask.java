@@ -27,8 +27,8 @@ public class CorgiTopicTask {
     private CorgiLikeService corgiLikeService;
 
 
-    @Async
-    @Scheduled(cron = "0 0 22,23 * * *")
+    //@Async
+    //@Scheduled(cron = "0 0 22,23 * * *")
     //@Scheduled(fixedRate = 3600 * 1000)
     public void run() {
         int page = 1;
