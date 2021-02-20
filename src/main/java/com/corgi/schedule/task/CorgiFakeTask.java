@@ -47,7 +47,7 @@ public class CorgiFakeTask {
     @Autowired
     private MQService mqService;
 
-    private static final Double DAY_MINUTE = 13 * 60.0;
+    private static final Double DAY_MINUTE = 14 * 60.0;
 
     private static final String LAST_ACTIVITY = "last_activity_";
 
