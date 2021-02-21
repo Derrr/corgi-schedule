@@ -199,7 +199,6 @@ public class CorgiFakeTask {
         boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
         String activityId = getLastActivity(profile.getUserId(), lastDay);
         double followChance = 0.0;
-        Integer fakeFollowers = corgiFakeService.countFakeFollower(profile.getUserId());
         double likeChance = 0.0;
         followChance = 100 / (30 * DAY_MINUTE);
         if (hasFace) {
