@@ -1,6 +1,8 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.user.api.CorgiLikeService;
 import com.corgi.user.api.CorgiToolService;
 import com.corgi.user.api.CorgiVlogService;
@@ -27,6 +29,8 @@ public class CorgiHotVlogTask {
     private CorgiVlogService corgiVlogService;
     @Reference
     private CorgiLikeService corgiLikeService;
+    @Reference
+    private CorgiActivityService corgiActivityService;
 
 
     @Async
@@ -66,6 +70,7 @@ public class CorgiHotVlogTask {
                 queryHot.setActivityId(activityId);
                 List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
+
                 if (tmpList.size() > 0) {
                     CorgiVlogHot hot = tmpList.get(0);
                     if (likeCount * 10 > hot.getExpectView()) {
@@ -93,6 +98,9 @@ public class CorgiHotVlogTask {
                         corgiVlogService.updateHotVlog(updateHot);
                     }
                 }
+                queryHot.setType(CorgiVlogHot.TYPE.AUTO);
+                Long totalCount = corgiLikeService.countActivityLike(activityId);
+                corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
             }
             page++;
         } while (shouldContinue);
