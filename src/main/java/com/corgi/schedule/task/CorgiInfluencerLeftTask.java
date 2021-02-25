@@ -51,7 +51,7 @@ public class CorgiInfluencerLeftTask {
                 userDetail.setUserId(userProfile.getUserId());
                 corgiUserService.updateDetail(userDetail);
                 corgiToolService.countUserNumber(userProfile.getNickname());
-                mqService.sendInfluencerLeftMessage(PushMessage.builder().targetUserId(userProfile.getUserId()).build());
+                //mqService.sendInfluencerLeftMessage(PushMessage.builder().targetUserId(userProfile.getUserId()).build());
             }
         }
     }
