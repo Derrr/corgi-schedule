@@ -46,7 +46,8 @@ public class CorgiInfluencerLeftTask {
         Long threshold = System.currentTimeMillis() - 30 * 24 * 1000 * 3600;
         for (UserProfile userProfile : influencers) {
             UserPosition userPosition = corgiUserService.getUserPosition(userProfile.getUserId());
-            if (userPosition == null || userPosition.getUptime() < threshold) {
+            if (userPosition != null && userPosition.getUptime() < threshold) {
+                log.error(userPosition.getUserId() + ":" + userPosition.getUptime() + "<" + threshold);
                 userDetail.setUserId(userProfile.getUserId());
                 corgiUserService.updateDetail(userDetail);
                 corgiToolService.countUserNumber(userProfile.getNickname());
