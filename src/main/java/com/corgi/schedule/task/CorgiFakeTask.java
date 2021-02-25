@@ -60,7 +60,7 @@ public class CorgiFakeTask {
         int pageSize = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         UserDetail userDetail = null;
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             String userId = corgiFakeService.selectFakeUser();
             userDetail = corgiUserService.getUserDetailBasic(userId);
             if (userDetail != null) {
@@ -70,6 +70,7 @@ public class CorgiFakeTask {
         if (userDetail == null) {
             return;
         }
+
         corgiFakeService.updateFakeTime(userDetail.getUserId());
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -30);
@@ -170,11 +171,10 @@ public class CorgiFakeTask {
             } else {
                 followChance = 10.0 / (30.0 * DAY_MINUTE);
             }
-            if (!"-1".equals(activityId) || !StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
-                followChance += 30.0 / (30.0 * DAY_MINUTE);
-            }
         }
-
+        if (!"-1".equals(activityId)) {
+            followChance += 30.0 / (30.0 * DAY_MINUTE);
+        }
         if (profile.getTime() != null && System.currentTimeMillis() - 24 * 1000 * 3600 > profile.getTime()) {
             if (hasFace) {
                 followChance += 1.0 / DAY_MINUTE;
@@ -204,7 +204,7 @@ public class CorgiFakeTask {
         if (hasFace) {
             followChance += 200 / (30 * DAY_MINUTE);
         }
-        if (!StringUtils.isEmpty(corgiFakeService.getLastActivity(profile.getUserId(), profile.getCreateTime()))) {
+        if (!"-1".equals(activityId)) {
             followChance += 400 / (30 * DAY_MINUTE);
         }
 
@@ -264,15 +264,16 @@ public class CorgiFakeTask {
     }
 
     private String getLastActivity(String userId, String lastDay) {
-        String activityId = redisTemplate.opsForValue().get(LAST_ACTIVITY.concat(userId));
-        if (StringUtils.isEmpty(activityId)) {
-            activityId = corgiFakeService.getLastActivity(userId, lastDay);
-            if (StringUtils.isEmpty(activityId)) {
-                activityId = "-1";
-                redisTemplate.opsForValue().set(LAST_ACTIVITY.concat(userId), activityId, 1L, TimeUnit.HOURS);
-            } else {
-                redisTemplate.opsForValue().set(LAST_ACTIVITY.concat(userId), activityId, 1L, TimeUnit.DAYS);
+        if (!redisTemplate.hasKey(LAST_ACTIVITY)) {
+            List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
+            for (CorgiActivity activity : corgiActivities) {
+                redisTemplate.opsForHash().put(LAST_ACTIVITY, userId, activity.getId());
             }
+            redisTemplate.expire(LAST_ACTIVITY, 1L, TimeUnit.HOURS);
+        }
+        String activityId = (String) redisTemplate.opsForHash().get(LAST_ACTIVITY, userId);
+        if (StringUtils.isEmpty(activityId)) {
+            activityId = "-1";
         }
         return activityId;
     }
