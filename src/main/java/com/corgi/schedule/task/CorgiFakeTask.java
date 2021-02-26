@@ -1,6 +1,7 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.corgi.activity.api.CorgiActivityFeedService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
@@ -279,4 +280,26 @@ public class CorgiFakeTask {
         return activityId;
     }
 
+    private List<UserProfile> getBasicUserDetailByPage(Integer page, Integer pageSize) {
+        List<UserProfile> result = new ArrayList<>();
+        String userListKey = "user_list" + page;
+        String userDetailKey = "user_detail";
+        if (redisTemplate.hasKey(userListKey)) {
+            List<String> userIds = redisTemplate.opsForList().range(userListKey, 0, pageSize);
+            for (String userId : userIds) {
+                String detailJson = (String) redisTemplate.opsForHash().get(userDetailKey, userId);
+                if(!StringUtils.isEmpty(detailJson)) {
+                    result.add(JSON.parseObject(detailJson, UserProfile.class));
+                }
+            }
+        } else {
+            result = corgiUserService.getBasicUserDetailByPage(page, pageSize);
+            for (UserProfile userProfile : result) {
+                redisTemplate.opsForList().rightPush(userListKey, userProfile.getUserId());
+                redisTemplate.opsForHash().put(userDetailKey, userProfile.getUserId(), JSON.toJSONString(userProfile));
+            }
+            redisTemplate.expire(userListKey, 1L, TimeUnit.HOURS);
+        }
+        return result;
+    }
 }
