@@ -8,6 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+
+import java.util.concurrent.Executors;
 
 /**
  * @author tairanliu
@@ -16,7 +20,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @EnableDubboConfiguration
 @EnableAsync
-public class ScheduleApplication {
+public class ScheduleApplication implements SchedulingConfigurer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ScheduleApplication.class, args);
@@ -32,4 +36,8 @@ public class ScheduleApplication {
 		return new Queue(CorgiQueueName.USER_RECOMMEND_QUEUE);
 	}
 
+	@Override
+	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
+		scheduledTaskRegistrar.setScheduler(Executors.newScheduledThreadPool(10));
+	}
 }
