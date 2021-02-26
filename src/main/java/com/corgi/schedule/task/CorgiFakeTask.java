@@ -10,8 +10,6 @@ import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
 import com.corgi.user.api.*;
 import com.corgi.user.entity.*;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +53,6 @@ public class CorgiFakeTask {
 
     private static final String LAST_ACTIVITY = "last_activity_";
 
-    private Cache<String, List<String>> userListCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1L, TimeUnit.HOURS)
-            .initialCapacity(100)
-            .build();
-
-    private Cache<String, UserProfile> userDetailCache = CacheBuilder.newBuilder()
-            .initialCapacity(150000)
-            .build();
-
 
     @Async(value = "asyncExecutor")
     @Scheduled(cron = "0 0/1 9-22 * * *")
@@ -96,10 +85,10 @@ public class CorgiFakeTask {
 
         List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
         do {
-            Long oneStart = System.currentTimeMillis();
+            Long startOne = System.currentTimeMillis();
             List<UserProfile> profiles = this.getBasicUserDetailByPage(page, pageSize);
-            Long onePageStart = System.currentTimeMillis();
-            log.info("fake get one page take:{} ", onePageStart - oneStart);
+            Long startOnePage = System.currentTimeMillis();
+            log.info("fake get one page:{} ", startOnePage - startOne);
             page++;
             if (CollectionUtils.isEmpty(profiles)) {
                 break;
@@ -116,10 +105,10 @@ public class CorgiFakeTask {
                     newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
                 }
             }
-            Long onePageEnd = System.currentTimeMillis();
-            log.info("fake check one page take:{} ", onePageEnd - onePageStart);
+            Long endOne = System.currentTimeMillis();
+            log.info("fake get one page:{} ", endOne - startOnePage);
         } while (true);
-        log.info("fake task take: {} ", (System.currentTimeMillis() - start) / 1000);
+        log.info("fake task take:{} ", (System.currentTimeMillis() - start) / 1000);
     }
 
     private Boolean hasOnBoard(List<UserProfile> billboardUsers, UserProfile user) {
@@ -300,26 +289,26 @@ public class CorgiFakeTask {
     private List<UserProfile> getBasicUserDetailByPage(Integer page, Integer pageSize) {
         List<UserProfile> result = new ArrayList<>();
         String userListKey = "user_list" + page;
-        List<String> userIds = userListCache.getIfPresent(userListKey);
-        if (!CollectionUtils.isEmpty(userIds)) {
+        String userDetailKey = "user_detail";
+        if (redisTemplate.hasKey(userListKey)) {
+            List<String> userIds = redisTemplate.opsForSet().randomMembers(userListKey, pageSize);
             for (String userId : userIds) {
-                UserProfile userProfile = userDetailCache.getIfPresent(userId);
-                if (userProfile != null) {
-                    result.add(userProfile);
+                String detailJson = (String) redisTemplate.opsForHash().get(userDetailKey, userId);
+                if (!StringUtils.isEmpty(detailJson)) {
+                    result.add(JSON.parseObject(detailJson, UserProfile.class));
                 }
             }
         } else {
-            userIds = new ArrayList<>();
             result = corgiUserService.getBasicUserDetailByPage(page, pageSize);
             if (CollectionUtils.isEmpty(result)) {
-                userListCache.put(userListKey, Arrays.asList("empty"));
+                redisTemplate.opsForSet().add(userListKey, "empty");
             } else {
                 for (UserProfile userProfile : result) {
-                    userIds.add(userProfile.getUserId());
-                    userDetailCache.put(userProfile.getUserId(), userProfile);
+                    redisTemplate.opsForSet().add(userListKey, userProfile.getUserId());
+                    redisTemplate.opsForHash().put(userDetailKey, userProfile.getUserId(), JSON.toJSONString(userProfile));
                 }
-                userListCache.put(userListKey, userIds);
             }
+            redisTemplate.expire(userListKey, 60 + new Random().nextInt(40), TimeUnit.MINUTES);
         }
         return result;
     }
