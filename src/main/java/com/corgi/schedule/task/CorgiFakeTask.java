@@ -106,7 +106,7 @@ public class CorgiFakeTask {
                 }
             }
             Long endOne = System.currentTimeMillis();
-            log.info("fake get one page:{} ", endOne - startOnePage);
+            log.info("fake check one page:{} ", endOne - startOnePage);
         } while (true);
         log.info("fake task take:{} ", (System.currentTimeMillis() - start) / 1000);
     }
