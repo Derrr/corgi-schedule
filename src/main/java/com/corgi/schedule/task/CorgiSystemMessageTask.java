@@ -46,7 +46,7 @@ public class CorgiSystemMessageTask {
     private HxPushMessageService hxPushMessageService;
 
     @Async
-    @Scheduled(cron = "0 0/1 * * * *")
+    @Scheduled(cron = "0 0/10 * * * *")
     public void run() {
         log.info("start sending...");
         List<SystemMessage> systemMessageList = corgiSystemMessageService.getSystemMessagesByTime(System.currentTimeMillis());
