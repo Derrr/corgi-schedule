@@ -56,6 +56,7 @@ public class CorgiFakeTask {
     @Scheduled(cron = "0 0/1 9-22 * * *")
     public void run() {
         log.info("creating fake");
+        Long start = System.currentTimeMillis();
         int page = 1;
         int pageSize = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -100,7 +101,7 @@ public class CorgiFakeTask {
                 }
             }
         } while (true);
-
+        log.info("fake task take: {}", (System.currentTimeMillis() - start)/1000);
     }
 
     private Boolean hasOnBoard(List<UserProfile> billboardUsers, UserProfile user) {
