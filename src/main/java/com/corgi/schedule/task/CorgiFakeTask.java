@@ -84,7 +84,7 @@ public class CorgiFakeTask {
 
         List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
         do {
-            List<UserProfile> profiles = corgiUserService.getBasicUserDetailByPage(page, pageSize);
+            List<UserProfile> profiles = this.getBasicUserDetailByPage(page, pageSize);
             page++;
             if (CollectionUtils.isEmpty(profiles)) {
                 break;
@@ -288,15 +288,19 @@ public class CorgiFakeTask {
             List<String> userIds = redisTemplate.opsForList().range(userListKey, 0, pageSize);
             for (String userId : userIds) {
                 String detailJson = (String) redisTemplate.opsForHash().get(userDetailKey, userId);
-                if(!StringUtils.isEmpty(detailJson)) {
+                if (!StringUtils.isEmpty(detailJson)) {
                     result.add(JSON.parseObject(detailJson, UserProfile.class));
                 }
             }
         } else {
             result = corgiUserService.getBasicUserDetailByPage(page, pageSize);
-            for (UserProfile userProfile : result) {
-                redisTemplate.opsForList().rightPush(userListKey, userProfile.getUserId());
-                redisTemplate.opsForHash().put(userDetailKey, userProfile.getUserId(), JSON.toJSONString(userProfile));
+            if (CollectionUtils.isEmpty(result)) {
+                redisTemplate.opsForList().rightPush(userListKey, "empty");
+            } else {
+                for (UserProfile userProfile : result) {
+                    redisTemplate.opsForList().rightPush(userListKey, userProfile.getUserId());
+                    redisTemplate.opsForHash().put(userDetailKey, userProfile.getUserId(), JSON.toJSONString(userProfile));
+                }
             }
             redisTemplate.expire(userListKey, 1L, TimeUnit.HOURS);
         }
