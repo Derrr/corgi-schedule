@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import java.util.concurrent.Executors;
@@ -39,5 +40,18 @@ public class ScheduleApplication implements SchedulingConfigurer {
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
 		scheduledTaskRegistrar.setScheduler(Executors.newScheduledThreadPool(10));
+	}
+
+	/**
+	 * 异步任务执行线程池
+	 * @return
+	 */
+	@Bean(name = "asyncExecutor")
+	public ThreadPoolTaskExecutor asyncExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(100);
+		executor.setThreadNamePrefix("asyncTaskExecutor-");
+		executor.initialize();
+		return executor;
 	}
 }

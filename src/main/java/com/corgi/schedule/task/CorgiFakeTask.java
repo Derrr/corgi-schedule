@@ -52,7 +52,7 @@ public class CorgiFakeTask {
     private static final String LAST_ACTIVITY = "last_activity_";
 
 
-    @Async
+    @Async(value = "asyncExecutor")
     @Scheduled(cron = "0 0/1 9-22 * * *")
     public void run() {
         log.info("creating fake");
@@ -101,7 +101,7 @@ public class CorgiFakeTask {
                 }
             }
         } while (true);
-        log.info("fake task take: {}", (System.currentTimeMillis() - start)/1000);
+        log.info("fake task take: {}", (System.currentTimeMillis() - start) / 1000);
     }
 
     private Boolean hasOnBoard(List<UserProfile> billboardUsers, UserProfile user) {
