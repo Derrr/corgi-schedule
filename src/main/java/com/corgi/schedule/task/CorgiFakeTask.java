@@ -286,11 +286,6 @@ public class CorgiFakeTask {
         String userListKey = "user_list" + page;
         String userDetailKey = "user_detail";
         if (redisTemplate.hasKey(userListKey)) {
-            if (!DataType.SET.equals(redisTemplate.type(userListKey))) {
-                redisTemplate.delete(userListKey);
-            }
-        }
-        if (redisTemplate.hasKey(userListKey)) {
             List<String> userIds = redisTemplate.opsForSet().randomMembers(userListKey, pageSize);
             for (String userId : userIds) {
                 String detailJson = (String) redisTemplate.opsForHash().get(userDetailKey, userId);
