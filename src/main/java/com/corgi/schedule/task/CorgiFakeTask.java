@@ -285,7 +285,7 @@ public class CorgiFakeTask {
         String userListKey = "user_list" + page;
         String userDetailKey = "user_detail";
         if (redisTemplate.hasKey(userListKey)) {
-            List<String> userIds = redisTemplate.opsForList().range(userListKey, 0, pageSize);
+            List<String> userIds = redisTemplate.opsForSet().randomMembers(userListKey, pageSize);
             for (String userId : userIds) {
                 String detailJson = (String) redisTemplate.opsForHash().get(userDetailKey, userId);
                 if (!StringUtils.isEmpty(detailJson)) {
@@ -295,10 +295,10 @@ public class CorgiFakeTask {
         } else {
             result = corgiUserService.getBasicUserDetailByPage(page, pageSize);
             if (CollectionUtils.isEmpty(result)) {
-                redisTemplate.opsForList().rightPush(userListKey, "empty");
+                redisTemplate.opsForSet().add(userListKey, "empty");
             } else {
                 for (UserProfile userProfile : result) {
-                    redisTemplate.opsForList().rightPush(userListKey, userProfile.getUserId());
+                    redisTemplate.opsForSet().add(userListKey, userProfile.getUserId());
                     redisTemplate.opsForHash().put(userDetailKey, userProfile.getUserId(), JSON.toJSONString(userProfile));
                 }
             }
