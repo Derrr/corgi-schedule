@@ -308,7 +308,7 @@ public class CorgiFakeTask {
                     redisTemplate.opsForHash().put(userDetailKey, userProfile.getUserId(), JSON.toJSONString(userProfile));
                 }
             }
-            redisTemplate.expire(userListKey, 1L, TimeUnit.HOURS);
+            redisTemplate.expire(userListKey, 60 + new Random().nextInt(40), TimeUnit.MINUTES);
         }
         return result;
     }
