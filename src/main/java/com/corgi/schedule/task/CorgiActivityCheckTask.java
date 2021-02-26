@@ -82,7 +82,9 @@ public class CorgiActivityCheckTask {
                     UserLogin userLogin = corgiUserService.getUserLogin(activity.getUserId());
                     sendMessage(client, activity, activity.getUserId(), userLogin.getTelNo(), time);
                     for (UserProfile userProfile : userProfiles) {
-                        sendMessage(client, activity, userProfile.getUserId(), userProfile.getTelNo(), time);
+                        if (userProfile.getTelNo() != null) {
+                            sendMessage(client, activity, userProfile.getUserId(), userProfile.getTelNo(), time);
+                        }
                     }
 
                 }
@@ -95,7 +97,7 @@ public class CorgiActivityCheckTask {
         String key = "activity_check_sent_" + activity.getId() + "_" + userId;
         if (!redisTemplate.hasKey(key)) {
             String sign = "SMS_187225471";
-            if(telNo.contains("-")){
+            if (telNo.contains("-")) {
                 sign = "SMS_188550914";
             }
             CommonRequest request = new CommonRequest();
@@ -104,7 +106,7 @@ public class CorgiActivityCheckTask {
             request.setVersion("2017-05-25");
             request.setAction("SendSms");
             request.putQueryParameter("RegionId", "cn-hangzhou");
-            request.putQueryParameter("PhoneNumbers", telNo.replaceAll("-",""));
+            request.putQueryParameter("PhoneNumbers", telNo.replaceAll("-", ""));
             request.putQueryParameter("SignName", "Corgi");
             request.putQueryParameter("TemplateCode", sign);
             request.putQueryParameter("TemplateParam", "{\"time\":\"" + time + "\",\"name\":\"" + activity.getAddress() + "\"}");
