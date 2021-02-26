@@ -13,6 +13,7 @@ import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -284,6 +285,11 @@ public class CorgiFakeTask {
         List<UserProfile> result = new ArrayList<>();
         String userListKey = "user_list" + page;
         String userDetailKey = "user_detail";
+        if (redisTemplate.hasKey(userListKey)) {
+            if (!DataType.SET.equals(redisTemplate.type(userListKey))) {
+                redisTemplate.delete(userListKey);
+            }
+        }
         if (redisTemplate.hasKey(userListKey)) {
             List<String> userIds = redisTemplate.opsForSet().randomMembers(userListKey, pageSize);
             for (String userId : userIds) {
