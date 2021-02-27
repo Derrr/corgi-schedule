@@ -101,14 +101,13 @@ public class CorgiFakeTask {
 
         List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
         do {
-            Long oneStart = System.currentTimeMillis();
+
             List<UserProfile> profiles = this.getBasicUserDetailByPage(page, pageSize);
-            Long onePageStart = System.currentTimeMillis();
-            log.info("fake get one page take:{} ", onePageStart - oneStart);
             page++;
             if (CollectionUtils.isEmpty(profiles)) {
                 break;
             }
+            Long oneStart = System.currentTimeMillis();
             for (UserProfile profile : profiles) {
                 if (userDetail.getUserId().equals(profile.getUserId())) {
                     continue;
@@ -121,8 +120,7 @@ public class CorgiFakeTask {
                     newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
                 }
             }
-            Long onePageEnd = System.currentTimeMillis();
-            log.info("fake check one page take:{} ", onePageEnd - onePageStart);
+            log.info("check one page:{} ", System.currentTimeMillis() - oneStart);
         } while (true);
         log.info("fake task take: {} ", (System.currentTimeMillis() - start) / 1000);
     }
@@ -295,6 +293,7 @@ public class CorgiFakeTask {
             for (CorgiActivity activity : corgiActivities) {
                 activityMap.put(userId, activity.getId());
             }
+            activityCache.put(LAST_ACTIVITY, activityMap);
         }
         String activityId = activityMap.get(userId);
         if (StringUtils.isEmpty(activityId)) {
