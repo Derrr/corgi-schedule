@@ -288,12 +288,14 @@ public class CorgiFakeTask {
     private String getLastActivity(String userId, String lastDay) {
         HashMap<String, String> activityMap = activityCache.getIfPresent(LAST_ACTIVITY);
         if (activityMap == null) {
-            activityMap = new HashMap<String, String>();
+            activityMap = new HashMap<>();
             List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
             for (CorgiActivity activity : corgiActivities) {
                 activityMap.put(userId, activity.getId());
             }
             activityCache.put(LAST_ACTIVITY, activityMap);
+        } else {
+            log.info("map size:{} ", activityMap.size());
         }
         String activityId = activityMap.get(userId);
         if (StringUtils.isEmpty(activityId)) {
