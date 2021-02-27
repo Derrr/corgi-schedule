@@ -64,6 +64,11 @@ public class CorgiFakeTask {
             .initialCapacity(150000)
             .build();
 
+    private Cache<String, HashMap<String, String>> activityCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(10L, TimeUnit.MINUTES)
+            .initialCapacity(100)
+            .build();
+
 
     @Async(value = "asyncExecutor")
     @Scheduled(cron = "0 0/1 9-22 * * *")
@@ -283,14 +288,15 @@ public class CorgiFakeTask {
     }
 
     private String getLastActivity(String userId, String lastDay) {
-        if (!redisTemplate.hasKey(LAST_ACTIVITY)) {
+        HashMap<String, String> activityMap = activityCache.getIfPresent(LAST_ACTIVITY);
+        if (activityMap == null) {
+            activityMap = new HashMap<String, String>();
             List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
             for (CorgiActivity activity : corgiActivities) {
-                redisTemplate.opsForHash().put(LAST_ACTIVITY, userId, activity.getId());
+                activityMap.put(userId, activity.getId());
             }
-            redisTemplate.expire(LAST_ACTIVITY, 1L, TimeUnit.HOURS);
         }
-        String activityId = (String) redisTemplate.opsForHash().get(LAST_ACTIVITY, userId);
+        String activityId = activityMap.get(userId);
         if (StringUtils.isEmpty(activityId)) {
             activityId = "-1";
         }
