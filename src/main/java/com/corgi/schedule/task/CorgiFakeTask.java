@@ -53,7 +53,7 @@ public class CorgiFakeTask {
 
     private static final Double DAY_MINUTE = 14 * 60.0;
 
-    private static final String LAST_ACTIVITY = "last_activity_";
+    private static final String LAST_ACTIVITY = "last_activity";
 
     private Cache<String, List<String>> userListCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1L, TimeUnit.HOURS)
@@ -291,11 +291,9 @@ public class CorgiFakeTask {
             activityMap = new HashMap<>();
             List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
             for (CorgiActivity activity : corgiActivities) {
-                activityMap.put(userId, activity.getId());
+                activityMap.put(activity.getUserId(), activity.getId());
             }
             activityCache.put(LAST_ACTIVITY, activityMap);
-        } else {
-            log.info("map size:{} ", activityMap.size());
         }
         String activityId = activityMap.get(userId);
         if (StringUtils.isEmpty(activityId)) {
