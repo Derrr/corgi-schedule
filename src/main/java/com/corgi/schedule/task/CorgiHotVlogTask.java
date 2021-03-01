@@ -42,7 +42,7 @@ public class CorgiHotVlogTask {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<String> activityList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, 60);
+        calendar.add(Calendar.MINUTE, -60);
         String hourAgo = sdf.format(calendar.getTime());
         boolean shouldContinue = true;
         CorgiVlogHot queryHot = new CorgiVlogHot();
