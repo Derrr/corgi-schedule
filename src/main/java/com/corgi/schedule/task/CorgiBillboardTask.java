@@ -172,6 +172,9 @@ public class CorgiBillboardTask {
     }
 
     private boolean checkUser(List<String> userIds, String userId) {
+        if (userId == null) {
+            return true;
+        }
         if (userIds.contains(userId)) {
             return true;
         }
