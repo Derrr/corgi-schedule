@@ -9,6 +9,7 @@ import com.corgi.user.api.CorgiVlogService;
 import com.corgi.user.entity.ActivityLike;
 import com.corgi.user.entity.CorgiVlog;
 import com.corgi.user.entity.CorgiVlogHot;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import java.util.List;
  * @author tairanliu
  */
 @Component
+@Slf4j
 public class CorgiHotVlogTask {
     @Reference
     private CorgiVlogService corgiVlogService;
@@ -50,10 +52,12 @@ public class CorgiHotVlogTask {
         queryHot.setType(CorgiVlogHot.TYPE.AUTO);
         do {
             List<ActivityLike> likeList = corgiLikeService.getLikeByPage(page, size);
+            log.info("like size:{} ", likeList.size());
             if (CollectionUtils.isEmpty(likeList)) {
                 break;
             }
             for (ActivityLike like : likeList) {
+                log.info("like:{} ,hourAgo:{} ,likeTime:{} ,result:{} ", like.getActivityId(), hourAgo, like.getCtime(), hourAgo.compareTo(like.getCtime()));
                 if (hourAgo.compareTo(like.getCtime()) > 0) {
                     shouldContinue = false;
                     break;

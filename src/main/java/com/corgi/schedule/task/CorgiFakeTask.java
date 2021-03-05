@@ -73,7 +73,6 @@ public class CorgiFakeTask {
     @Async(value = "asyncExecutor")
     @Scheduled(cron = "0 0/1 9-22 * * *")
     public void run() {
-        log.info("creating fake");
         int page = 1;
         int pageSize = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -106,7 +105,6 @@ public class CorgiFakeTask {
             if (CollectionUtils.isEmpty(profiles)) {
                 break;
             }
-            Long oneStart = System.currentTimeMillis();
             for (UserProfile profile : profiles) {
                 if (userDetail.getUserId().equals(profile.getUserId())) {
                     continue;
