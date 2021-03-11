@@ -1,21 +1,11 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.fastjson.JSONObject;
 import com.corgi.schedule.service.HxPushMessageService;
 import com.corgi.user.api.CorgiSystemMessageService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,13 +13,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author tairanliu
@@ -62,6 +47,27 @@ public class CorgiSystemMessageTask {
                 log.info("sending {} ", systemMessage.getContent());
                 sendMessages(systemMessage);
             }
+        }
+    }
+
+    @Async
+    @Scheduled(cron = "0 25 10 * * *")
+    public void birthdayNotice() {
+        SimpleDateFormat sdf = new SimpleDateFormat("/MM/dd");
+        Long time = System.currentTimeMillis() - 30 * 24 * 3600 * 1000;
+        List<String> userIds = corgiUserService.getUserByBirthday(sdf.format(new Date()), time);
+        if (!CollectionUtils.isEmpty(userIds)) {
+            String userId = userIds.get(0);
+            UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
+            List<String> corgiIds = Arrays.asList("corgi1", "corgi2", "corgi4", "corgi7");
+            SystemMessage systemMessage = new SystemMessage();
+            systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
+            systemMessage.setTitle("生日提醒");
+            systemMessage.setType("905");
+            systemMessage.setPicUrl(userDetail.getAvatar());
+            systemMessage.setUrl(userDetail.getUserId());
+            systemMessage.setUrlType("4");
+            hxPushMessageService.sendMessage(systemMessage, corgiIds);
         }
     }
 
