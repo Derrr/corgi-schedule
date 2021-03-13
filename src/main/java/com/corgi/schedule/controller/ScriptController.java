@@ -52,6 +52,8 @@ public class ScriptController {
     private CorgiStatisticService corgiStatisticService;
     @Reference(retries = 1, timeout = 100000)
     private CorgiUserRecommendService corgiUserRecommendService;
+    @Reference
+    private CorgiSystemMessageService corgiSystemMessageService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -97,6 +99,12 @@ public class ScriptController {
         }
         hxPushMessageService.sendMessage(systemMessage, Arrays.asList(userId), extra);
         return "success";
+    }
+
+    @GetMapping("push_system_message")
+    public String pushSystemMessage(@RequestParam("id") String id, @RequestParam("userId") String userId) {
+        SystemMessage message = corgiSystemMessageService.getMessageDetail(id);
+        return hxPushMessageService.sendMessage(message, Arrays.asList("corgi" + userId), new HashMap());
     }
 
 
