@@ -36,14 +36,14 @@ public class CorgiInfluencerLeftTask {
     private TaskService taskService;
 
 
-    @Async
-    @Scheduled(cron = "0 0 10 25 * *")
+    //@Async
+    //@Scheduled(cron = "0 0 10 25 * *")
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         List<UserProfile> influencers = corgiUserRecommendService.getInfluencerByCity(null, "全国", 1000);
         UserDetail userDetail = new UserDetail();
         userDetail.setAvatarStatus("");
-        Long threshold = System.currentTimeMillis() - 30 * 24 * 1000 * 3600;
+        Long threshold = System.currentTimeMillis() - 30 * 24 * 1000 * 3600L;
         for (UserProfile userProfile : influencers) {
             UserPosition userPosition = corgiUserService.getUserPosition(userProfile.getUserId());
             if (userPosition != null && userPosition.getUptime() < threshold) {
