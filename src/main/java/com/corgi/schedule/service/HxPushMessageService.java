@@ -68,7 +68,7 @@ public class HxPushMessageService {
         try {
             content = new String(systemMessage.getContent().getBytes(), "UTF-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
         apnsContent.put("em_push_content", content);
 
