@@ -56,10 +56,14 @@ public class CorgiSystemMessageTask {
     public void birthdayNotice() {
         SimpleDateFormat sdf = new SimpleDateFormat("/MM/dd");
         Long time = System.currentTimeMillis() - 30 * 24 * 3600 * 1000;
-        List<String> userIds = corgiUserService.getUserByBirthday(sdf.format(new Date()), time);
+        String date = sdf.format(new Date());
+        log.info("start birthday notice:{} ", date);
+        List<String> userIds = corgiUserService.getUserByBirthday(date, time);
+        log.info("start birthday user:{} ", userIds.size());
         if (!CollectionUtils.isEmpty(userIds)) {
             String userId = userIds.get(0);
             UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
+            log.info("push user:{} ", userDetail);
             List<String> corgiIds = Arrays.asList("corgi1");
             SystemMessage systemMessage = new SystemMessage();
             systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
