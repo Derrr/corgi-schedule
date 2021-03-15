@@ -55,9 +55,9 @@ public class CorgiSystemMessageTask {
     @Scheduled(fixedRate = 1000 * 3600 * 24)
     public void birthdayNotice() {
         SimpleDateFormat sdf = new SimpleDateFormat("/MM/dd");
-        Long time = System.currentTimeMillis() - 30 * 24 * 3600 * 1000;
+        Long time = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
         String date = sdf.format(new Date());
-        log.info("start birthday notice:{} ", date);
+        log.info("start birthday notice:{},{} ", date,time);
         List<String> userIds = corgiUserService.getUserByBirthday(date, time);
         log.info("start birthday user:{} ", userIds.size());
         if (!CollectionUtils.isEmpty(userIds)) {
