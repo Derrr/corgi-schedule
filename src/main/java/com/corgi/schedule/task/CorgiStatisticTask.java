@@ -44,8 +44,6 @@ public class CorgiStatisticTask {
     @Reference
     private CorgiPushLogService corgiPushLogService;
     @Autowired
-    private MapService mapService;
-    @Autowired
     private TaskService taskService;
 
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");

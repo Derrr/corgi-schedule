@@ -25,8 +25,6 @@ import java.io.IOException;
 @Slf4j
 @Service
 public class MapService {
-    @Reference
-    CorgiAreaService corgiAreaService;
 
     public String getCity(Double lat, Double lng) {
         String location = lng + "," + lat;
@@ -148,7 +146,6 @@ public class MapService {
                                     .lng(Double.valueOf(location[0])).lat(Double.valueOf(location[1]))
                                     .address(addressArr[j])
                                     .build();
-                            corgiAreaService.addArea(area);
                         }
 
                     }
