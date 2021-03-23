@@ -51,7 +51,7 @@ public class CorgiFakeTask {
     @Autowired
     private MQService mqService;
 
-    private static final Double DAY_MINUTE = 14 * 60.0;
+    private static final Double DAY_MINUTE = 14 * 60.0 * 10;
 
     private static final String LAST_ACTIVITY = "last_activity";
 
@@ -71,7 +71,7 @@ public class CorgiFakeTask {
 
 
     @Async(value = "asyncExecutor")
-    @Scheduled(cron = "0 0/1 9-22 * * *")
+    @Scheduled(cron = "0/6 0 9-22 * * *")
     public void run() {
         int page = 1;
         int pageSize = 1000;
