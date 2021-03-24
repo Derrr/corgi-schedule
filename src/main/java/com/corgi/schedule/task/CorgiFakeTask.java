@@ -182,7 +182,7 @@ public class CorgiFakeTask {
         double followChance = 0.0;
         double likeChance = 0.0;
 
-        if (today.compareTo("2021-02-24") < 0 || today.compareTo(finalTime) < 0) {
+        if (today.compareTo(finalTime) < 0) {
             if (hasFace) {
                 followChance = 20.0 / (30.0 * DAY_MINUTE);
             } else {
@@ -190,7 +190,7 @@ public class CorgiFakeTask {
             }
         }
         if (!"-1".equals(activityId)) {
-            followChance += 30.0 / (30.0 * DAY_MINUTE);
+            followChance += 1 / DAY_MINUTE;
         }
         if (profile.getTime() != null && System.currentTimeMillis() - 24 * 1000 * 3600 > profile.getTime()) {
             if (hasFace) {
