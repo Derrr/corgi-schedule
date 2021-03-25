@@ -46,6 +46,8 @@ public class CorgiFakeTask {
     private CorgiToolService corgiToolService;
     @Reference
     private CorgiActivityFeedService corgiActivityFeedService;
+    @Reference
+    private CorgiVisitService corgiVisitService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -250,6 +252,7 @@ public class CorgiFakeTask {
                     .targetUserId(followId)
                     .extra(extra)
                     .build());
+            corgiVisitService.visit(userDetail.getUserId(), followId);
         }
     }
 
