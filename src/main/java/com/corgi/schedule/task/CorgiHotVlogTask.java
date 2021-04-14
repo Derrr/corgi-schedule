@@ -1,10 +1,12 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.activity.api.CorgiActivityFeedService;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.user.api.CorgiLikeService;
 import com.corgi.user.api.CorgiToolService;
+import com.corgi.user.api.CorgiUserActivityService;
 import com.corgi.user.api.CorgiVlogService;
 import com.corgi.user.entity.ActivityLike;
 import com.corgi.user.entity.CorgiVlog;
@@ -33,6 +35,8 @@ public class CorgiHotVlogTask {
     private CorgiLikeService corgiLikeService;
     @Reference
     private CorgiActivityService corgiActivityService;
+    @Reference
+    private CorgiActivityFeedService corgiActivityFeedService;
 
 
     @Async
@@ -68,6 +72,12 @@ public class CorgiHotVlogTask {
                     continue;
                 }
                 activityList.add(activityId);
+                CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
+                if (!CorgiActivity.CAT_IMAGE.equals(activity.getCategory())
+                        || !CorgiActivity.CAT_VIDEO.equals(activity.getCategory())
+                        || !CorgiActivity.CAT_TEXT.equals(activity.getCategory())) {
+                    continue;
+                }
 
                 Long totalCount = corgiLikeService.countActivityLike(activityId);
                 corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
