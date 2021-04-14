@@ -35,8 +35,8 @@ public class CorgiHotVlogTask {
     private CorgiActivityService corgiActivityService;
 
 
-    //@Async
-    //@Scheduled(cron = "0 0/30 * * * *")
+    @Async
+    @Scheduled(cron = "0 0/1 * * * *")
     //@Scheduled(fixedRate = 3600 * 1000)
     public void run() {
         int page = 1;
@@ -44,7 +44,7 @@ public class CorgiHotVlogTask {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<String> activityList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.MINUTE, -60);
+        calendar.add(Calendar.MINUTE, -5);
         String hourAgo = sdf.format(calendar.getTime());
         boolean shouldContinue = true;
         CorgiVlogHot queryHot = new CorgiVlogHot();
@@ -62,19 +62,22 @@ public class CorgiHotVlogTask {
                     shouldContinue = false;
                     break;
                 }
+
                 String activityId = like.getActivityId();
                 if (activityList.contains(activityId)) {
                     continue;
                 }
                 activityList.add(activityId);
-                CorgiVlog vlog = corgiVlogService.getVlog(activityId);
-                if (vlog == null || StringUtils.isEmpty(vlog.getActivityId())) {
+
+                Long totalCount = corgiLikeService.countActivityLike(activityId);
+                corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
+
+                Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
+                if (likeCount < 5) {
                     continue;
                 }
                 queryHot.setActivityId(activityId);
                 List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
-                Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
-
                 if (tmpList.size() > 0) {
                     CorgiVlogHot hot = tmpList.get(0);
                     if (likeCount * 10 > hot.getExpectView()) {
@@ -103,8 +106,6 @@ public class CorgiHotVlogTask {
                     }
                 }
                 queryHot.setType(CorgiVlogHot.TYPE.AUTO);
-                Long totalCount = corgiLikeService.countActivityLike(activityId);
-                corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
             }
             page++;
         } while (shouldContinue);
