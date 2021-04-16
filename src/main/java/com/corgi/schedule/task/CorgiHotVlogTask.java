@@ -74,8 +74,8 @@ public class CorgiHotVlogTask {
                 activityList.add(activityId);
                 CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
                 if (!CorgiActivity.CAT_IMAGE.equals(activity.getCategory())
-                        || !CorgiActivity.CAT_VIDEO.equals(activity.getCategory())
-                        || !CorgiActivity.CAT_TEXT.equals(activity.getCategory())) {
+                        && !CorgiActivity.CAT_VIDEO.equals(activity.getCategory())
+                        && !CorgiActivity.CAT_TEXT.equals(activity.getCategory())) {
                     continue;
                 }
 

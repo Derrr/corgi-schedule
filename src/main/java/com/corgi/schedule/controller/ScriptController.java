@@ -488,8 +488,8 @@ public class ScriptController {
                 activityList.add(activityId);
                 CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
                 if (!CorgiActivity.CAT_IMAGE.equals(activity.getCategory())
-                        || !CorgiActivity.CAT_VIDEO.equals(activity.getCategory())
-                        || !CorgiActivity.CAT_TEXT.equals(activity.getCategory())) {
+                        && !CorgiActivity.CAT_VIDEO.equals(activity.getCategory())
+                        && !CorgiActivity.CAT_TEXT.equals(activity.getCategory())) {
                     continue;
                 }
 
@@ -497,7 +497,6 @@ public class ScriptController {
                 corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
 
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
-                log.info("activity:{} like count:{} ", activityId, likeCount);
                 if (likeCount < 5) {
                     continue;
                 }
@@ -518,7 +517,6 @@ public class ScriptController {
                     addHot.setExpectView(likeCount * 10);
                     addHot.setLikeCount(likeCount);
                     addHot.setType(CorgiVlogHot.TYPE.AUTO);
-                    log.info("adding activity:{} ", activityId);
                     corgiVlogService.addHotVlog(addHot);
                 }
                 queryHot.setType(CorgiVlogHot.TYPE.MANUAL);
