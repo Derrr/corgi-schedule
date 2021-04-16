@@ -497,6 +497,7 @@ public class ScriptController {
                 corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
 
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
+                log.info("activity:{} like count:{} ", activityId, likeCount);
                 if (likeCount < 5) {
                     continue;
                 }
