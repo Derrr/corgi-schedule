@@ -1,6 +1,7 @@
 package com.corgi.schedule.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.activity.api.CorgiActivityFeedService;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
@@ -24,10 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author tairanliu
@@ -54,6 +52,12 @@ public class ScriptController {
     private CorgiUserRecommendService corgiUserRecommendService;
     @Reference
     private CorgiSystemMessageService corgiSystemMessageService;
+    @Reference
+    private CorgiVlogService corgiVlogService;
+    @Reference
+    private CorgiLikeService corgiLikeService;
+    @Reference
+    private CorgiActivityFeedService corgiActivityFeedService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -458,6 +462,77 @@ public class ScriptController {
                 }
             }
         } while (!CollectionUtils.isEmpty(userPositionList));
+        return "success";
+    }
+
+    @GetMapping("init_hot_activity")
+    public String initHotActivity() {
+        int page = 1;
+        int size = 1000;
+        List<String> activityList = new ArrayList<>();
+        boolean shouldContinue = true;
+        CorgiVlogHot queryHot = new CorgiVlogHot();
+        queryHot.setStatus(CorgiVlogHot.STATUS.OPEN);
+        queryHot.setType(CorgiVlogHot.TYPE.AUTO);
+        do {
+            List<ActivityLike> likeList = corgiLikeService.getLikeByPage(page, size);
+            log.info("like size:{} ", likeList.size());
+            if (CollectionUtils.isEmpty(likeList)) {
+                break;
+            }
+            for (ActivityLike like : likeList) {
+                String activityId = like.getActivityId();
+                if (activityList.contains(activityId)) {
+                    continue;
+                }
+                activityList.add(activityId);
+                CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
+                if (!CorgiActivity.CAT_IMAGE.equals(activity.getCategory())
+                        || !CorgiActivity.CAT_VIDEO.equals(activity.getCategory())
+                        || !CorgiActivity.CAT_TEXT.equals(activity.getCategory())) {
+                    continue;
+                }
+
+                Long totalCount = corgiLikeService.countActivityLike(activityId);
+                corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
+
+                Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
+                if (likeCount < 5) {
+                    continue;
+                }
+                queryHot.setActivityId(activityId);
+                List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
+                if (tmpList.size() > 0) {
+                    CorgiVlogHot hot = tmpList.get(0);
+                    if (likeCount * 10 > hot.getExpectView()) {
+                        CorgiVlogHot updateHot = new CorgiVlogHot();
+                        updateHot.setId(hot.getId());
+                        updateHot.setLikeCount(likeCount);
+                        updateHot.setExpectView(likeCount * 10);
+                        corgiVlogService.updateHotVlog(updateHot);
+                    }
+                } else {
+                    CorgiVlogHot addHot = new CorgiVlogHot();
+                    addHot.setActivityId(activityId);
+                    addHot.setExpectView(likeCount * 10);
+                    addHot.setLikeCount(likeCount);
+                    addHot.setType(CorgiVlogHot.TYPE.AUTO);
+                    corgiVlogService.addHotVlog(addHot);
+                }
+                queryHot.setType(CorgiVlogHot.TYPE.MANUAL);
+                List<CorgiVlogHot> manualList = corgiVlogService.getHotVlog(queryHot, 1, 10);
+                if (CollectionUtils.isEmpty(manualList)) {
+                    for (CorgiVlogHot hot : manualList) {
+                        CorgiVlogHot updateHot = new CorgiVlogHot();
+                        updateHot.setId(hot.getId());
+                        updateHot.setLikeCount(likeCount);
+                        corgiVlogService.updateHotVlog(updateHot);
+                    }
+                }
+                queryHot.setType(CorgiVlogHot.TYPE.AUTO);
+            }
+            page++;
+        } while (shouldContinue);
         return "success";
     }
 }
