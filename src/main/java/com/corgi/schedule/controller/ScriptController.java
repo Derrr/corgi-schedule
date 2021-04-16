@@ -518,6 +518,7 @@ public class ScriptController {
                     addHot.setExpectView(likeCount * 10);
                     addHot.setLikeCount(likeCount);
                     addHot.setType(CorgiVlogHot.TYPE.AUTO);
+                    log.info("adding activity:{} ", activityId);
                     corgiVlogService.addHotVlog(addHot);
                 }
                 queryHot.setType(CorgiVlogHot.TYPE.MANUAL);
