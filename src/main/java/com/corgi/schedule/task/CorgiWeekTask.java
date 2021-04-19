@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class CorgiWeekTask {
-    @Reference(retries = 1, timeout = 100000)
+    @Reference(retries = 1, timeout = 5000000)
     private CorgiFakeService corgiFakeService;
     @Autowired
     private TaskService taskService;
