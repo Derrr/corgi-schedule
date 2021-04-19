@@ -72,8 +72,8 @@ public class CorgiFakeTask {
             .build();
 
 
-    //@Async(value = "asyncExecutor")
-    //@Scheduled(cron = "0/6 * 9-22 * * *")
+    @Async(value = "asyncExecutor")
+    @Scheduled(cron = "0/6 * 9-22 * * *")
     public void run() {
         int page = 1;
         int pageSize = 1000;
