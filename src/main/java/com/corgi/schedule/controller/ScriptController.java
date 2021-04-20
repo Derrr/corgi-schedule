@@ -58,6 +58,10 @@ public class ScriptController {
     private CorgiLikeService corgiLikeService;
     @Reference
     private CorgiActivityFeedService corgiActivityFeedService;
+    @Reference
+    private CorgiToolService corgiToolService;
+    @Reference
+    private CorgiUserDateService corgiUserDateService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
     @Autowired
@@ -329,6 +333,80 @@ public class ScriptController {
         CorgiPic pic = new CorgiPic();
         pic.setPicUrl(avatar);
         faceDetectedService.checkFace(pic, "1");
+        return "success";
+    }
+
+    @GetMapping("init_date")
+    public String initDate() {
+        List<UserPosition> userPositionList;
+        int page = 1;
+        int pageSize = 1000;
+        HashMap<String, String> dateTypeMap = new HashMap<>();
+        List<DateType> dateTypes = corgiToolService.getDateTypes();
+        for (DateType dateType : dateTypes) {
+            dateTypeMap.put(dateType.getType(), dateType.getContent());
+        }
+        CorgiActivity query = new CorgiActivity();
+        query.setCategory(CorgiActivity.CAT_ACTIVITY);
+        do {
+            userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
+            page++;
+            if (userPositionList != null) {
+                for (UserPosition userPosition : userPositionList) {
+                    log.info("check user ... " + userPosition.getUserId());
+                    if (StringUtils.isEmpty(userPosition.getUserId())) {
+                        continue;
+                    }
+                    String userId = userPosition.getUserId();
+                    UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
+                    if (userDetail != null) {
+                        query.setUserId(userId);
+                        CorgiDate corgiDate = new CorgiDate();
+                        corgiDate.setUserId(userId);
+                        query.setStatus(CorgiActivity.CREATED);
+                        List<CorgiActivity> corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 10);
+                        if (!CollectionUtils.isEmpty(corgiActivities)
+                                && corgiActivities.get(0) != null) {
+                            CorgiActivity corgiActivity = corgiActivities.get(0);
+                            String type = corgiActivity.getActivityType();
+                            if (dateTypeMap.get(type) != null) {
+                                corgiDate.setType(type);
+                                corgiDate.setDetail(corgiActivity.getContent());
+                                corgiUserDateService.addDate(corgiDate);
+                            } else {
+                                type = "不限";
+                                corgiDate.setType(type);
+                                corgiDate.setDetail(dateTypeMap.get(type));
+                                corgiUserDateService.addDate(corgiDate);
+                            }
+                        } else if ("influencer".equals(userDetail.getAvatarStatus())) {
+                            String type = "不限";
+                            corgiDate.setType(type);
+                            corgiDate.setDetail(dateTypeMap.get(type));
+                            corgiUserDateService.addDate(corgiDate);
+                        } else {
+                            query.setStatus(CorgiActivity.ENDED);
+                            corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 10);
+                            if (!CollectionUtils.isEmpty(corgiActivities)
+                                    && corgiActivities.get(0) != null) {
+                                CorgiActivity corgiActivity = corgiActivities.get(0);
+                                String type = corgiActivity.getActivityType();
+                                if (dateTypeMap.get(type) != null) {
+                                    corgiDate.setType(type);
+                                    corgiDate.setDetail(dateTypeMap.get(type));
+                                    corgiUserDateService.addDate(corgiDate);
+                                } else {
+                                    type = "不限";
+                                    corgiDate.setType(type);
+                                    corgiDate.setDetail(dateTypeMap.get(type));
+                                    corgiUserDateService.addDate(corgiDate);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } while (!CollectionUtils.isEmpty(userPositionList));
         return "success";
     }
 
