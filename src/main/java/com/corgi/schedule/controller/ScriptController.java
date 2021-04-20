@@ -379,11 +379,6 @@ public class ScriptController {
                                 corgiDate.setDetail(dateTypeMap.get(type));
                                 corgiUserDateService.addDate(corgiDate);
                             }
-                        } else if ("influencer".equals(userDetail.getAvatarStatus())) {
-                            String type = "不限";
-                            corgiDate.setType(type);
-                            corgiDate.setDetail(dateTypeMap.get(type));
-                            corgiUserDateService.addDate(corgiDate);
                         } else {
                             query.setStatus(CorgiActivity.ENDED);
                             corgiActivities = corgiActivityService.searchCorgiActivity(query, 1, 10);
@@ -401,6 +396,11 @@ public class ScriptController {
                                     corgiDate.setDetail(dateTypeMap.get(type));
                                     corgiUserDateService.addDate(corgiDate);
                                 }
+                            } else if ("influencer".equals(userDetail.getAvatarStatus())) {
+                                String type = "不限";
+                                corgiDate.setType(type);
+                                corgiDate.setDetail(dateTypeMap.get(type));
+                                corgiUserDateService.addDate(corgiDate);
                             }
                         }
                     }
