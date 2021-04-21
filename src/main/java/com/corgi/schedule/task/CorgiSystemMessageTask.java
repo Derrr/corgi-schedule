@@ -71,7 +71,7 @@ public class CorgiSystemMessageTask {
             JSONArray content = new JSONArray();
             content.add(new JSONObject().fluentPut("text", "今天是您关注的好友 "));
             content.add(new JSONObject().fluentPut("text",  "@"+userDetail.getNickname()).fluentPut("url",userDetail.getUserId()).fluentPut("urlType","4"));
-            content.add(new JSONObject().fluentPut("text",  "生日哦，快发个信息祝福一下吧！说不定就成了呢  ~ "));
+            content.add(new JSONObject().fluentPut("text",  " 生日哦，快发个信息祝福一下吧！说不定就成了呢  ~ "));
             content.add(new JSONObject().fluentPut("text",  "祝福一下>").fluentPut("url",userDetail.getUserId()).fluentPut("urlType","5"));
             extra.put("content", content);
             hxPushMessageService.sendMessage(systemMessage, corgiIds, extra);
