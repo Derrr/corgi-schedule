@@ -1,6 +1,8 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.corgi.schedule.service.HxPushMessageService;
 import com.corgi.user.api.CorgiSystemMessageService;
 import com.corgi.user.api.CorgiUserService;
@@ -57,22 +59,22 @@ public class CorgiSystemMessageTask {
         SimpleDateFormat sdf = new SimpleDateFormat("/MM/dd");
         Long time = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
         String date = sdf.format(new Date());
-        log.info("start birthday notice:{},{} ", date, time);
         List<String> userIds = corgiUserService.getUserByBirthday(date, time);
-        log.info("start birthday user:{} ", userIds.size());
+        HashMap extra = new HashMap();
+        extra.put("type", "907");
         if (!CollectionUtils.isEmpty(userIds)) {
             String userId = userIds.get(0);
             UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
-            log.info("push user:{} ", userDetail);
             List<String> corgiIds = Arrays.asList("corgi1", "corgi4", "corgi7");
             SystemMessage systemMessage = new SystemMessage();
             systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
-            systemMessage.setTitle("生日提醒");
-            systemMessage.setType("905");
-            systemMessage.setPicUrl(userDetail.getAvatar());
-            systemMessage.setUrl(userDetail.getUserId());
-            systemMessage.setUrlType("4");
-            hxPushMessageService.sendMessage(systemMessage, corgiIds);
+            JSONArray content = new JSONArray();
+            content.add(new JSONObject().fluentPut("text", "今天是您关注的好友 "));
+            content.add(new JSONObject().fluentPut("text",  "@"+userDetail.getNickname()).fluentPut("url",userDetail.getUserId()).fluentPut("urlType","4"));
+            content.add(new JSONObject().fluentPut("text",  "生日哦，快发个信息祝福一下吧！说不定就成了呢  ~ "));
+            content.add(new JSONObject().fluentPut("text",  "祝福一下>").fluentPut("url",userDetail.getUserId()).fluentPut("urlType","5"));
+            extra.put("content", content);
+            hxPushMessageService.sendMessage(systemMessage, corgiIds, extra);
         }
     }
 
