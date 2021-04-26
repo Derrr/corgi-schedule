@@ -16,10 +16,9 @@ import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiUserActivityService;
+import com.corgi.user.api.CorgiUserDateService;
 import com.corgi.user.api.CorgiUserService;
-import com.corgi.user.entity.UserLogin;
-import com.corgi.user.entity.UserProfile;
-import com.corgi.user.entity.UserSignUp;
+import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -46,12 +45,15 @@ public class CorgiActivityCheckTask {
     private CorgiUserActivityService corgiUserActivityService;
     @Reference
     private CorgiUserService corgiUserService;
+    @Reference
+    private CorgiUserDateService corgiUserDateService;
     @Autowired
     private MQService mqService;
     @Autowired
     private RedisTemplate redisTemplate;
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+    private SimpleDateFormat d_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private SimpleDateFormat m_sdf = new SimpleDateFormat("HH点mm分");
 
     @Scheduled(cron = "0 * * * * *")
@@ -91,6 +93,32 @@ public class CorgiActivityCheckTask {
             }
         } while (!CollectionUtils.isEmpty(activityList));
 
+        calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        CorgiDateApply search = new CorgiDateApply();
+        search.setStatus(CorgiDateApply.APPLY);
+        search.setCtime(d_sdf.format(calendar.getTime()));
+        page = 1;
+        pageSize = 100;
+        do {
+            List<CorgiDateApply> applies = corgiUserDateService.searchApplies(search, page, pageSize);
+            if (CollectionUtils.isEmpty(applies)) {
+                return;
+            }
+            for (CorgiDateApply apply : applies) {
+                apply.setStatus(CorgiDateApply.CANCEL);
+                apply.setOperator("system");
+                corgiUserDateService.approve(apply);
+                PushMessage pushMessage = PushMessage.builder()
+                        .sourceUserId("datehelper")
+                        .message("超时未确认已自动取消，去看看其他约会吧。")
+                        .targetUserId(apply.getApprovalUserId()).build();
+                mqService.sendDateMessage(pushMessage);
+                pushMessage.setTargetUserId(apply.getApplyUserId());
+                mqService.sendDateMessage(pushMessage);
+            }
+            page++;
+        } while (true);
     }
 
     private void sendMessage(IAcsClient client, CorgiActivity activity, String userId, String telNo, String time) {

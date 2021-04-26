@@ -36,4 +36,8 @@ public class MQService {
         rabbitTemplate.convertAndSend(CorgiQueueName.ACTIVITY_RECOMMEND_QUEUE, calculater);
     }
 
+    public void sendDateMessage(PushMessage pushMessage) {
+        rabbitTemplate.convertAndSend(CorgiQueueName.USER_DATE_QUEUE, pushMessage);
+    }
+
 }
