@@ -61,12 +61,12 @@ public class CorgiSystemMessageTask {
         String date = sdf.format(new Date());
         List<String> userIds = corgiUserService.getUserByBirthday(date, time);
         HashMap extra = new HashMap();
-        extra.put("type", "907");
         if (!CollectionUtils.isEmpty(userIds)) {
             String userId = userIds.get(0);
             UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
             List<String> corgiIds = Arrays.asList("corgi1", "corgi4", "corgi7");
             SystemMessage systemMessage = new SystemMessage();
+            systemMessage.setType("907");
             systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
             JSONArray content = new JSONArray();
             content.add(new JSONObject().fluentPut("text", "今天是您关注的好友 "));
