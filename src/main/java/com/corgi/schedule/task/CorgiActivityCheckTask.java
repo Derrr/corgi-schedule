@@ -102,6 +102,7 @@ public class CorgiActivityCheckTask {
         pageSize = 100;
         do {
             List<CorgiDateApply> applies = corgiUserDateService.searchApplies(search, page, pageSize);
+            log.info("apply size:{} ", applies.size());
             if (CollectionUtils.isEmpty(applies)) {
                 return;
             }
