@@ -64,7 +64,7 @@ public class CorgiSystemMessageTask {
         if (!CollectionUtils.isEmpty(userIds)) {
             String userId = userIds.get(0);
             UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
-            List<String> corgiIds = Arrays.asList("corgi1", "corgi4", "corgi7");
+            List<String> corgiIds = Arrays.asList("corgi1","corgi2", "corgi4", "corgi7","corgi8","corgi593");
             SystemMessage systemMessage = new SystemMessage();
             systemMessage.setType("907");
             systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
