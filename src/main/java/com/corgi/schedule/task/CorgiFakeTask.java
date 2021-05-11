@@ -276,7 +276,7 @@ public class CorgiFakeTask {
                         .type(PushMessage.DEFAULT)
                         .sourceUserId(activityLike.getLikeUserId())
                         .targetUserId(activityLike.getUserId())
-                        .message(PushMessage.NEW_MESSAGE)
+                        .message(PushMessage.USER_LIKE)
                         .extra(extra)
                         .build());
             }
