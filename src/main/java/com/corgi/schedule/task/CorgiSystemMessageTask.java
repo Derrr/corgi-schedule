@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.corgi.schedule.service.HxPushMessageService;
 import com.corgi.user.api.CorgiSystemMessageService;
+import com.corgi.user.api.CorgiUserFollowService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,8 @@ public class CorgiSystemMessageTask {
     private CorgiSystemMessageService corgiSystemMessageService;
     @Reference
     private CorgiUserService corgiUserService;
+    @Reference
+    private CorgiUserFollowService corgiUserFollowService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
 
@@ -62,19 +65,34 @@ public class CorgiSystemMessageTask {
         List<String> userIds = corgiUserService.getUserByBirthday(date, time);
         HashMap extra = new HashMap();
         if (!CollectionUtils.isEmpty(userIds)) {
-            String userId = userIds.get(0);
-            UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
-            List<String> corgiIds = Arrays.asList("corgi1","corgi2", "corgi4", "corgi7","corgi8","corgi593");
-            SystemMessage systemMessage = new SystemMessage();
-            systemMessage.setType("907");
-            systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
-            JSONArray content = new JSONArray();
-            content.add(new JSONObject().fluentPut("text", "今天是您关注的好友 "));
-            content.add(new JSONObject().fluentPut("text",  "@"+userDetail.getNickname()).fluentPut("url",userDetail.getUserId()).fluentPut("urlType","4"));
-            content.add(new JSONObject().fluentPut("text",  " 生日哦，快发个信息祝福一下吧！说不定就成了呢  ~ "));
-            content.add(new JSONObject().fluentPut("text",  "祝福一下>").fluentPut("url",userDetail.getUserId()).fluentPut("urlType","5"));
-            extra.put("content", content);
-            hxPushMessageService.sendMessage(systemMessage, corgiIds, extra);
+            for (String userId : userIds) {
+                UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
+                SystemMessage systemMessage = new SystemMessage();
+                systemMessage.setType("907");
+                systemMessage.setContent("你关注的 " + userDetail.getNickname() + " 今天过生日啦，快去祝贺他吧");
+                JSONArray content = new JSONArray();
+                content.add(new JSONObject().fluentPut("text", "今天是您关注的好友 "));
+                content.add(new JSONObject().fluentPut("text", "@" + userDetail.getNickname()).fluentPut("url", userDetail.getUserId()).fluentPut("urlType", "4"));
+                content.add(new JSONObject().fluentPut("text", " 生日哦，快发个信息祝福一下吧！说不定就成了呢  ~ "));
+                content.add(new JSONObject().fluentPut("text", "祝福一下>").fluentPut("url", userDetail.getUserId()).fluentPut("urlType", "5"));
+                extra.put("content", content);
+                int page = 1;
+                int pageSize = 300;
+                while (true) {
+                    List<UserProfile> followers = corgiUserFollowService.getFollowedUserByPage(userId, 0L, page, pageSize);
+                    if (CollectionUtils.isEmpty(followers)) {
+                        break;
+                    }
+                    page++;
+                    List<String> corgiIds = new ArrayList<>();
+                    for (UserProfile follower : followers) {
+                        if ("real".equals(follower.getCheckDesc())) {
+                            corgiIds.add("corgi" + follower.getUserId());
+                        }
+                    }
+                    hxPushMessageService.sendMessage(systemMessage, corgiIds, extra);
+                }
+            }
         }
     }
 

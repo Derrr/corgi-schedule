@@ -252,7 +252,7 @@ public class CorgiFakeTask {
                     .targetUserId(followId)
                     .extra(extra)
                     .build());
-            //corgiVisitService.visit(userDetail.getUserId(), followId);
+            corgiVisitService.visit(userDetail.getUserId(), followId);
         }
     }
 
