@@ -83,9 +83,6 @@ public class CorgiHotVlogTask {
                 corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
 
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
-                if (likeCount < 5) {
-                    continue;
-                }
                 queryHot.setActivityId(activityId);
                 List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
                 if (tmpList.size() > 0) {
