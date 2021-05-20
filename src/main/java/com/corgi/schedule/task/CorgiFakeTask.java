@@ -308,8 +308,6 @@ public class CorgiFakeTask {
         if (activityMap == null) {
             activityMap = new HashMap<>();
             List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
-            String topicActivityId = "";
-            String nonTopicActivityId = "";
             for (CorgiActivity activity : corgiActivities) {
                 List<String> topics = corgiToolService.getActivityTopic(activity.getId());
                 if (topics.contains("37")) {
