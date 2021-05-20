@@ -311,12 +311,13 @@ public class CorgiFakeTask {
             String topicActivityId = "";
             String nonTopicActivityId = "";
             for (CorgiActivity activity : corgiActivities) {
-                List<String> topics = corgiToolService.getActivityTopic(activity.getId());
-                if (topics.contains("37")) {
-                    topicActivityId = "#" + activity.getId();
-                } else {
-                    nonTopicActivityId = activity.getId();
-                }
+                activityMap.put(activity.getUserId(), nonTopicActivityId);
+//                List<String> topics = corgiToolService.getActivityTopic(activity.getId());
+//                if (topics.contains("37")) {
+//                    topicActivityId = "#" + activity.getId();
+//                } else {
+//                    nonTopicActivityId = activity.getId();
+//                }
             }
             if (StringUtils.isEmpty(topicActivityId)) {
                 activityMap.put(userId, nonTopicActivityId);
