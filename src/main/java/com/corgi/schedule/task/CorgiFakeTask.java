@@ -319,11 +319,11 @@ public class CorgiFakeTask {
 //                    nonTopicActivityId = activity.getId();
 //                }
             }
-            if (StringUtils.isEmpty(topicActivityId)) {
-                activityMap.put(userId, nonTopicActivityId);
-            } else {
-                activityMap.put(userId, topicActivityId);
-            }
+//            if (StringUtils.isEmpty(topicActivityId)) {
+//                activityMap.put(userId, nonTopicActivityId);
+//            } else {
+//                activityMap.put(userId, topicActivityId);
+//            }
             activityCache.put(LAST_ACTIVITY, activityMap);
         }
         String activityId = activityMap.get(userId);
