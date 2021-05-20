@@ -311,7 +311,7 @@ public class CorgiFakeTask {
             String topicActivityId = "";
             String nonTopicActivityId = "";
             for (CorgiActivity activity : corgiActivities) {
-                activityMap.put(activity.getUserId(), nonTopicActivityId);
+                activityMap.put(activity.getUserId(), activity.getId());
 //                List<String> topics = corgiToolService.getActivityTopic(activity.getId());
 //                if (topics.contains("37")) {
 //                    topicActivityId = "#" + activity.getId();
