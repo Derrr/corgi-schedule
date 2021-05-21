@@ -151,7 +151,7 @@ public class CorgiFakeTask {
             if (activityId.contains("#")) {
                 activityId = activityId.replace("#", "");
                 if ("verified".equals(profile.getAvatarCheckStatus())) {
-                    likeChance += 60 / (2 * DAY_MINUTE);
+                    likeChance += 40 / (2 * DAY_MINUTE);
                 }
             }
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -212,7 +212,7 @@ public class CorgiFakeTask {
             if (activityId.contains("#")) {
                 activityId = activityId.replace("#", "");
                 if ("verified".equals(profile.getAvatarCheckStatus())) {
-                    likeChance += 60 / (2 * DAY_MINUTE);
+                    likeChance += 40 / (2 * DAY_MINUTE);
                 }
             }
         }
@@ -246,11 +246,11 @@ public class CorgiFakeTask {
             likeChance = 40 / (4 * DAY_MINUTE);
             if (activityId.contains("#")) {
                 activityId = activityId.replace("#", "");
-                likeChance += 60 / (2 * DAY_MINUTE);
+                likeChance += 40 / (2 * DAY_MINUTE);
                 if (activityId.equals("60a3ea656d7bfe75c363f265")
                         || activityId.equals("60a4870df68eff760722a54e")
                         || activityId.equals("60a4e2dd77402c665e6e25ef")) {
-                    likeChance += 60 / DAY_MINUTE;
+                    likeChance += 40 / DAY_MINUTE;
                 }
             }
         }
