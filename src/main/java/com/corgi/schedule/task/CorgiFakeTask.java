@@ -97,7 +97,7 @@ public class CorgiFakeTask {
         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
-        String lastDay = "2021-05-19 00:00:00";//sdf2.format(calendar.getTime());
+        String lastDay = sdf2.format(calendar.getTime());
 
         List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
         do {
@@ -147,13 +147,7 @@ public class CorgiFakeTask {
             followChance += 100.0 / DAY_MINUTE;
         }
         if (!"-1".equals(activityId)) {
-            likeChance = 20.0 / (4 * DAY_MINUTE);
-            if (activityId.contains("#")) {
-                activityId = activityId.replace("#", "");
-                if ("verified".equals(profile.getAvatarCheckStatus())) {
-                    likeChance += 40 / (2 * DAY_MINUTE);
-                }
-            }
+            likeChance = 20.0 / DAY_MINUTE;
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -7);
@@ -208,13 +202,7 @@ public class CorgiFakeTask {
             followChance += 100.0 / DAY_MINUTE;
         }
         if (!"-1".equals(activityId)) {
-            likeChance = 15.0 / (4 * DAY_MINUTE);
-            if (activityId.contains("#")) {
-                activityId = activityId.replace("#", "");
-                if ("verified".equals(profile.getAvatarCheckStatus())) {
-                    likeChance += 40 / (2 * DAY_MINUTE);
-                }
-            }
+            likeChance = 15.0 / DAY_MINUTE;
         }
 
         if (Math.random() < followChance) {
@@ -243,16 +231,7 @@ public class CorgiFakeTask {
         }
 
         if (!"-1".equals(activityId)) {
-            likeChance = 40 / (4 * DAY_MINUTE);
-            if (activityId.contains("#")) {
-                activityId = activityId.replace("#", "");
-                likeChance += 40 / (2 * DAY_MINUTE);
-                if (activityId.equals("60a3ea656d7bfe75c363f265")
-                        || activityId.equals("60a4870df68eff760722a54e")
-                        || activityId.equals("60a4e2dd77402c665e6e25ef")) {
-                    likeChance += 40 / DAY_MINUTE;
-                }
-            }
+            likeChance = 40 / DAY_MINUTE;
         }
 
         if (Math.random() < followChance) {
@@ -309,18 +288,10 @@ public class CorgiFakeTask {
             activityMap = new HashMap<>();
             List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
             for (CorgiActivity activity : corgiActivities) {
-                List<String> topics = corgiToolService.getActivityTopic(activity.getId());
-                if (topics.contains("37")) {
-                    activityMap.put(activity.getUserId(), "#" + activity.getId());
-                } else {
-                    String tmp = activityMap.get(activity.getUserId());
-                    if (StringUtils.isEmpty(tmp) || !tmp.contains("#")) {
-                        activityMap.put(activity.getUserId(), activity.getId());
-                    }
-                }
+                activityMap.put(activity.getUserId(), activity.getId());
             }
-            activityCache.put(LAST_ACTIVITY, activityMap);
         }
+        activityCache.put(LAST_ACTIVITY, activityMap);
         String activityId = activityMap.get(userId);
         if (StringUtils.isEmpty(activityId)) {
             activityId = "-1";
