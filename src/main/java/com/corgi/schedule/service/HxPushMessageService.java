@@ -65,12 +65,18 @@ public class HxPushMessageService {
         HashMap message = new HashMap();
         HashMap apnsContent = new HashMap();
         String content = systemMessage.getContent();
+        String title = systemMessage.getTitle();
         try {
             content = new String(systemMessage.getContent().getBytes(), "UTF-8");
+            if (StringUtils.isEmpty(title)) {
+                title = content;
+            } else {
+                title = new String(title.getBytes(), "UTF-8");
+            }
         } catch (UnsupportedEncodingException e) {
             log.error(e.getMessage(), e);
         }
-        apnsContent.put("em_push_content", content);
+        apnsContent.put("em_push_content", title);
 
         extra.put("type", systemMessage.getType());
         extra.put("em_apns_ext", apnsContent);
