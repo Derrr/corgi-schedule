@@ -87,17 +87,24 @@ public class CorgiHotVlogTask {
                 List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
                 if (tmpList.size() > 0) {
                     CorgiVlogHot hot = tmpList.get(0);
-                    if (likeCount * 10 > hot.getExpectView()) {
+                    Integer expectView = likeCount * 10;
+                    if (likeCount > 10) {
+                        expectView = likeCount * 15;
+                    }
+                    if (expectView > hot.getExpectView()) {
                         CorgiVlogHot updateHot = new CorgiVlogHot();
                         updateHot.setId(hot.getId());
                         updateHot.setLikeCount(likeCount);
-                        updateHot.setExpectView(likeCount * 10);
+                        updateHot.setExpectView(expectView);
                         corgiVlogService.updateHotVlog(updateHot);
                     }
                 } else if (likeCount > 0) {
                     CorgiVlogHot addHot = new CorgiVlogHot();
                     addHot.setActivityId(activityId);
                     addHot.setExpectView(likeCount * 10);
+                    if (likeCount > 10) {
+                        addHot.setExpectView(likeCount * 15);
+                    }
                     addHot.setLikeCount(likeCount);
                     addHot.setType(CorgiVlogHot.TYPE.AUTO);
                     corgiVlogService.addHotVlog(addHot);
