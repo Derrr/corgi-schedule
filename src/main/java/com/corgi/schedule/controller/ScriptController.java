@@ -260,7 +260,7 @@ public class ScriptController {
 
     @GetMapping("init_bar_city")
     public String initBarCity() {
-        List<BarProfile> barProfiles = corgiBarService.getBarListByCity(null);
+        List<BarProfile> barProfiles = corgiBarService.getBarListByCity(null, null, null);
         for (BarProfile bar : barProfiles) {
             String[] cityArr = mapService.getCity(bar.getLat(), bar.getLng()).split("-");
             bar.setCity(cityArr[cityArr.length - 1]);
