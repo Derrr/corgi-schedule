@@ -121,13 +121,10 @@ public class CorgiHotVlogTask {
     }
 
     private Integer getExpectView(Integer likeCount) {
-        Integer expectView = likeCount * 10;
-        if (likeCount > 10) {
-            expectView = likeCount * 15;
+        if (likeCount == null || likeCount < 0) {
+            return 0;
         }
-        if (likeCount > 30) {
-            expectView = likeCount * 20;
-        }
+        Integer expectView = new Double(Math.pow(likeCount * 1.0, 1.5) * 10).intValue();
         return expectView;
     }
 
