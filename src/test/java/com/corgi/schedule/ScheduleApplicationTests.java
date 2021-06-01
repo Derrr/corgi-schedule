@@ -8,7 +8,7 @@ class ScheduleApplicationTests {
 
 	@Test
 	void contextLoads() {
-		System.out.println(new Double(Math.round(Math.pow(182 * 1.0, 1.5) * 10)).intValue());
+		System.out.println(new Double(Math.round(Math.pow(182, 1.5) * 10)).intValue());
 	}
 
 }
