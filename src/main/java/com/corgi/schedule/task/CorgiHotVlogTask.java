@@ -85,12 +85,9 @@ public class CorgiHotVlogTask {
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
                 queryHot.setActivityId(activityId);
                 List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
+                Integer expectView = this.getExpectView(likeCount);
                 if (tmpList.size() > 0) {
                     CorgiVlogHot hot = tmpList.get(0);
-                    Integer expectView = likeCount * 10;
-                    if (likeCount > 10) {
-                        expectView = likeCount * 15;
-                    }
                     if (expectView > hot.getExpectView()) {
                         CorgiVlogHot updateHot = new CorgiVlogHot();
                         updateHot.setId(hot.getId());
@@ -101,10 +98,7 @@ public class CorgiHotVlogTask {
                 } else if (likeCount > 0) {
                     CorgiVlogHot addHot = new CorgiVlogHot();
                     addHot.setActivityId(activityId);
-                    addHot.setExpectView(likeCount * 10);
-                    if (likeCount > 10) {
-                        addHot.setExpectView(likeCount * 15);
-                    }
+                    addHot.setExpectView(expectView);
                     addHot.setLikeCount(likeCount);
                     addHot.setType(CorgiVlogHot.TYPE.AUTO);
                     corgiVlogService.addHotVlog(addHot);
@@ -124,6 +118,17 @@ public class CorgiHotVlogTask {
             page++;
         } while (shouldContinue);
 
+    }
+
+    private Integer getExpectView(Integer likeCount) {
+        Integer expectView = likeCount * 10;
+        if (likeCount > 10) {
+            expectView = likeCount * 15;
+        }
+        if (likeCount > 30) {
+            expectView = likeCount * 20;
+        }
+        return expectView;
     }
 
 }
