@@ -48,6 +48,8 @@ public class CorgiFakeTask {
     private CorgiActivityFeedService corgiActivityFeedService;
     @Reference
     private CorgiVisitService corgiVisitService;
+    @Reference
+    private CorgiUserDateService corgiUserDateService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -71,6 +73,10 @@ public class CorgiFakeTask {
             .initialCapacity(100)
             .build();
 
+    private Cache<String, String> userDateCache = CacheBuilder.newBuilder()
+            .initialCapacity(150000)
+            .expireAfterWrite(10L, TimeUnit.MINUTES)
+            .build();
 
     @Async(value = "asyncExecutor")
     @Scheduled(cron = "0/6 * 9-22 * * *")
@@ -92,12 +98,8 @@ public class CorgiFakeTask {
 
         corgiFakeService.updateFakeTime(userDetail.getUserId());
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -30);
+        calendar.add(Calendar.DATE, -3);
         String date = sdf.format(calendar.getTime());
-        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -1);
-        String lastDay = sdf2.format(calendar.getTime());
 
         List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
         do {
@@ -111,11 +113,11 @@ public class CorgiFakeTask {
                     continue;
                 }
                 if ("influencer".equals(profile.getAvatarStatus())) {
-                    influencer(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
+                    influencer(profile, userDetail, hasOnBoard(onBoardUsers, profile));
                 } else if (date.compareTo(profile.getCreateTime()) > 0) {
-                    oldCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
+                    oldCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile));
                 } else {
-                    newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile), lastDay);
+                    newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile));
                 }
             }
         } while (true);
@@ -135,99 +137,128 @@ public class CorgiFakeTask {
         return false;
     }
 
-    private void newCorgier(UserProfile profile, UserDetail userDetail, Boolean hasBoard, String lastDay) {
-        boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        String activityId = getLastActivity(profile.getUserId(), lastDay);
-        double followChance = 10.0 / (30.0 * DAY_MINUTE);
+    private void newCorgier(UserProfile profile, UserDetail userDetail, Boolean hasBoard) {
+        boolean hasFace = UserDetail.VERIFIED.equals(profile.getAvatarCheckStatus());
+
+        String dateStatus = getDateStatus(profile.getUserId());
+        boolean hasDate = CorgiDate.OPEN.equals(dateStatus);
+
+        String activityId = getLastActivity(profile.getUserId());
+        double followChance = 0.0;
+        if (hasDate) {
+            followChance += 10.0 / (3.0 * DAY_MINUTE);
+        }
         double likeChance = 0.0;
         if (hasFace) {
-            followChance = 20.0 / (30.0 * DAY_MINUTE);
+            followChance += 5.0 / (3.0 * DAY_MINUTE);
         }
         if (hasBoard) {
-            followChance += 100.0 / DAY_MINUTE;
+            followChance += 50.0 / DAY_MINUTE;
         }
         if (!"-1".equals(activityId)) {
             likeChance = 20.0 / DAY_MINUTE;
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DATE, -7);
-            if (sdf.format(calendar.getTime()).compareTo(profile.getCreateTime()) < 0) {
+            if (activityId.contains("#")) {
+                activityId = activityId.replaceAll("#", "");
+                followChance += 10.0 / (3.0 * DAY_MINUTE);
+                likeChance += 30.0 / DAY_MINUTE;
+            }
+        }
+
+        if (Math.random() < followChance) {
+            followUser(userDetail, profile.getUserId());
+        }
+        if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance) {
+            likeActivity(userDetail, activityId, profile.getUserId());
+        }
+
+    }
+
+    private void oldCorgier(UserProfile profile, UserDetail userDetail, Boolean hasBoard) {
+        boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
+
+
+//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+//        String today = sdf.format(new Date());
+//        String finalTime;
+//        try {
+//            sdf.parse(profile.getCreateTime());
+//            Calendar calendar = sdf.getCalendar();
+//            calendar.add(Calendar.DATE, 60);
+//            finalTime = sdf.format(calendar.getTime());
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//            return;
+//        }
+        String activityId = getLastActivity(profile.getUserId());
+        double followChance = 0.0;
+        double likeChance = 0.0;
+
+//        if (today.compareTo(finalTime) < 0) {
+//            if (hasFace) {
+//                followChance = 20.0 / (30.0 * DAY_MINUTE);
+//            } else {
+//                followChance = 10.0 / (30.0 * DAY_MINUTE);
+//            }
+//        }
+//        if (!"-1".equals(activityId)) {
+//            followChance += 1 / DAY_MINUTE;
+//        }
+//        if (profile.getTime() != null && System.currentTimeMillis() - 24 * 1000 * 3600 > profile.getTime()) {
+//            if (hasFace) {
+//                followChance += 1.0 / DAY_MINUTE;
+//            }
+//        }
+        if (hasBoard) {
+            followChance += 50.0 / DAY_MINUTE;
+        }
+        if (!"-1".equals(activityId)) {
+            if (activityId.contains("#")) {
+                activityId = activityId.replaceAll("#", "");
+            }
+            likeChance += 10.0 / DAY_MINUTE;
+            String dateStatus = getDateStatus(profile.getUserId());
+            if (CorgiDate.OPEN.equals(dateStatus)) {
+                likeChance += 5.0 / DAY_MINUTE;
+            }
+            if (hasFace) {
+                likeChance *= 1.5;
+            }
+        }
+
+        if (Math.random() < followChance) {
+            followUser(userDetail, profile.getUserId());
+        }
+        if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance) {
+            likeActivity(userDetail, activityId, profile.getUserId());
+        }
+    }
+
+    private void influencer(UserProfile profile, UserDetail userDetail, Boolean hasBoard) {
+        boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
+        String activityId = getLastActivity(profile.getUserId());
+        double followChance = 0.0;
+        double likeChance = 0.0;
+//        followChance = 100 / (30 * DAY_MINUTE);
+//        if (hasFace) {
+//            followChance += 200 / (30 * DAY_MINUTE);
+//        }
+        if (!"-1".equals(activityId)) {
+            if (activityId.contains("#")) {
+                activityId = activityId.replaceAll("#", "");
                 followChance += 10.0 / DAY_MINUTE;
             }
-        }
-
-        if (Math.random() < followChance) {
-            followUser(userDetail, profile.getUserId());
-        }
-        if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance) {
-            likeActivity(userDetail, activityId, profile.getUserId());
-        }
-
-    }
-
-    private void oldCorgier(UserProfile profile, UserDetail userDetail, Boolean hasBoard, String lastDay) {
-        boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String today = sdf.format(new Date());
-        String finalTime;
-        try {
-            sdf.parse(profile.getCreateTime());
-            Calendar calendar = sdf.getCalendar();
-            calendar.add(Calendar.DATE, 60);
-            finalTime = sdf.format(calendar.getTime());
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return;
-        }
-        String activityId = getLastActivity(profile.getUserId(), lastDay);
-        double followChance = 0.0;
-        double likeChance = 0.0;
-
-        if (today.compareTo(finalTime) < 0) {
-            if (hasFace) {
-                followChance = 20.0 / (30.0 * DAY_MINUTE);
-            } else {
-                followChance = 10.0 / (30.0 * DAY_MINUTE);
+            likeChance += 20.0 / DAY_MINUTE;
+            String dateStatus = getDateStatus(profile.getUserId());
+            if (CorgiDate.OPEN.equals(dateStatus)) {
+                likeChance += 10.0 / DAY_MINUTE;
             }
-        }
-        if (!"-1".equals(activityId)) {
-            followChance += 1 / DAY_MINUTE;
-        }
-        if (profile.getTime() != null && System.currentTimeMillis() - 24 * 1000 * 3600 > profile.getTime()) {
             if (hasFace) {
-                followChance += 1.0 / DAY_MINUTE;
+                likeChance *= 1.5;
             }
-        }
-        if (hasBoard) {
-            followChance += 100.0 / DAY_MINUTE;
-        }
-        if (!"-1".equals(activityId)) {
-            likeChance = 15.0 / DAY_MINUTE;
-        }
-
-        if (Math.random() < followChance) {
-            followUser(userDetail, profile.getUserId());
-        }
-        if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance) {
-            likeActivity(userDetail, activityId, profile.getUserId());
-        }
-    }
-
-    private void influencer(UserProfile profile, UserDetail userDetail, Boolean hasBoard, String lastDay) {
-        boolean hasFace = !UserDetail.NO_FACE.equals(profile.getAvatarCheckStatus());
-        String activityId = getLastActivity(profile.getUserId(), lastDay);
-        double followChance = 0.0;
-        double likeChance = 0.0;
-        followChance = 100 / (30 * DAY_MINUTE);
-        if (hasFace) {
-            followChance += 200 / (30 * DAY_MINUTE);
-        }
-        if (!"-1".equals(activityId)) {
-            followChance += 400 / (30 * DAY_MINUTE);
         }
 
         if (hasBoard) {
-            followChance += 100 / DAY_MINUTE;
+            followChance += 50.0 / DAY_MINUTE;
         }
 
         if (!"-1".equals(activityId)) {
@@ -282,13 +313,35 @@ public class CorgiFakeTask {
         }
     }
 
-    private String getLastActivity(String userId, String lastDay) {
+    private String getDateStatus(String userId) {
+        String dateStatus = userDateCache.getIfPresent(userId);
+        if (StringUtils.isEmpty(dateStatus)) {
+            CorgiDate date = corgiUserDateService.getDateByUserId(userId);
+            dateStatus = date.getStatus();
+            userDateCache.put(userId, date.getStatus());
+        }
+        return dateStatus;
+    }
+
+    private String getLastActivity(String userId) {
         HashMap<String, String> activityMap = activityCache.getIfPresent(LAST_ACTIVITY);
         if (activityMap == null) {
             activityMap = new HashMap<>();
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DATE, -1);
+            String lastDay = sdf2.format(calendar.getTime());
+
             List<CorgiActivity> corgiActivities = corgiFakeService.getActivityByDate(lastDay);
             for (CorgiActivity activity : corgiActivities) {
                 activityMap.put(activity.getUserId(), activity.getId());
+            }
+
+            calendar.add(Calendar.DATE, -1);
+            String lastTwoDay = sdf2.format(calendar.getTime());
+            corgiActivities = corgiFakeService.getHotActivityByDate(lastTwoDay, 1);
+            for (CorgiActivity activity : corgiActivities) {
+                activityMap.put(activity.getUserId(), "#" + activity.getId());
             }
         }
         activityCache.put(LAST_ACTIVITY, activityMap);

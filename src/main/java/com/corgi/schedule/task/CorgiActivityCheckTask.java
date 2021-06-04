@@ -103,7 +103,7 @@ public class CorgiActivityCheckTask {
         do {
             List<CorgiDateApply> applies = corgiUserDateService.searchApplies(search, page, pageSize);
             if (CollectionUtils.isEmpty(applies)) {
-                return;
+                break;
             }
             for (CorgiDateApply apply : applies) {
                 apply.setStatus(CorgiDateApply.CANCEL);
@@ -116,6 +116,24 @@ public class CorgiActivityCheckTask {
                 mqService.sendDateMessage(pushMessage);
                 pushMessage.setTargetUserId(apply.getApplyUserId());
                 mqService.sendDateMessage(pushMessage);
+            }
+            page++;
+        } while (true);
+
+        calendar.add(Calendar.DATE, -6);
+        search = new CorgiDateApply();
+        search.setStatus(CorgiDateApply.AGREE);
+        search.setCtime(d_sdf.format(calendar.getTime()));
+        page = 1;
+        pageSize = 100;
+        do {
+            List<CorgiDateApply> applies = corgiUserDateService.searchApplies(search, page, pageSize);
+            if (CollectionUtils.isEmpty(applies)) {
+                break;
+            }
+            for (CorgiDateApply apply : applies) {
+                apply.setStatus(CorgiDateApply.FINISH);
+                //corgiUserDateService.approve(apply);
             }
             page++;
         } while (true);
