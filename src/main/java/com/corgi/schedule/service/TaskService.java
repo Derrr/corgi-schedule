@@ -81,7 +81,7 @@ public class TaskService {
         int page = 1;
         int pageSize = 1000;
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, -90);
+        calendar.add(Calendar.DATE, -1);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String time = sdf.format(calendar.getTime());
         List<String> refreshedUsers = new ArrayList<>();
