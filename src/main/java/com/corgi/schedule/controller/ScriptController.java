@@ -460,7 +460,7 @@ public class ScriptController {
 
     @GetMapping("init_recommend")
     public String initRecommend() {
-        //taskService.calculateRecommend();
+        taskService.calculateRecommend();
         taskService.calculateRecommendActivity();
         return "success";
     }
