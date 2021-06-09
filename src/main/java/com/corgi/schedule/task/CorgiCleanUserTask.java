@@ -44,8 +44,12 @@ public class CorgiCleanUserTask {
         }
         for (String userId : userIds) {
             if (userId != null) {
-                corgiUserService.deleteUser(userId);
-                corgiActivityService.deleteUserActivity(userId);
+                try {
+                    corgiUserService.deleteUser(userId);
+                    corgiActivityService.deleteUserActivity(userId);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
     }
