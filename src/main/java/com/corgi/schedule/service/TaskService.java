@@ -3,14 +3,13 @@ package com.corgi.schedule.service;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.common.messages.TraceFollow;
-import com.corgi.user.api.CorgiLikeService;
-import com.corgi.user.api.CorgiStatisticService;
-import com.corgi.user.api.CorgiUserFollowService;
-import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.api.*;
 import com.corgi.user.entity.ActivityLike;
+import com.corgi.user.entity.CorgiFeed;
 import com.corgi.user.entity.UserPosition;
 import com.corgi.user.entity.UserProfile;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -30,6 +29,8 @@ public class TaskService {
     private CorgiUserFollowService corgiUserFollowService;
     @Reference
     private CorgiLikeService corgiLikeService;
+    @Reference
+    private CorgiFeedService corgiFeedService;
     @Autowired
     private MQService mqService;
 
@@ -47,7 +48,7 @@ public class TaskService {
         }
     }
 
-    public void calculateRecommendActivity(){
+    public void calculateRecommendActivity() {
         int page = 1;
         int pageSize = 1000;
         Calendar calendar = Calendar.getInstance();
@@ -105,6 +106,15 @@ public class TaskService {
                 refreshedUsers.add(profile.getUserId());
             }
         } while (true);
+    }
+
+    public void clearFeed() {
+        CorgiFeed delete = new CorgiFeed();
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -7);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        delete.setCtime(sdf.format(calendar.getTime()));
+        corgiFeedService.deleteFeed(delete);
     }
 
 }

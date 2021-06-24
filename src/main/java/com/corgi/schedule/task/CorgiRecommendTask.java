@@ -43,11 +43,12 @@ public class CorgiRecommendTask {
         log.info("refreshing recommend...........");
         taskService.calculateRecommend();
         taskService.calculateRecommendActivity();
+        taskService.clearFeed();
     }
 
     @Async
     @Scheduled(cron = "0 0 5 * * *")
-    public void runInfluencer(){
+    public void runInfluencer() {
         log.info("refreshing Influencer...........");
         corgiUserRecommendService.initInfluencer();
     }
