@@ -56,19 +56,27 @@ public class CorgiBillboardTask {
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
+        userIds.add("7");
         userIds.add("8");
+        userIds.add("9");
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 3);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(calendar.getTime());
-        calendar.add(Calendar.DATE, -7);
+        calendar.add(Calendar.DATE, -30);
         String pastDate = sdf.format(calendar.getTime());
-        calendar.add(Calendar.DATE, -23);
+        calendar.add(Calendar.DATE, -60);
+        String pastTimesDate = sdf.format(calendar.getTime());
+        calendar.add(Calendar.DATE, -90);
         String pastPopularDate = sdf.format(calendar.getTime());
         List<UserProfile> pastUsers = corgiBillboardService.getPastBillboard(pastDate);
+        List<UserProfile> pastTimesUsers = corgiBillboardService.getPastBillboard(pastTimesDate);
         List<UserProfile> pastPopularUsers = corgiBillboardService.getPastBillboard(pastPopularDate);
         for (UserProfile userProfile : pastUsers) {
+            if (userIds.contains(userProfile.getUserId())) {
+                continue;
+            }
             userIds.add(userProfile.getUserId());
         }
 
@@ -79,9 +87,19 @@ public class CorgiBillboardTask {
             userIds.add(userProfile.getUserId());
         }
 
+        for (UserProfile userProfile : pastTimesUsers) {
+            if (userIds.contains(userProfile.getUserId())) {
+                continue;
+            }
+            Integer count = corgiBillboardService.countOnBoard(userProfile.getUserId());
+            if (count != null && count > 6) {
+                userIds.add(userProfile.getUserId());
+            }
+        }
+
         UserDetail searchUser = new UserDetail();
         searchUser.setRole("1");
-        List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
+        List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
         int total = 0;
         int i = 0;
         for (UserProfile userProfile : userProfiles) {
@@ -100,7 +118,7 @@ public class CorgiBillboardTask {
         }
         searchUser.setRole("0");
         i = 0;
-        userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
+        userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
                 continue;
@@ -113,7 +131,7 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-        userProfiles = corgiBillboardService.getPassionUser(searchUser, 100);
+        userProfiles = corgiBillboardService.getPassionUser(searchUser, 500);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
@@ -127,7 +145,7 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-        userProfiles = corgiBillboardService.getActiveUser(searchUser, 100);
+        userProfiles = corgiBillboardService.getActiveUser(searchUser, 500);
         i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
@@ -143,7 +161,7 @@ public class CorgiBillboardTask {
         }
         if (total < 10) {
             searchUser.setRole(null);
-            userProfiles = corgiBillboardService.getPopularUser(searchUser, 100);
+            userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
             for (UserProfile userProfile : userProfiles) {
                 if (checkUser(userIds, userProfile.getUserId())) {
                     continue;
