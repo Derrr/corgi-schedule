@@ -146,6 +146,24 @@ public class ScriptController {
         return "success";
     }
 
+    @GetMapping("repaire_video_cover")
+    public String repairVideoCover() {
+        CorgiActivity search = new CorgiActivity();
+        search.setCoverUrl("Expires");
+        search.setStatus(CorgiActivity.NOT_DELETED);
+        for (int i = 1; i < 5; i++) {
+            List<CorgiActivity> activityList = corgiActivityService.searchCorgiActivity(search, 1, 100);
+            if (CollectionUtils.isEmpty(activityList)) {
+                break;
+            }
+            for (CorgiActivity activity : activityList) {
+                log.info("updating:{} cover:{} ", activity.getId(), activity.getCoverUrl());
+                corgiActivityService.updateByColumnn(activity.getId(), "coverUrl", activity.getCoverUrl().split("\\?Expires")[0]);
+            }
+        }
+        return "success";
+    }
+
     @GetMapping("repair_birthday")
     public String repairBirthday() {
         for (int i = 0; i < 10; i++) {
