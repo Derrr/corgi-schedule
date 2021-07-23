@@ -146,7 +146,7 @@ public class ScriptController {
         return "success";
     }
 
-    @GetMapping("repaire_video_cover")
+    @GetMapping("repair_video_cover")
     public String repairVideoCover() {
         CorgiActivity search = new CorgiActivity();
         search.setCoverUrl("Expires");
