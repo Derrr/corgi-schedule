@@ -478,8 +478,12 @@ public class ScriptController {
 
     @GetMapping("init_recommend")
     public String initRecommend() {
-        taskService.calculateRecommend();
-        taskService.calculateRecommendActivity();
+        RecommendCalculater calculater = new RecommendCalculater();
+        calculater.setUserId("8");
+        log.info("recommend..." + calculater.getUserId());
+        mqService.sendCalculater(calculater);
+        //taskService.calculateRecommend();
+        //taskService.calculateRecommendActivity();
         return "success";
     }
 
