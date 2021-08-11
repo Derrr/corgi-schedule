@@ -51,8 +51,8 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    @Scheduled(cron = "0 0 20 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 20 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
@@ -98,7 +98,7 @@ public class CorgiBillboardTask {
         }
 
         UserDetail searchUser = new UserDetail();
-        searchUser.setRole("1");
+//        searchUser.setRole("1");
         List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
         int total = 0;
         int i = 0;
@@ -109,71 +109,71 @@ public class CorgiBillboardTask {
 
             i++;
             total++;
-            log.info("fan1..." + userProfile.getUserId());
+            log.info("popular..." + userProfile.getUserId());
             userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "fans1");
-            if (i >= 2) {
+            corgiBillboardService.addBillboard(userProfile, date, "popular");
+            if (i >= 10) {
                 break;
             }
         }
-        searchUser.setRole("0");
-        i = 0;
-        userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
-        for (UserProfile userProfile : userProfiles) {
-            if (checkUser(userIds, userProfile.getUserId())) {
-                continue;
-            }
-            i++;
-            total++;
-            userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "fans0");
-            if (i >= 2) {
-                break;
-            }
-        }
-        userProfiles = corgiBillboardService.getPassionUser(searchUser, 500);
-        i = 0;
-        for (UserProfile userProfile : userProfiles) {
-            if (checkUser(userIds, userProfile.getUserId())) {
-                continue;
-            }
-            i++;
-            total++;
-            userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "follow");
-            if (i >= 2) {
-                break;
-            }
-        }
-        userProfiles = corgiBillboardService.getActiveUser(searchUser, 500);
-        i = 0;
-        for (UserProfile userProfile : userProfiles) {
-            if (checkUser(userIds, userProfile.getUserId())) {
-                continue;
-            }
-            i++;
-            total++;
-            userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "active");
-            if (i >= 4) {
-                break;
-            }
-        }
-        if (total < 10) {
-            searchUser.setRole(null);
-            userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
-            for (UserProfile userProfile : userProfiles) {
-                if (checkUser(userIds, userProfile.getUserId())) {
-                    continue;
-                }
-                total++;
-                userIds.add(userProfile.getUserId());
-                corgiBillboardService.addBillboard(userProfile, date, "fanstotal");
-                if (total >= 10) {
-                    break;
-                }
-            }
-        }
+//        searchUser.setRole("0");
+//        i = 0;
+//        userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
+//        for (UserProfile userProfile : userProfiles) {
+//            if (checkUser(userIds, userProfile.getUserId())) {
+//                continue;
+//            }
+//            i++;
+//            total++;
+//            userIds.add(userProfile.getUserId());
+//            corgiBillboardService.addBillboard(userProfile, date, "fans0");
+//            if (i >= 2) {
+//                break;
+//            }
+//        }
+//        userProfiles = corgiBillboardService.getPassionUser(searchUser, 500);
+//        i = 0;
+//        for (UserProfile userProfile : userProfiles) {
+//            if (checkUser(userIds, userProfile.getUserId())) {
+//                continue;
+//            }
+//            i++;
+//            total++;
+//            userIds.add(userProfile.getUserId());
+//            corgiBillboardService.addBillboard(userProfile, date, "follow");
+//            if (i >= 2) {
+//                break;
+//            }
+//        }
+//        userProfiles = corgiBillboardService.getActiveUser(searchUser, 500);
+//        i = 0;
+//        for (UserProfile userProfile : userProfiles) {
+//            if (checkUser(userIds, userProfile.getUserId())) {
+//                continue;
+//            }
+//            i++;
+//            total++;
+//            userIds.add(userProfile.getUserId());
+//            corgiBillboardService.addBillboard(userProfile, date, "active");
+//            if (i >= 4) {
+//                break;
+//            }
+//        }
+//        if (total < 10) {
+//            searchUser.setRole(null);
+//            userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
+//            for (UserProfile userProfile : userProfiles) {
+//                if (checkUser(userIds, userProfile.getUserId())) {
+//                    continue;
+//                }
+//                total++;
+//                userIds.add(userProfile.getUserId());
+//                corgiBillboardService.addBillboard(userProfile, date, "fanstotal");
+//                if (total >= 10) {
+//                    break;
+//                }
+//            }
+//        }
     }
 
     @Async
