@@ -51,8 +51,8 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
-    //@Scheduled(cron = "0 0 20 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 0 10 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
@@ -100,7 +100,6 @@ public class CorgiBillboardTask {
         UserDetail searchUser = new UserDetail();
 //        searchUser.setRole("1");
         List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
-        int total = 0;
         int i = 0;
         for (UserProfile userProfile : userProfiles) {
             if (checkUser(userIds, userProfile.getUserId())) {
@@ -108,7 +107,6 @@ public class CorgiBillboardTask {
             }
 
             i++;
-            total++;
             log.info("popular..." + userProfile.getUserId());
             userIds.add(userProfile.getUserId());
             corgiBillboardService.addBillboard(userProfile, date, "popular");
