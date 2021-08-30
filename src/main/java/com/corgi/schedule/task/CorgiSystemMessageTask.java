@@ -120,31 +120,31 @@ public class CorgiSystemMessageTask {
                 }
                 log.info("sending user profiles... {} ", userProfiles.size());
                 List<String> userIds = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
                 userProfiles.forEach(userProfile -> {
                     MessageRecord messageRecord = new MessageRecord();
                     messageRecord.setMessageId(systemMessage.getId());
                     messageRecord.setStatus("sending");
                     messageRecord.setNickname(userProfile.getNickname());
                     messageRecord.setUserId(userProfile.getUserId());
-                    corgiSystemMessageService.addMessageRecord(messageRecord);
+                    String id = corgiSystemMessageService.addMessageRecord(messageRecord);
+                    ids.add(id);
                     log.info("prepare sending to... {} ", userProfile.getNickname());
                     userIds.add("corgi" + userProfile.getUserId());
                 });
                 if (hxPushMessageService.sendMessage(systemMessage, userIds)) {
-                    userProfiles.forEach(userProfile -> {
+                    ids.forEach(id -> {
                         MessageRecord messageRecord = new MessageRecord();
-                        messageRecord.setMessageId(systemMessage.getId());
                         messageRecord.setStatus("success");
-                        messageRecord.setUserId(userProfile.getUserId());
+                        messageRecord.setId(id);
                         corgiSystemMessageService.updateMessageRecord(messageRecord);
                     });
                 } else {
-                    userProfiles.forEach(userProfile -> {
+                    ids.forEach(id -> {
                         MessageRecord messageRecord = new MessageRecord();
-                        messageRecord.setMessageId(systemMessage.getId());
                         messageRecord.setStatus("failed");
                         messageRecord.setReason(HxPushMessageService.RESULT.get());
-                        messageRecord.setUserId(userProfile.getUserId());
+                        messageRecord.setId(id);
                         corgiSystemMessageService.updateMessageRecord(messageRecord);
                     });
                 }
