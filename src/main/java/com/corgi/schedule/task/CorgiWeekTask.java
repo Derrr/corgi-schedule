@@ -23,9 +23,9 @@ public class CorgiWeekTask {
     private TaskService taskService;
 
 
-    //@Async
+    @Async
     //@Scheduled(cron = "0 0 2 * * MON")
-    //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
+    @Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void run() {
         log.info("refreshing fake user pool...........");
         corgiFakeService.refreshFakeUser(10000);

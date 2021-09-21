@@ -3,6 +3,7 @@ package com.corgi.schedule.task;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.corgi.activity.api.CorgiActivityFeedService;
+import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
 import com.corgi.common.messages.RecommendCalculater;
@@ -12,6 +13,7 @@ import com.corgi.user.api.*;
 import com.corgi.user.entity.*;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +51,8 @@ public class CorgiFakeTask {
     @Reference
     private CorgiVisitService corgiVisitService;
     @Reference
+    private CorgiActivityService corgiActivityService;
+    @Reference
     private CorgiUserDateService corgiUserDateService;
     @Autowired
     private StringRedisTemplate redisTemplate;
@@ -78,8 +82,8 @@ public class CorgiFakeTask {
             .expireAfterWrite(10L, TimeUnit.MINUTES)
             .build();
 
-    //@Async(value = "asyncExecutor")
-    //@Scheduled(cron = "0/6 * 9-22 * * *")
+    @Async(value = "asyncExecutor")
+    @Scheduled(cron = "0/6 * 9-22 * * *")
     public void run() {
         int page = 1;
         int pageSize = 1000;
@@ -100,27 +104,34 @@ public class CorgiFakeTask {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -3);
         String date = sdf.format(calendar.getTime());
+        List<CorgiActivity> corgiActivities = corgiActivityService.getActivityByUserIds(Arrays.asList("254215", "254188", "804", "423", "2058"), CorgiActivity.CAT_IMAGE, 1, 1000);
+        Double likeChance = 25.0 / DAY_MINUTE;
+        for (CorgiActivity corgiActivity : corgiActivities) {
+            if (!StringUtils.isEmpty(corgiActivity.getId()) && Math.random() < likeChance) {
+                likeActivity(userDetail, corgiActivity.getId(), corgiActivity.getUserId());
+            }
+        }
 
-        List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
-        do {
-            List<UserProfile> profiles = this.getBasicUserDetailByPage(page, pageSize);
-            page++;
-            if (CollectionUtils.isEmpty(profiles)) {
-                break;
-            }
-            for (UserProfile profile : profiles) {
-                if (userDetail.getUserId().equals(profile.getUserId())) {
-                    continue;
-                }
-                if ("influencer".equals(profile.getAvatarStatus())) {
-                    influencer(profile, userDetail, hasOnBoard(onBoardUsers, profile));
-                } else if (date.compareTo(profile.getCreateTime()) > 0) {
-                    oldCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile));
-                } else {
-                    newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile));
-                }
-            }
-        } while (true);
+//        List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(new Date()));
+//        do {
+//            List<UserProfile> profiles = this.getBasicUserDetailByPage(page, pageSize);
+//            page++;
+//            if (CollectionUtils.isEmpty(profiles)) {
+//                break;
+//            }
+//            for (UserProfile profile : profiles) {
+//                if (userDetail.getUserId().equals(profile.getUserId())) {
+//                    continue;
+//                }
+//                if ("influencer".equals(profile.getAvatarStatus())) {
+//                    influencer(profile, userDetail, hasOnBoard(onBoardUsers, profile));
+//                } else if (date.compareTo(profile.getCreateTime()) > 0) {
+//                    oldCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile));
+//                } else {
+//                    newCorgier(profile, userDetail, hasOnBoard(onBoardUsers, profile));
+//                }
+//            }
+//        } while (true);
     }
 
     private Boolean hasOnBoard(List<UserProfile> billboardUsers, UserProfile user) {
