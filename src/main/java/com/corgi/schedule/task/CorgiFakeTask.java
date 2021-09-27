@@ -99,7 +99,8 @@ public class CorgiFakeTask {
             .build();
 
     @Async(value = "asyncExecutor")
-    @Scheduled(cron = "0/6 * 9-22 * * *")
+    //@Scheduled(cron = "0/6 * 9-22 * * *")
+    @Scheduled(fixedRate = 6000)
     public void run2() {
         UserDetail userDetail = null;
         for (int i = 0; i < 10; i++) {
