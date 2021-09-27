@@ -226,6 +226,9 @@ public class CorgiFakeTask {
                     continue;
                 }
                 avatarStatus = commentUser.getAvatarStatus();
+                if (avatarStatus == null) {
+                    avatarStatus = "";
+                }
                 redisTemplate.opsForValue().set(influencerUserKey, avatarStatus, 20l, TimeUnit.HOURS);
             }
             double likeChance = 5;
@@ -305,6 +308,9 @@ public class CorgiFakeTask {
                     return 0.0;
                 }
                 avatarStatus = userDetail.getAvatarStatus();
+                if(avatarStatus == null){
+                    avatarStatus = "";
+                }
                 redisTemplate.opsForValue().set(influencerUserKey, avatarStatus, 20l, TimeUnit.HOURS);
             }
             if ("influencer".equals(avatarStatus)) {
