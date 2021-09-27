@@ -99,8 +99,8 @@ public class CorgiFakeTask {
             .build();
 
     //@Async(value = "asyncExecutor")
-    //@Scheduled(cron = "0/6 * 9-22 * * *")
-    @Scheduled(fixedRate = 6000)
+    @Scheduled(cron = "0/6 * 9-22 * * *")
+    //@Scheduled(fixedRate = 6000)
     public void run2() {
         UserDetail userDetail = null;
         for (int i = 0; i < 10; i++) {
@@ -113,7 +113,7 @@ public class CorgiFakeTask {
         if (userDetail == null) {
             return;
         }
-
+        log.info("running fake task...");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -1);
