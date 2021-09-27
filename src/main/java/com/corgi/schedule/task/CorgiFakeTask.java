@@ -98,7 +98,7 @@ public class CorgiFakeTask {
             .expireAfterWrite(10L, TimeUnit.MINUTES)
             .build();
 
-    @Async(value = "asyncExecutor")
+    //@Async(value = "asyncExecutor")
     //@Scheduled(cron = "0/6 * 9-22 * * *")
     @Scheduled(fixedRate = 6000)
     public void run2() {
