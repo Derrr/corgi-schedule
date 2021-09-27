@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
  */
 @Component
 @Slf4j
+@EnableAsync
 public class CorgiFakeTask {
     @Reference
     private CorgiFakeService corgiFakeService;
@@ -101,7 +103,7 @@ public class CorgiFakeTask {
     //@Async(value = "asyncExecutor")
     @Scheduled(cron = "0/6 * 9-22 * * *")
     //@Scheduled(fixedRate = 6000)
-    public void run2() {
+    public void runFakeTask() {
         UserDetail userDetail = null;
         for (int i = 0; i < 10; i++) {
             String userId = corgiFakeService.selectFakeUser();
@@ -335,7 +337,7 @@ public class CorgiFakeTask {
 
     @Async(value = "asyncExecutor")
     @Scheduled(cron = "0/6 * 9-22 * * *")
-    public void run1() {
+    public void runUserFakeTask() {
         int page = 1;
         int pageSize = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
