@@ -7,6 +7,7 @@ import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
 import com.corgi.common.messages.RecommendCalculater;
+import com.corgi.entity.ActivityQuery;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
 import com.corgi.user.api.*;
@@ -15,6 +16,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.DataType;
@@ -24,11 +26,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import sun.util.resources.CalendarData;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author tairanliu
@@ -51,9 +55,15 @@ public class CorgiFakeTask {
     @Reference
     private CorgiVisitService corgiVisitService;
     @Reference
+    private CorgiLikeService corgiLikeService;
+    @Reference
     private CorgiActivityService corgiActivityService;
     @Reference
     private CorgiUserDateService corgiUserDateService;
+    @Reference
+    private CorgiUserActivityService corgiUserActivityService;
+    @Reference
+    private CorgiCommentService corgiCommentService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -62,6 +72,12 @@ public class CorgiFakeTask {
     private static final Double DAY_MINUTE = 14 * 60.0 * 10;
 
     private static final String LAST_ACTIVITY = "last_activity";
+
+    private static final String activityKey = "recent_activity";
+    private static final String activityAllKey = "all_activity";
+    private static final String creatorKey = "activity_creator";
+    private static final String influencerKey = "is_influencer";
+    private static final String publishDate = "publish_date_";
 
     private Cache<String, List<String>> userListCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1L, TimeUnit.HOURS)
@@ -84,7 +100,241 @@ public class CorgiFakeTask {
 
     @Async(value = "asyncExecutor")
     @Scheduled(cron = "0/6 * 9-22 * * *")
-    public void run() {
+    public void run2() {
+        UserDetail userDetail = null;
+        for (int i = 0; i < 10; i++) {
+            String userId = corgiFakeService.selectFakeUser();
+            userDetail = corgiUserService.getUserDetailBasic(userId);
+            if (userDetail != null) {
+                break;
+            }
+        }
+        if (userDetail == null) {
+            return;
+        }
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -1);
+        String c1 = sdf.format(calendar.getTime());
+        calendar.add(Calendar.DATE, -2);
+        String c3 = sdf.format(calendar.getTime());
+        calendar.add(Calendar.DATE, -4);
+        String c7 = sdf.format(calendar.getTime());
+        List<String> onBoardUsers = getOnBoardUsers();
+
+        List<String> activityIds = redisTemplate.opsForList().range(activityKey, 0, -1);
+        if (CollectionUtils.isEmpty(activityIds)) {
+            redisTemplate.delete(activityAllKey);
+            ActivityQuery query = new ActivityQuery();
+            query.setPageSize(5000);
+            List<CorgiActivity> corgiActivities = corgiUserActivityService.queryActivity(query);
+            for (CorgiActivity corgiActivity : corgiActivities) {
+                String activityId = corgiActivity.getId();
+                if (c1.compareTo(corgiActivity.getCreateTime()) > 0) {
+                    redisTemplate.opsForList().rightPush(activityKey, activityId);
+                } else if (c3.compareTo(corgiActivity.getCreateTime()) > 0) {
+                    redisTemplate.opsForList().rightPush(activityAllKey, activityId);
+                } else {
+                    break;
+                }
+                String key = creatorKey + activityId;
+                if (!redisTemplate.hasKey(key)) {
+                    redisTemplate.opsForValue().set(key, corgiActivity.getUserId(), 3L, TimeUnit.DAYS);
+                }
+            }
+            redisTemplate.expire(activityKey, 10l, TimeUnit.MINUTES);
+        }
+        List<String> creatorIds = new ArrayList<>();
+        for (String activityId : activityIds) {
+            String userId = redisTemplate.opsForValue().get(creatorKey + activityId);
+            if (!creatorIds.contains(userId)) {
+                creatorIds.add(userId);
+                String datesKey = publishDate.concat(userId);
+                String dateCountStr = redisTemplate.opsForValue().get(datesKey);
+                Integer dateCount;
+                if (StringUtils.isEmpty(dateCountStr)) {
+                    ActivityQuery query = new ActivityQuery();
+                    query.setUserId(userId);
+                    query.setEndTime(c3);
+                    dateCount = corgiUserActivityService.countActivityDate(query);
+                    if (dateCount >= 3) {
+                        query.setEndTime(c7);
+                        dateCount = corgiUserActivityService.countActivityDate(query);
+                    }
+
+                    redisTemplate.opsForValue().set(datesKey, dateCount + "", 10l, TimeUnit.MINUTES);
+                } else {
+                    dateCount = Integer.valueOf(dateCountStr);
+                }
+                if (dateCount >= 7 && Math.random() < 5.0 / DAY_MINUTE) {
+                    followUser(userDetail, userId);
+                }
+            }
+            Double likeChance = this.countLikeChance(activityId, onBoardUsers, userId, userDetail);
+            if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
+                likeActivity(userDetail, activityId, userId);
+            }
+        }
+
+        List<String> allActivityIds = redisTemplate.opsForList().range(activityAllKey, 0, -1);
+        for (String activityId : allActivityIds) {
+            String userId = redisTemplate.opsForValue().get(creatorKey + activityId);
+            if (!creatorIds.contains(userId)) {
+                creatorIds.add(userId);
+            }
+            Double likeChance = this.countAllLikeChance(activityId, onBoardUsers, userId);
+            if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
+                likeActivity(userDetail, activityId, userId);
+            }
+        }
+
+        CorgiVlogHot query = new CorgiVlogHot();
+        query.setType(CorgiVlogHot.TYPE.MANUAL);
+        query.setStatus(CorgiVlogHot.STATUS.OPEN);
+        List<CorgiVlogHot> hots = corgiVlogService.getHotVlog(query, 1, 300);
+        for (CorgiVlogHot hot : hots) {
+            if (c1.compareTo(hot.getCtime()) > 0) {
+                break;
+            }
+            String activityId = hot.getActivityId();
+            String userId = redisTemplate.opsForValue().get(creatorKey + activityId);
+            if (!StringUtils.isEmpty(activityId) && Math.random() < 30.0 / DAY_MINUTE) {
+                likeActivity(userDetail, activityId, userId);
+            }
+            if (Math.random() < 5.0 / DAY_MINUTE) {
+                followUser(userDetail, userId);
+            }
+        }
+
+        ActivityComment queryComment = new ActivityComment();
+        queryComment.setCtime(c1);
+        List<ActivityComment> activityComments = corgiCommentService.listComment(queryComment, 100);
+        List<String> commentUserIds = new ArrayList<>();
+        for (ActivityComment comment : activityComments) {
+            String commentUserId = comment.getCommentUserId();
+            String activityId = comment.getActivityId();
+            String userId = comment.getUserId();
+            if (userId.equals(commentUserId)) {
+                continue;
+            }
+            String influencerUserKey = influencerKey + userId;
+            String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
+            if (StringUtils.isEmpty(avatarStatus)) {
+                UserDetail commentUser = corgiUserService.getUserDetailBasic(commentUserId);
+                if (commentUser == null) {
+                    continue;
+                }
+                avatarStatus = commentUser.getAvatarStatus();
+                redisTemplate.opsForValue().set(influencerUserKey, avatarStatus, 20l, TimeUnit.HOURS);
+            }
+            double likeChance = 5;
+
+            if ("influencer".equals(avatarStatus)) {
+                likeChance = 10;
+            }
+            if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
+                likeActivity(userDetail, activityId, userId);
+            }
+            if (!commentUserIds.contains(commentUserId)) {
+                commentUserIds.add(commentUserId);
+                if (Math.random() < 5.0 / DAY_MINUTE) {
+                    followUser(userDetail, commentUserId);
+                }
+            }
+        }
+
+    }
+
+    private List<String> getOnBoardUsers() {
+        String key = "on_board";
+        if (!redisTemplate.hasKey(key)) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar calendar = Calendar.getInstance();
+            List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(calendar.getTime()));
+            List<String> users = onBoardUsers.stream().map(u -> u.getUserId()).collect(Collectors.toList());
+            redisTemplate.opsForList().rightPushAll(key, users);
+            redisTemplate.expire(key, 1l, TimeUnit.HOURS);
+        }
+        return redisTemplate.opsForList().range(key, 0, -1);
+    }
+
+    private Double countAllLikeChance(String activityId, List<String> onBoardUsers, String userId) {
+        String likeChanceKey = "activity_chance_like_" + activityId;
+        String chanceStr = redisTemplate.opsForValue().get(likeChanceKey);
+        String datesKey = publishDate.concat(userId);
+        String dateCountStr = redisTemplate.opsForValue().get(datesKey);
+        if (StringUtils.isEmpty(chanceStr)) {
+            Double likeChance = 0.0;
+            if (onBoardUsers.contains(userId)) {
+                likeChance += 30;
+            }
+            String likeKey = "activity_like_" + activityId;
+            Integer likeCount = Integer.valueOf(redisTemplate.opsForValue().get(likeKey));
+            if (likeCount >= 20) {
+                likeChance += 50.0 / 3.0;
+            } else if (likeCount >= 20) {
+                likeChance += 10;
+            }
+            if (!StringUtils.isEmpty(dateCountStr)) {
+                Integer dateCount = Integer.valueOf(dateCountStr);
+                if (dateCount >= 7) {
+                    likeChance += 10;
+                } else if (dateCount >= 3) {
+                    likeChance += 20.0 / 3;
+                }
+            }
+            redisTemplate.opsForValue().set(likeChanceKey, likeChance + "", 1l, TimeUnit.HOURS);
+            return likeChance;
+        } else {
+            return Double.valueOf(chanceStr);
+        }
+    }
+
+    private Double countLikeChance(String activityId, List<String> onBoardUsers, String userId, UserDetail userDetail1) {
+        String likeChanceKey = "activity_chance_like_" + activityId;
+        String chanceStr = redisTemplate.opsForValue().get(likeChanceKey);
+        if (StringUtils.isEmpty(chanceStr)) {
+            double likeChance = 5;
+            String influencerUserKey = influencerKey + userId;
+            String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
+            if (StringUtils.isEmpty(avatarStatus)) {
+                UserDetail userDetail = corgiUserService.getUserDetailBasic(userId);
+                if (userDetail == null) {
+                    redisTemplate.opsForValue().set(likeChanceKey, "0.0", 3l, TimeUnit.DAYS);
+                    return 0.0;
+                }
+                avatarStatus = userDetail.getAvatarStatus();
+                redisTemplate.opsForValue().set(influencerUserKey, avatarStatus, 20l, TimeUnit.HOURS);
+            }
+            if ("influencer".equals(avatarStatus)) {
+                likeChance += 5;
+            }
+            Long likeCount = corgiLikeService.countActivityLike(activityId);
+            String likeKey = "activity_like_" + activityId;
+            redisTemplate.opsForValue().set(likeKey, likeCount + "", 3L, TimeUnit.DAYS);
+            likeChance += countAllLikeChance(activityId, onBoardUsers, userId);
+            redisTemplate.opsForValue().set(likeChanceKey, likeChance + "", 10l, TimeUnit.MINUTES);
+            return likeChance;
+        } else {
+            String likeKey = "activity_like_" + activityId;
+            String likeCountStr = redisTemplate.opsForValue().get(likeKey);
+            if (!StringUtils.isEmpty(likeCountStr)) {
+                Long likeCount = Long.valueOf(likeCountStr);
+                if (likeCount >= 20 && Math.random() < 50.0 / DAY_MINUTE) {
+                    followUser(userDetail1, userId);
+                } else if (likeCount >= 10 && Math.random() < 30.0 / DAY_MINUTE) {
+                    followUser(userDetail1, userId);
+                }
+            }
+
+            return Double.valueOf(chanceStr);
+        }
+    }
+
+    @Async(value = "asyncExecutor")
+    @Scheduled(cron = "0/6 * 9-22 * * *")
+    public void run1() {
         int page = 1;
         int pageSize = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
