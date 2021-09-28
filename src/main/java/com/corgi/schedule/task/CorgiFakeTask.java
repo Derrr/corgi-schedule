@@ -338,8 +338,8 @@ public class CorgiFakeTask {
         }
     }
 
-    @Async(value = "asyncExecutor")
-    @Scheduled(cron = "0/6 * 9-22 * * *")
+    //@Async(value = "asyncExecutor")
+    //@Scheduled(cron = "0/6 * 9-22 * * *")
     public void runUserFakeTask() {
         int page = 1;
         int pageSize = 1000;
