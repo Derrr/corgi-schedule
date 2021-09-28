@@ -74,7 +74,7 @@ public class CorgiBillboardTask {
         billboardQuery.setDate(lastTime);
         billboardQuery.setCtime(date);
         List<String> activityIds = corgiBillboardService.getAllActivityBillboard(billboardQuery).stream().map(a -> a.getActivityId()).collect(Collectors.toList());
-        log.info("activity size:{} ", activityIds.size());
+        log.info("activity size:{} ", corgiActivities.size());
         int total = 0;
         for (CorgiActivity activity : corgiActivities) {
             if (StringUtils.isEmpty(activity.getUserId()) || userIds.contains(activity.getUserId())) {
