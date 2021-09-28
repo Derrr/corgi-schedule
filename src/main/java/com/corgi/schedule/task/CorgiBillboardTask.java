@@ -12,15 +12,16 @@ import com.aliyuncs.profile.DefaultProfile;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
+import com.corgi.entity.ActivityQuery;
 import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiBillboardService;
 import com.corgi.user.api.CorgiUserActivityService;
 import com.corgi.user.api.CorgiUserService;
-import com.corgi.user.entity.UserDetail;
-import com.corgi.user.entity.UserLogin;
-import com.corgi.user.entity.UserProfile;
-import com.corgi.user.entity.UserSignUp;
+import com.corgi.user.entity.*;
+import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -28,6 +29,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,6 +38,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * @author tairanliu
@@ -49,6 +52,50 @@ public class CorgiBillboardTask {
     private MQService mqService;
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    @Async
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    public void run2() {
+        log.info("adding activity billboard...........");
+        List<String> userIds = Lists.newArrayList("7", "8", "9");
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, 3);
+        String date = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+        calendar.add(Calendar.DATE, -6);
+        String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
+
+        ActivityQuery query = new ActivityQuery();
+        query.setStartTime(startTime);
+        List<CorgiActivity> corgiActivities = corgiBillboardService.getPopularActivity(query, 1000);
+
+        calendar.add(Calendar.DATE, -1);
+        String lastTime = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+        ActivityBillboard billboardQuery = new ActivityBillboard();
+        billboardQuery.setDate(lastTime);
+        billboardQuery.setCtime(date);
+        List<String> activityIds = corgiBillboardService.getAllActivityBillboard(billboardQuery).stream().map(a -> a.getActivityId()).collect(Collectors.toList());
+        int total = 0;
+        for (CorgiActivity activity : corgiActivities) {
+            if (StringUtils.isEmpty(activity.getUserId()) || userIds.contains(activity.getUserId())) {
+                continue;
+            }
+            if (StringUtils.isEmpty(activity.getId()) || activityIds.contains(activity.getId())) {
+                continue;
+            }
+            total++;
+            if (total > 10) {
+                break;
+            }
+            userIds.add(activity.getUserId());
+            ActivityBillboard activityBillboard = new ActivityBillboard();
+            activityBillboard.setActivityId(activity.getId());
+            activityBillboard.setDate(date);
+            activityBillboard.setUserId(activity.getUserId());
+            activityBillboard.setCount(activity.getLikeCount().intValue());
+            activityBillboard.setOrder(99);
+            corgiBillboardService.addActivityBillboard(activityBillboard);
+        }
+    }
 
     @Async
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
@@ -114,64 +161,6 @@ public class CorgiBillboardTask {
                 break;
             }
         }
-//        searchUser.setRole("0");
-//        i = 0;
-//        userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
-//        for (UserProfile userProfile : userProfiles) {
-//            if (checkUser(userIds, userProfile.getUserId())) {
-//                continue;
-//            }
-//            i++;
-//            total++;
-//            userIds.add(userProfile.getUserId());
-//            corgiBillboardService.addBillboard(userProfile, date, "fans0");
-//            if (i >= 2) {
-//                break;
-//            }
-//        }
-//        userProfiles = corgiBillboardService.getPassionUser(searchUser, 500);
-//        i = 0;
-//        for (UserProfile userProfile : userProfiles) {
-//            if (checkUser(userIds, userProfile.getUserId())) {
-//                continue;
-//            }
-//            i++;
-//            total++;
-//            userIds.add(userProfile.getUserId());
-//            corgiBillboardService.addBillboard(userProfile, date, "follow");
-//            if (i >= 2) {
-//                break;
-//            }
-//        }
-//        userProfiles = corgiBillboardService.getActiveUser(searchUser, 500);
-//        i = 0;
-//        for (UserProfile userProfile : userProfiles) {
-//            if (checkUser(userIds, userProfile.getUserId())) {
-//                continue;
-//            }
-//            i++;
-//            total++;
-//            userIds.add(userProfile.getUserId());
-//            corgiBillboardService.addBillboard(userProfile, date, "active");
-//            if (i >= 4) {
-//                break;
-//            }
-//        }
-//        if (total < 10) {
-//            searchUser.setRole(null);
-//            userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
-//            for (UserProfile userProfile : userProfiles) {
-//                if (checkUser(userIds, userProfile.getUserId())) {
-//                    continue;
-//                }
-//                total++;
-//                userIds.add(userProfile.getUserId());
-//                corgiBillboardService.addBillboard(userProfile, date, "fanstotal");
-//                if (total >= 10) {
-//                    break;
-//                }
-//            }
-//        }
     }
 
     @Async
