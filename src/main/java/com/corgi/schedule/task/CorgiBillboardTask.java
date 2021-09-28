@@ -74,6 +74,7 @@ public class CorgiBillboardTask {
         billboardQuery.setDate(lastTime);
         billboardQuery.setCtime(date);
         List<String> activityIds = corgiBillboardService.getAllActivityBillboard(billboardQuery).stream().map(a -> a.getActivityId()).collect(Collectors.toList());
+        log.info("activity size:{} ", activityIds.size());
         int total = 0;
         for (CorgiActivity activity : corgiActivities) {
             if (StringUtils.isEmpty(activity.getUserId()) || userIds.contains(activity.getUserId())) {
@@ -93,6 +94,7 @@ public class CorgiBillboardTask {
             activityBillboard.setUserId(activity.getUserId());
             activityBillboard.setCount(activity.getLikeCount().intValue());
             activityBillboard.setOrder(99);
+            log.info("add billboard:{} ", activityBillboard);
             corgiBillboardService.addActivityBillboard(activityBillboard);
         }
     }
