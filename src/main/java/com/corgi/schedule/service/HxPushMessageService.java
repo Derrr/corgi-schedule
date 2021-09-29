@@ -52,7 +52,9 @@ public class HxPushMessageService {
     }
 
     public boolean sendMessage(SystemMessage systemMessage, List<String> userIds) {
-        return !"false".equals(sendMessage(systemMessage, userIds, new HashMap()));
+        HashMap extra = new HashMap();
+        extra.put("content", systemMessage.getContent());
+        return !"false".equals(sendMessage(systemMessage, userIds, extra));
     }
 
 
