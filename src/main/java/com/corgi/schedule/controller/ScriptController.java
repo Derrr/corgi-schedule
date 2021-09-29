@@ -112,7 +112,9 @@ public class ScriptController {
     @GetMapping("push_system_message")
     public String pushSystemMessage(@RequestParam("id") String id, @RequestParam("userId") String userId) {
         SystemMessage message = corgiSystemMessageService.getMessageDetail(id);
-        return hxPushMessageService.sendMessage(message, Arrays.asList("corgi" + userId), new HashMap());
+        HashMap extra = new HashMap();
+        extra.put("content", message.getContent());
+        return hxPushMessageService.sendMessage(message, Arrays.asList("corgi" + userId), extra);
     }
 
 
