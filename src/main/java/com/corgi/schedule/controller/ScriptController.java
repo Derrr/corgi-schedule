@@ -1,6 +1,7 @@
 package com.corgi.schedule.controller;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSON;
 import com.corgi.activity.api.CorgiActivityFeedService;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
@@ -113,7 +114,7 @@ public class ScriptController {
     public String pushSystemMessage(@RequestParam("id") String id, @RequestParam("userId") String userId) {
         SystemMessage message = corgiSystemMessageService.getMessageDetail(id);
         HashMap extra = new HashMap();
-        extra.put("content", message.getContent());
+        extra.put("content", JSON.parse(message.getContent()));
         message.setContent(message.getTitle());
         return hxPushMessageService.sendMessage(message, Arrays.asList("corgi" + userId), extra);
     }
