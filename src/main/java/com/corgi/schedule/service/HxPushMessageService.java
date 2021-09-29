@@ -1,5 +1,6 @@
 package com.corgi.schedule.service;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.corgi.user.entity.SystemMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,10 @@ public class HxPushMessageService {
 
     public boolean sendMessage(SystemMessage systemMessage, List<String> userIds) {
         HashMap extra = new HashMap();
-        extra.put("content", systemMessage.getContent());
+        if("907".equals(systemMessage.getType())) {
+            extra.put("content", JSON.parse(systemMessage.getContent()));
+            systemMessage.setContent(systemMessage.getTitle());
+        }
         return !"false".equals(sendMessage(systemMessage, userIds, extra));
     }
 
