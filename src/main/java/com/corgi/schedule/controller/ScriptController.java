@@ -115,7 +115,7 @@ public class ScriptController {
         SystemMessage message = corgiSystemMessageService.getMessageDetail(id);
         HashMap extra = new HashMap();
         extra.put("content", JSON.parse(message.getContent()));
-        message.setContent(message.getTitle());
+        //message.setContent(message.getTitle());
         return hxPushMessageService.sendMessage(message, Arrays.asList("corgi" + userId), extra);
     }
 
