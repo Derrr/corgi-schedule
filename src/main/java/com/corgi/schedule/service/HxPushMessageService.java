@@ -13,6 +13,7 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -53,12 +54,14 @@ public class HxPushMessageService {
     }
 
     public boolean sendMessage(SystemMessage systemMessage, List<String> userIds) {
+        SystemMessage message = new SystemMessage();
+        BeanUtils.copyProperties(systemMessage, message);
         HashMap extra = new HashMap();
-        if("907".equals(systemMessage.getType())) {
+        if ("907".equals(message.getType())) {
             extra.put("content", JSON.parse(systemMessage.getContent()));
-            systemMessage.setContent(systemMessage.getTitle());
+            message.setContent(systemMessage.getTitle());
         }
-        return !"false".equals(sendMessage(systemMessage, userIds, extra));
+        return !"false".equals(sendMessage(message, userIds, extra));
     }
 
 
