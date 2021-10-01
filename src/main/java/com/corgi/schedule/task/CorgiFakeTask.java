@@ -282,9 +282,9 @@ public class CorgiFakeTask {
             if (!StringUtils.isEmpty(dateCountStr)) {
                 Integer dateCount = Integer.valueOf(dateCountStr);
                 if (dateCount >= 7) {
-                    likeChance += 10;
+                    likeChance += 20;
                 } else if (dateCount >= 3) {
-                    likeChance += 20.0 / 3;
+                    likeChance += 40.0 / 3;
                 }
             }
             redisTemplate.opsForValue().set(likeChanceKey, likeChance + "", 1l, TimeUnit.HOURS);
