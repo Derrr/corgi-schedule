@@ -128,7 +128,7 @@ public class CorgiFakeTask {
         CorgiVlogHot hot = new CorgiVlogHot();
         hot.setStatus(CorgiVlogHot.STATUS.OPEN);
         hot.setType(CorgiVlogHot.TYPE.MANUAL);
-        hot.setCtime(date);
+        hot.setCtime(c1);
         List<String> hotIds = corgiVlogService.getHotVlog(hot, 1, 100).stream().map(h -> h.getActivityId()).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(hotIds)) {
             for (String id : hotIds) {
