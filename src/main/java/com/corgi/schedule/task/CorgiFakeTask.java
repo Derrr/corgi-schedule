@@ -285,7 +285,7 @@ public class CorgiFakeTask {
         String datesKey = publishDate.concat(userId);
         String dateCountStr = redisTemplate.opsForValue().get(datesKey);
         if (StringUtils.isEmpty(chanceStr)) {
-            Double likeChance = 20.0;
+            Double likeChance = 0.0;
             String likeKey = "activity_like_" + activityId;
             Integer likeCount = Integer.valueOf(redisTemplate.opsForValue().get(likeKey));
             if (likeCount >= 12) {
@@ -312,7 +312,7 @@ public class CorgiFakeTask {
         String likeChanceKey = "activity_chance_like_" + activityId;
         String chanceStr = redisTemplate.opsForValue().get(likeChanceKey);
         if (StringUtils.isEmpty(chanceStr)) {
-            double likeChance = 5;
+            double likeChance = 20;
             String influencerUserKey = influencerKey + userId;
             String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
             if (StringUtils.isEmpty(avatarStatus)) {
@@ -328,7 +328,7 @@ public class CorgiFakeTask {
                 redisTemplate.opsForValue().set(influencerUserKey, avatarStatus, 20l, TimeUnit.HOURS);
             }
             if ("influencer".equals(avatarStatus)) {
-                likeChance += 5;
+                likeChance += 10;
             }
             Long likeCount = corgiLikeService.countActivityLike(activityId);
             String likeKey = "activity_like_" + activityId;
