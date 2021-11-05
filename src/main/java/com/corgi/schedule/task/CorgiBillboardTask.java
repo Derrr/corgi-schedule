@@ -167,7 +167,7 @@ public class CorgiBillboardTask {
 
     @Async
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    @Scheduled(cron = "0 0 8 * * *")
+    //@Scheduled(cron = "0 0 8 * * *")
     public void notice() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String date = sdf.format(new Date());
