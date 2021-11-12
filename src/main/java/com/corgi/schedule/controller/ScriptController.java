@@ -164,7 +164,7 @@ public class ScriptController {
             }
             for (CorgiActivity activity : activityList) {
                 log.info("updating:{} cover:{} ", activity.getId(), activity.getCoverUrl());
-                corgiActivityService.updateByColumnn(activity.getId(), "coverUrl", activity.getCoverUrl().split("\\?Expires")[0]);
+                corgiActivityService.updateByColumn(activity.getId(), "coverUrl", activity.getCoverUrl().split("\\?Expires")[0]);
             }
         }
         return "success";
@@ -601,7 +601,7 @@ public class ScriptController {
                 }
 
                 Long totalCount = corgiLikeService.countActivityLike(activityId);
-                corgiActivityService.updateByColumnn(activityId, "likeCount", totalCount + "");
+                corgiActivityService.updateByColumn(activityId, "likeCount", totalCount + "");
 
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
                 if (likeCount < 5) {
