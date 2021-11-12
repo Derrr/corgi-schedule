@@ -56,7 +56,7 @@ public class CorgiActivityCheckTask {
     private SimpleDateFormat d_sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     private SimpleDateFormat m_sdf = new SimpleDateFormat("HH点mm分");
 
-    @Scheduled(cron = "0 * * * * *")
+    //@Scheduled(cron = "0 * * * * *")
     public void run() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.HOUR_OF_DAY, 1);
