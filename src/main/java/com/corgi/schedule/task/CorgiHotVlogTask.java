@@ -44,7 +44,7 @@ public class CorgiHotVlogTask {
     //@Scheduled(fixedRate = 3600 * 1000)
     public void run() {
         int page = 1;
-        int size = 10000;
+        int size = 1000;
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         List<String> activityList = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
@@ -62,10 +62,10 @@ public class CorgiHotVlogTask {
             }
             for (ActivityLike like : likeList) {
                 log.info("like:{} ,hourAgo:{} ,likeTime:{} ,result:{} ", like.getActivityId(), hourAgo, like.getCtime(), hourAgo.compareTo(like.getCtime()));
-//                if (hourAgo.compareTo(like.getCtime()) > 0) {
-//                    shouldContinue = false;
-//                    break;
-//                }
+                if (hourAgo.compareTo(like.getCtime()) > 0) {
+                    shouldContinue = false;
+                    break;
+                }
 
                 String activityId = like.getActivityId();
                 if (activityList.contains(activityId)) {
