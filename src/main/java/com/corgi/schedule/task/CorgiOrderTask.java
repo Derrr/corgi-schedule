@@ -81,6 +81,9 @@ public class CorgiOrderTask {
                     if (CorgiOrder.PAY_TYPE.WX.equals(order.getPayType())) {
                         this.queryWXOrder(order);
                     }
+                    if (CorgiOrder.PAY_TYPE.ALIPAY.equals(order.getPayType())) {
+                        this.queryAlipayOrder(order);
+                    }
                 }
             }
         }
@@ -108,21 +111,17 @@ public class CorgiOrderTask {
                     order.setStatus(CorgiOrder.STATUS.CLOSE);
                 } else {
                     Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.MINUTE, -15);
+                    calendar.add(Calendar.MINUTE, -5);
                     if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
                         AlipayTradeCloseRequest closeRequest = new AlipayTradeCloseRequest();
                         closeRequest.setBizContent(bizContent.toString());
                         alipayClient.execute(closeRequest);
-                        corgiOrderService.updateOrder(order);
-                        return;
                     }
                 }
-            } else {
-                corgiOrderService.updateOrder(order);
-                return;
             }
         } catch (AlipayApiException e) {
             log.error(e.getErrMsg(), e);
+            order.setResult(e.getErrMsg());
         }
         corgiOrderService.updateOrder(order);
     }
@@ -149,12 +148,10 @@ public class CorgiOrderTask {
                 order.setStatus(CorgiOrder.STATUS.FAIL);
             } else {
                 Calendar calendar = Calendar.getInstance();
-                calendar.add(Calendar.MINUTE, -15);
+                calendar.add(Calendar.MINUTE, -5);
                 if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
                     wxPay.closeOrder(orderQuery);
                 }
-                corgiOrderService.updateOrder(order);
-                return;
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
