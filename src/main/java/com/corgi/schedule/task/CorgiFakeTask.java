@@ -173,6 +173,7 @@ public class CorgiFakeTask {
         }
         List<String> creatorIds = new ArrayList<>();
         for (String activityId : activityIds) {
+
             String userId = redisTemplate.opsForValue().get(creatorKey + activityId);
             if (!creatorIds.contains(userId)) {
                 creatorIds.add(userId);
@@ -197,6 +198,12 @@ public class CorgiFakeTask {
                     followUser(userDetail, userId);
                 }
             }
+
+            List<String> topics = corgiToolService.getActivityTopic(activityId);
+            if (topics.contains("57") && Math.random() < 20.0 / DAY_MINUTE) {
+                likeActivity(userDetail, activityId, userId);
+            }
+
             Double likeChance = this.countLikeChance(activityId, userId, userDetail);
             if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
                 likeActivity(userDetail, activityId, userId);
