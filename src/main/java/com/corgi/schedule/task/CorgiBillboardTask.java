@@ -165,7 +165,7 @@ public class CorgiBillboardTask {
         }
     }
 
-    @Async
+    //@Async
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
     //@Scheduled(cron = "0 0 8 * * *")
     public void notice() {

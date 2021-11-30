@@ -152,10 +152,15 @@ public class CorgiFakeTask {
         if (CollectionUtils.isEmpty(activityIds)) {
             redisTemplate.delete(activityAllKey);
             ActivityQuery query = new ActivityQuery();
+            query.setCategory(CorgiActivity.CAT_IMAGE);
             query.setPageSize(5000);
             List<CorgiActivity> corgiActivities = corgiUserActivityService.queryActivity(query);
             for (CorgiActivity corgiActivity : corgiActivities) {
                 String activityId = corgiActivity.getId();
+                String category = corgiActivity.getCategory();
+                if (!CorgiActivity.CAT_IMAGE.equals(category) && !CorgiActivity.CAT_VIDEO.equals(category) && !CorgiActivity.CAT_TEXT.equals(category)) {
+                    continue;
+                }
                 if (c1.compareTo(corgiActivity.getCreateTime()) > 0) {
                     redisTemplate.opsForList().rightPush(activityKey, activityId);
                 } else if (c3.compareTo(corgiActivity.getCreateTime()) > 0) {
