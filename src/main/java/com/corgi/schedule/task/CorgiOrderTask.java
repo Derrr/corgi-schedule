@@ -118,6 +118,8 @@ public class CorgiOrderTask {
                         alipayClient.execute(closeRequest);
                     }
                 }
+            } else {
+                order.setStatus(CorgiOrder.STATUS.CLOSE);
             }
         } catch (AlipayApiException e) {
             log.error(e.getErrMsg(), e);
