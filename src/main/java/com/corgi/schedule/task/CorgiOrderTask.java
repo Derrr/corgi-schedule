@@ -91,7 +91,6 @@ public class CorgiOrderTask {
                             order.setStatus(CorgiOrder.STATUS.CLOSE);
                             corgiOrderService.updateOrder(order);
                         }
-
                     }
                 }
             }
@@ -166,6 +165,7 @@ public class CorgiOrderTask {
                 calendar.add(Calendar.MINUTE, -5);
                 if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
                     wxPay.closeOrder(orderQuery);
+                    order.setStatus(CorgiOrder.STATUS.CLOSE);
                 }
             }
         } catch (Exception e) {
