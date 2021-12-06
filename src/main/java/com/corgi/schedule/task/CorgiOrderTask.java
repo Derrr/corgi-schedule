@@ -84,6 +84,15 @@ public class CorgiOrderTask {
                     if (CorgiOrder.PAY_TYPE.ALIPAY.equals(order.getPayType())) {
                         this.queryAlipayOrder(order);
                     }
+                    if (CorgiOrder.PAY_TYPE.IN_APP.equals(order.getPayType())) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.add(Calendar.MINUTE, -5);
+                        if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
+                            order.setStatus(CorgiOrder.STATUS.CLOSE);
+                            corgiOrderService.updateOrder(order);
+                        }
+
+                    }
                 }
             }
         }
@@ -119,7 +128,11 @@ public class CorgiOrderTask {
                     }
                 }
             } else {
-                order.setStatus(CorgiOrder.STATUS.CLOSE);
+                Calendar calendar = Calendar.getInstance();
+                calendar.add(Calendar.MINUTE, -5);
+                if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
+                    order.setStatus(CorgiOrder.STATUS.CLOSE);
+                }
             }
         } catch (AlipayApiException e) {
             log.error(e.getErrMsg(), e);
