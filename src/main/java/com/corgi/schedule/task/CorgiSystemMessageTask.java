@@ -36,11 +36,9 @@ public class CorgiSystemMessageTask {
     private HxPushMessageService hxPushMessageService;
 
     @Async
-    @Scheduled(cron = "0 0/10 * * * *")
+    @Scheduled(cron = "0 0/1 * * * *")
     public void run() {
-        log.info("start sending...");
         List<SystemMessage> systemMessageList = corgiSystemMessageService.getSystemMessagesByTime(System.currentTimeMillis());
-        log.info("sending {} ", systemMessageList.size());
         if (!CollectionUtils.isEmpty(systemMessageList)) {
             for (SystemMessage systemMessage : systemMessageList) {
                 SystemMessage updateMessage = new SystemMessage();
@@ -49,7 +47,6 @@ public class CorgiSystemMessageTask {
                 corgiSystemMessageService.updateSystemMessage(updateMessage);
             }
             for (SystemMessage systemMessage : systemMessageList) {
-                log.info("sending {} ", systemMessage.getContent());
                 sendMessages(systemMessage);
             }
         }
