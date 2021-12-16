@@ -124,10 +124,17 @@ public class CorgiSystemMessageTask {
                     messageRecord.setStatus("sending");
                     messageRecord.setNickname(userProfile.getNickname());
                     messageRecord.setUserId(userProfile.getUserId());
-                    String id = corgiSystemMessageService.addMessageRecord(messageRecord);
-                    ids.add(id);
-                    log.info("prepare sending to... {} ", userProfile.getNickname());
-                    userIds.add("corgi" + userProfile.getUserId());
+                    MessageRecord query = new MessageRecord();
+                    query.setStatus("success");
+                    query.setMessageId(systemMessage.getId());
+                    query.setUserId(userProfile.getUserId());
+                    log.info("check user... {} ", userProfile.getNickname());
+                    if (CollectionUtils.isEmpty(corgiSystemMessageService.searchMessageRecordList(query))) {
+                        String id = corgiSystemMessageService.addMessageRecord(messageRecord);
+                        ids.add(id);
+                        log.info("prepare sending to... {} ", userProfile.getNickname());
+                        userIds.add("corgi" + userProfile.getUserId());
+                    }
                 });
                 if (hxPushMessageService.sendMessage(systemMessage, userIds)) {
                     ids.forEach(id -> {
