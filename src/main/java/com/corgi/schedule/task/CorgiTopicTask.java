@@ -31,19 +31,19 @@ public class CorgiTopicTask {
     //@Scheduled(cron = "0 0 22,23 * * *")
     //@Scheduled(fixedRate = 3600 * 1000)
     public void run() {
-        int page = 1;
-        int size = 1000;
-        do {
-            List<String> activityIds = corgiToolService.getActivityIdsByTopic("24", page, size);
-            if (CollectionUtils.isEmpty(activityIds)) {
-                break;
-            }
-            for (String activityId : activityIds) {
-                Long weight = corgiLikeService.countActivityLike(activityId);
-                corgiToolService.updateActivityTopicWeight(activityId, weight.intValue());
-            }
-            page++;
-        } while (true);
+//        int page = 1;
+//        int size = 1000;
+//        do {
+//            List<String> activityIds = corgiToolService.getActivityIdsByTopic("24", page, size);
+//            if (CollectionUtils.isEmpty(activityIds)) {
+//                break;
+//            }
+//            for (String activityId : activityIds) {
+//                Long weight = corgiLikeService.countActivityLike(activityId);
+//                corgiToolService.updateActivityTopicWeight(activityId, weight.intValue());
+//            }
+//            page++;
+//        } while (true);
 
     }
 
