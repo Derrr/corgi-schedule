@@ -138,6 +138,9 @@ public class CorgiFakeTask {
         }
         List<CorgiActivity> onBoardActivity = corgiActivityService.getActivityByIds(onBoardActivityIds);
         for (CorgiActivity activity : onBoardActivity) {
+            if (CorgiActivity.CAT_PAYING.equals(activity.getCategory())) {
+                continue;
+            }
             if (!StringUtils.isEmpty(activity.getId()) && Math.random() < 50.0 / DAY_MINUTE) {
                 likeActivity(userDetail, activity.getId(), activity.getUserId());
             }
@@ -256,7 +259,10 @@ public class CorgiFakeTask {
                 likeChance = 10;
             }
             if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
-                likeActivity(userDetail, activityId, userId);
+                CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
+                if (!CorgiActivity.CAT_PAYING.equals(activity.getCategory())) {
+                    likeActivity(userDetail, activityId, userId);
+                }
             }
             if (!commentUserIds.contains(commentUserId)) {
                 commentUserIds.add(commentUserId);
@@ -579,10 +585,6 @@ public class CorgiFakeTask {
     }
 
     private void likeActivity(UserDetail userDetail, String activityId, String activityCreator) {
-        CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
-        if (activity == null || CorgiActivity.CAT_PAYING.equals(activity.getCategory())) {
-            return;
-        }
         ActivityLike activityLike = new ActivityLike();
         activityLike.setActivityId(activityId);
         activityLike.setLikeUserId(userDetail.getUserId());
