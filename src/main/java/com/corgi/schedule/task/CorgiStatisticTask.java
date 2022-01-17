@@ -80,7 +80,7 @@ public class CorgiStatisticTask {
         Calendar tmp = Calendar.getInstance();
         tmp.setTimeInMillis(time);
         countUserAge(tmp, today);
-        countActivityType(today);
+        //countActivityType(today);
 
         tmp = Calendar.getInstance();
         tmp.setTimeInMillis(time);

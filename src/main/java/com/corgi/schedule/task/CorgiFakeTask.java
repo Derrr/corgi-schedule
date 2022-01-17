@@ -579,6 +579,10 @@ public class CorgiFakeTask {
     }
 
     private void likeActivity(UserDetail userDetail, String activityId, String activityCreator) {
+        CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
+        if (activity == null || CorgiActivity.CAT_PAYING.equals(activity.getCategory())) {
+            return;
+        }
         ActivityLike activityLike = new ActivityLike();
         activityLike.setActivityId(activityId);
         activityLike.setLikeUserId(userDetail.getUserId());
