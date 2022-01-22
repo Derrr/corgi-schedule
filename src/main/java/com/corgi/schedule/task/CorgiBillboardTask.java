@@ -99,9 +99,9 @@ public class CorgiBillboardTask {
         }
     }
 
-    @Async
+    //@Async
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    @Scheduled(cron = "0 0 10 * * *")
+    //@Scheduled(cron = "0 0 10 * * *")
     public void run() {
         log.info("adding billboard...........");
         List<String> userIds = new ArrayList<>();
