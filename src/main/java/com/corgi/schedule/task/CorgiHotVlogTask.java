@@ -124,7 +124,7 @@ public class CorgiHotVlogTask {
         if (likeCount == null || likeCount < 0) {
             return 0;
         }
-        Integer expectView = new Double(Math.pow(likeCount, 1.5) * 10).intValue();
+        Integer expectView = new Double(Math.pow(likeCount, 1.5) * 10 + 500).intValue();
         return expectView;
     }
 
