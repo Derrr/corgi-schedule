@@ -9,6 +9,7 @@ import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.exceptions.ServerException;
 import com.aliyuncs.http.MethodType;
 import com.aliyuncs.profile.DefaultProfile;
+import com.corgi.activity.api.CorgiActivityFeedService;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
@@ -48,6 +49,8 @@ import java.util.stream.Collectors;
 public class CorgiBillboardTask {
     @Reference(retries = 1, timeout = 300000)
     private CorgiBillboardService corgiBillboardService;
+    @Reference
+    private CorgiActivityFeedService corgiActivityFeedService;
     @Autowired
     private MQService mqService;
     @Autowired
@@ -64,10 +67,21 @@ public class CorgiBillboardTask {
         String date = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
         calendar.add(Calendar.DATE, -6);
         String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
+        calendar.add(Calendar.DATE, 57);
+        String startDate = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
 
         ActivityQuery query = new ActivityQuery();
         query.setStartTime(startTime);
         List<CorgiActivity> corgiActivities = corgiBillboardService.getPopularActivity(query, 1000);
+        ActivityBillboard billboard = new ActivityBillboard();
+        billboard.setDate(startDate);
+        List<ActivityBillboard> allOnboardActivity = corgiBillboardService.getAllActivityBillboard(billboard);
+        for (ActivityBillboard billboard1 : allOnboardActivity) {
+            CorgiActivity activity = corgiActivityFeedService.getActivityById(billboard1.getActivityId());
+            if (activity != null) {
+                userIds.add(activity.getUserId());
+            }
+        }
 
         calendar.add(Calendar.DATE, -1);
         String lastTime = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
