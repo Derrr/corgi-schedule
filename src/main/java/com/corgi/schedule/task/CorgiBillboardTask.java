@@ -72,7 +72,7 @@ public class CorgiBillboardTask {
 
         ActivityQuery query = new ActivityQuery();
         query.setStartTime(startTime);
-        List<CorgiActivity> corgiActivities = corgiBillboardService.getPopularActivity(query, 3000);
+        List<CorgiActivity> corgiActivities = corgiBillboardService.getPopularActivity(query, 5000);
         ActivityBillboard billboard = new ActivityBillboard();
         billboard.setDate(startDate);
         List<ActivityBillboard> allOnboardActivity = corgiBillboardService.getAllActivityBillboard(billboard);
