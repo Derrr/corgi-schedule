@@ -57,8 +57,8 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    @Scheduled(cron = "0 0 10 * * *")
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 10 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run2() {
         log.info("adding activity billboard...........");
         List<String> userIds = Lists.newArrayList("7", "8", "9");
@@ -104,7 +104,8 @@ public class CorgiBillboardTask {
             userIds.add(activity.getUserId());
             ActivityBillboard activityBillboard = new ActivityBillboard();
             activityBillboard.setActivityId(activity.getId());
-            activityBillboard.setDate(date);
+            //activityBillboard.setDate(date);
+            activityBillboard.setDate("2022-02-19");
             activityBillboard.setUserId(activity.getUserId());
             activityBillboard.setCount(activity.getLikeCount().intValue());
             activityBillboard.setOrder(99);
