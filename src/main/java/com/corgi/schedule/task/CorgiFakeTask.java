@@ -211,10 +211,26 @@ public class CorgiFakeTask {
 //                likeActivity(userDetail, activityId, userId);
 //            }
             CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
-            if(CorgiActivity.CAT_ACTIVITY.equals(activity.getCategory())){
+            if (CorgiActivity.CAT_ACTIVITY.equals(activity.getCategory())) {
                 log.info(activityId);
             }
             Double likeChance = this.countLikeChance(activityId, userId, userDetail);
+            String influencerUserKey = influencerKey + userId;
+            String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
+            if (StringUtils.isEmpty(avatarStatus)) {
+                UserDetail createUser = corgiUserService.getUserDetailBasic(userId);
+                if (createUser != null) {
+                    avatarStatus = createUser.getAvatarStatus();
+                    if (avatarStatus == null) {
+                        avatarStatus = "";
+                    }
+                    redisTemplate.opsForValue().set(influencerUserKey, avatarStatus, 20l, TimeUnit.HOURS);
+                }
+            }
+
+            if ("influencer".equals(avatarStatus)) {
+                likeChance += 15;
+            }
             if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
                 likeActivity(userDetail, activityId, userId);
             }
@@ -228,7 +244,7 @@ public class CorgiFakeTask {
             }
             Double likeChance = this.countAllLikeChance(activityId, userId);
             CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
-            if(CorgiActivity.CAT_ACTIVITY.equals(activity.getCategory())){
+            if (CorgiActivity.CAT_ACTIVITY.equals(activity.getCategory())) {
                 log.info(activityId);
             }
             if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
@@ -278,7 +294,6 @@ public class CorgiFakeTask {
                 }
             }
         }
-
 
     }
 
