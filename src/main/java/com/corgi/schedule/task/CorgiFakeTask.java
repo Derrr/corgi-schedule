@@ -217,7 +217,7 @@ public class CorgiFakeTask {
             Double likeChance = this.countLikeChance(activityId, userId, userDetail);
             String influencerUserKey = influencerKey + userId;
             String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
-            if (StringUtils.isEmpty(avatarStatus)) {
+            if (avatarStatus == null) {
                 UserDetail createUser = corgiUserService.getUserDetailBasic(userId);
                 if (createUser != null) {
                     avatarStatus = createUser.getAvatarStatus();
@@ -265,7 +265,7 @@ public class CorgiFakeTask {
             }
             String influencerUserKey = influencerKey + userId;
             String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
-            if (StringUtils.isEmpty(avatarStatus)) {
+            if (avatarStatus == null) {
                 UserDetail commentUser = corgiUserService.getUserDetailBasic(commentUserId);
                 if (commentUser == null) {
                     continue;
