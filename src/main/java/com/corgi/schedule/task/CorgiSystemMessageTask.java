@@ -47,7 +47,14 @@ public class CorgiSystemMessageTask {
                 corgiSystemMessageService.updateSystemMessage(updateMessage);
             }
             for (SystemMessage systemMessage : systemMessageList) {
-                sendMessages(systemMessage);
+                try {
+                    sendMessages(systemMessage);
+                }catch (Exception e){
+                    SystemMessage updateMessage = new SystemMessage();
+                    updateMessage.setId(systemMessage.getId());
+                    updateMessage.setStatus(SystemMessage.STATUS_DISABLED);
+                    corgiSystemMessageService.updateSystemMessage(updateMessage);
+                }
             }
         }
     }
@@ -136,7 +143,7 @@ public class CorgiSystemMessageTask {
                         userIds.add("corgi" + userProfile.getUserId());
                     }
                 });
-                if (hxPushMessageService.sendMessage(systemMessage, userIds)) {
+                if (!CollectionUtils.isEmpty(userIds) && hxPushMessageService.sendMessage(systemMessage, userIds)) {
                     ids.forEach(id -> {
                         MessageRecord messageRecord = new MessageRecord();
                         messageRecord.setStatus("success");
