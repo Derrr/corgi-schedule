@@ -23,8 +23,8 @@ public class CorgiWeekTask {
     private TaskService taskService;
 
 
-    @Async
-    @Scheduled(cron = "0 30 2 * * MON")
+    //@Async
+    //@Scheduled(cron = "0 30 2 * * MON")
     //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void refreshingFakeUserPool() {
         log.info("refreshing fake user pool...........");
