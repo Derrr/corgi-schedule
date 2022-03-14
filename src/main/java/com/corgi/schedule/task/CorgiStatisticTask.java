@@ -50,7 +50,7 @@ public class CorgiStatisticTask {
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
 
     @Async
-    @Scheduled(cron = "0 30 2 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         Calendar calendar = Calendar.getInstance();

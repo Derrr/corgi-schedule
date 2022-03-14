@@ -29,8 +29,8 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
-    @Async
-    @Scheduled(cron = "0 0 0/3 * * *")
+    //@Async
+    //@Scheduled(cron = "0 0 0/3 * * *")
     public void run() {
         Calendar calendar = Calendar.getInstance();
         String date = dau_sdf.format(calendar.getTime());
