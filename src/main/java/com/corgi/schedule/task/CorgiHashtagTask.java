@@ -26,8 +26,8 @@ public class CorgiHashtagTask {
     @Reference
     private CorgiVlogService corgiVlogService;
 
-    @Async
-    @Scheduled(cron = "0 0 * * * *")
+    //@Async
+    //@Scheduled(cron = "0 0 * * * *")
     public void hourRefresh() {
         List<CorgiHashtag> hashtagList = corgiToolService.searchHashtag("", "");
         Calendar calendar = Calendar.getInstance();
@@ -46,8 +46,8 @@ public class CorgiHashtagTask {
         }
     }
 
-    @Async
-    @Scheduled(cron = "0 0 3 * * *")
+    //@Async
+    //@Scheduled(cron = "0 0 3 * * *")
     public void dayRefresh() {
         List<CorgiHashtag> hashtagList = corgiToolService.searchHashtag("", "");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -69,9 +69,9 @@ public class CorgiHashtagTask {
         }
     }
 
-    @Async
-    @Scheduled(cron = "0 0 3 * * TUE")
-    public void weedRefresh() {
+    //@Async
+    //@Scheduled(cron = "0 0 3 * * TUE")
+    public void weekRefresh() {
         List<CorgiHashtag> hashtagList = corgiToolService.searchHashtag("", "");
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
