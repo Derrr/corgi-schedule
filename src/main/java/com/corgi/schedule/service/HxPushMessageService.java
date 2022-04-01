@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 
@@ -82,8 +83,9 @@ public class HxPushMessageService {
             } else {
                 title = new String(title.getBytes(), "UTF-8");
             }
-        } catch (UnsupportedEncodingException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
+            HxPushMessageService.RESULT.set(e.getMessage());
         }
         apnsContent.put("em_push_content", title);
 
@@ -110,6 +112,7 @@ public class HxPushMessageService {
             return this.postJson(url, message, accessToken);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
+            HxPushMessageService.RESULT.set(e.getMessage());
         }
         return "false";
     }

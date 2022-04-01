@@ -5,10 +5,6 @@ import com.corgi.user.api.CorgiToolService;
 import com.corgi.user.api.CorgiVlogService;
 import com.corgi.user.entity.CorgiHashtag;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.C;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
