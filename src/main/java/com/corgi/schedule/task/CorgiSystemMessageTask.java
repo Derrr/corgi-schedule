@@ -129,7 +129,7 @@ public class CorgiSystemMessageTask {
                 log.info("sending user profiles... {} ", userProfiles.size());
                 List<String> userIds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
-                String key = "sendingSystem_" + userProfiles.get(0).getUserId();
+                String key = "sendingSystem_" + systemMessage.getId() + "-" + page;
                 if (redisTemplate.opsForValue().setIfAbsent(key, System.currentTimeMillis() + "", 10L, TimeUnit.SECONDS)) {
                     userProfiles.forEach(userProfile -> {
                         MessageRecord messageRecord = new MessageRecord();
