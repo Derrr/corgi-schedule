@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -136,6 +137,7 @@ public class CorgiFakeTask {
                 }
             }
         }
+        SimpleDateFormat sdfActivity = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         List<CorgiActivity> onBoardActivity = corgiActivityService.getActivityByIds(onBoardActivityIds);
         for (CorgiActivity activity : onBoardActivity) {
             if (CorgiActivity.CAT_PAYING.equals(activity.getCategory())) {
@@ -146,6 +148,16 @@ public class CorgiFakeTask {
             }
             if (Math.random() < 10.0 / DAY_MINUTE) {
                 followUser(userDetail, activity.getUserId());
+            }
+            try {
+                if (Math.random() < 0.02 && sdfActivity.parse(activity.getCreateTime()).getTime() > System.currentTimeMillis() - 10000 * 60L) {
+                    commentActivity(userDetail, activity.getId());
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            if (Math.random() < 20.0 / DAY_MINUTE) {
+                commentActivity(userDetail, activity.getId());
             }
         }
 
@@ -250,6 +262,10 @@ public class CorgiFakeTask {
             if (!StringUtils.isEmpty(activityId) && Math.random() < likeChance / DAY_MINUTE) {
                 likeActivity(userDetail, activityId, userId);
             }
+        }
+        String commentActivityId = allActivityIds.get(new Random().nextInt(allActivityIds.size()) + 1);
+        if (!StringUtils.isEmpty(commentActivityId) && Math.random() < 300 / DAY_MINUTE) {
+            commentActivity(userDetail, commentActivityId);
         }
 
         ActivityComment queryComment = new ActivityComment();
@@ -603,6 +619,34 @@ public class CorgiFakeTask {
                     .extra(extra)
                     .build());
             corgiVisitService.visit(userDetail.getUserId(), followId);
+        }
+    }
+
+    private void commentActivity(UserDetail userDetail, String activity) {
+        ActivityComment activityComment = new ActivityComment();
+        activityComment.setActivityId(activity);
+        activityComment.setContent(corgiFakeService.getFakeComment());
+        activityComment.setCommentUserId(userDetail.getUserId());
+        activityComment.setStatus(ActivityComment.NORMAL);
+        activityComment.setParentCommentId("0");
+        List<CorgiActivity> activityList = corgiActivityService.getActivityByIds(Arrays.asList(activity));
+        if (CollectionUtils.isEmpty(activityList)) {
+            return;
+        }
+        activityComment.setUserId(activityList.get(0).getUserId());
+
+        activityComment = corgiCommentService.addActivityComment(activityComment);
+        HashMap extra = new HashMap();
+        extra.put("activityId", activityComment.getActivityId());
+        extra.put("type", PushMessage.LIKE_COMMENT_TYPE);
+        if (!activityComment.getUserId().equals(activityComment.getCommentUserId())) {
+            mqService.sendMessage(PushMessage.builder()
+                    .type(PushMessage.DEFAULT)
+                    .sourceUserId(activityComment.getCommentUserId())
+                    .targetUserId(activityComment.getUserId())
+                    .message(PushMessage.USER_COMMENT)
+                    .extra(extra)
+                    .build());
         }
     }
 
