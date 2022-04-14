@@ -10,6 +10,7 @@ import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tairanliu
@@ -34,6 +36,8 @@ public class CorgiSystemMessageTask {
     private CorgiUserFollowService corgiUserFollowService;
     @Autowired
     private HxPushMessageService hxPushMessageService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
     @Async
     @Scheduled(cron = "0 0/1 * * * *")
@@ -49,7 +53,7 @@ public class CorgiSystemMessageTask {
             for (SystemMessage systemMessage : systemMessageList) {
                 try {
                     sendMessages(systemMessage);
-                }catch (Exception e){
+                } catch (Exception e) {
                     SystemMessage updateMessage = new SystemMessage();
                     updateMessage.setId(systemMessage.getId());
                     updateMessage.setStatus(SystemMessage.STATUS_DISABLED);
@@ -125,40 +129,44 @@ public class CorgiSystemMessageTask {
                 log.info("sending user profiles... {} ", userProfiles.size());
                 List<String> userIds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
-                userProfiles.forEach(userProfile -> {
-                    MessageRecord messageRecord = new MessageRecord();
-                    messageRecord.setMessageId(systemMessage.getId());
-                    messageRecord.setStatus("sending");
-                    messageRecord.setNickname(userProfile.getNickname());
-                    messageRecord.setUserId(userProfile.getUserId());
-                    MessageRecord query = new MessageRecord();
-                    query.setStatus("success");
-                    query.setMessageId(systemMessage.getId());
-                    query.setUserId(userProfile.getUserId());
-                    log.info("check user... {} ", userProfile.getNickname());
-                    if (CollectionUtils.isEmpty(corgiSystemMessageService.searchMessageRecordList(query))) {
-                        String id = corgiSystemMessageService.addMessageRecord(messageRecord);
-                        ids.add(id);
-                        log.info("prepare sending to... {} ", userProfile.getNickname());
-                        userIds.add("corgi" + userProfile.getUserId());
+                String key = "sendingSystem_" + userProfiles.get(0).getUserId();
+                if (redisTemplate.opsForValue().setIfAbsent(key, System.currentTimeMillis() + "", 10L, TimeUnit.SECONDS)) {
+                    userProfiles.forEach(userProfile -> {
+                        MessageRecord messageRecord = new MessageRecord();
+                        messageRecord.setMessageId(systemMessage.getId());
+                        messageRecord.setStatus("sending");
+                        messageRecord.setNickname(userProfile.getNickname());
+                        messageRecord.setUserId(userProfile.getUserId());
+                        MessageRecord query = new MessageRecord();
+                        query.setStatus("success");
+                        query.setMessageId(systemMessage.getId());
+                        query.setUserId(userProfile.getUserId());
+                        log.info("check user... {} ", userProfile.getNickname());
+                        if (CollectionUtils.isEmpty(corgiSystemMessageService.searchMessageRecordList(query))) {
+                            String id = corgiSystemMessageService.addMessageRecord(messageRecord);
+                            ids.add(id);
+                            log.info("prepare sending to... {} ", userProfile.getNickname());
+                            userIds.add("corgi" + userProfile.getUserId());
+                        }
+                    });
+                    if (!CollectionUtils.isEmpty(userIds) && hxPushMessageService.sendMessage(systemMessage, userIds)) {
+                        ids.forEach(id -> {
+                            MessageRecord messageRecord = new MessageRecord();
+                            messageRecord.setStatus("success");
+                            messageRecord.setId(id);
+                            corgiSystemMessageService.updateMessageRecord(messageRecord);
+                        });
+                    } else {
+                        ids.forEach(id -> {
+                            MessageRecord messageRecord = new MessageRecord();
+                            messageRecord.setStatus("failed");
+                            messageRecord.setReason(HxPushMessageService.RESULT.get());
+                            messageRecord.setId(id);
+                            corgiSystemMessageService.updateMessageRecord(messageRecord);
+                        });
                     }
-                });
-                if (!CollectionUtils.isEmpty(userIds) && hxPushMessageService.sendMessage(systemMessage, userIds)) {
-                    ids.forEach(id -> {
-                        MessageRecord messageRecord = new MessageRecord();
-                        messageRecord.setStatus("success");
-                        messageRecord.setId(id);
-                        corgiSystemMessageService.updateMessageRecord(messageRecord);
-                    });
-                } else {
-                    ids.forEach(id -> {
-                        MessageRecord messageRecord = new MessageRecord();
-                        messageRecord.setStatus("failed");
-                        messageRecord.setReason(HxPushMessageService.RESULT.get());
-                        messageRecord.setId(id);
-                        corgiSystemMessageService.updateMessageRecord(messageRecord);
-                    });
                 }
+                redisTemplate.delete(key);
                 page++;
                 //break;
             } while (true);
