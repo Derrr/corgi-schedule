@@ -629,7 +629,7 @@ public class CorgiFakeTask {
         activityComment.setActivityId(activity);
         activityComment.setContent(corgiFakeService.getFakeComment());
         activityComment.setCommentUserId(userDetail.getUserId());
-        activityComment.setStatus(ActivityComment.NORMAL);
+        activityComment.setStatus("fake");
         activityComment.setParentCommentId("0");
         List<CorgiActivity> activityList = corgiActivityService.getActivityByIds(Arrays.asList(activity));
         if (CollectionUtils.isEmpty(activityList)) {
