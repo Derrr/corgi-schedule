@@ -175,9 +175,9 @@ public class CorgiFakeTask {
                 if (!CorgiActivity.CAT_IMAGE.equals(category) && !CorgiActivity.CAT_VIDEO.equals(category) && !CorgiActivity.CAT_TEXT.equals(category)) {
                     continue;
                 }
-                if (c1.compareTo(corgiActivity.getCreateTime()) > 0) {
+                if (c1.compareTo(corgiActivity.getCreateTime()) < 0) {
                     redisTemplate.opsForList().rightPush(activityKey, activityId);
-                } else if (c3.compareTo(corgiActivity.getCreateTime()) > 0) {
+                } else if (c3.compareTo(corgiActivity.getCreateTime()) < 0) {
                     redisTemplate.opsForList().rightPush(activityAllKey, activityId);
                 } else {
                     break;
@@ -263,9 +263,11 @@ public class CorgiFakeTask {
                 likeActivity(userDetail, activityId, userId);
             }
         }
-        String commentActivityId = allActivityIds.get(new Random().nextInt(allActivityIds.size()) + 1);
-        if (!StringUtils.isEmpty(commentActivityId) && Math.random() < 300 / DAY_MINUTE) {
-            commentActivity(userDetail, commentActivityId);
+        if (allActivityIds.size() > 0) {
+            String commentActivityId = allActivityIds.get(new Random().nextInt(allActivityIds.size()) + 1);
+            if (!StringUtils.isEmpty(commentActivityId) && Math.random() < 300 / DAY_MINUTE) {
+                commentActivity(userDetail, commentActivityId);
+            }
         }
 
         ActivityComment queryComment = new ActivityComment();
