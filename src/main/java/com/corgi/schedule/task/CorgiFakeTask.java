@@ -156,7 +156,7 @@ public class CorgiFakeTask {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            if (Math.random() < 20.0 / DAY_MINUTE) {
+            if (Math.random() < 5.0 / DAY_MINUTE) {
                 commentActivity(userDetail, activity.getId());
             }
         }
