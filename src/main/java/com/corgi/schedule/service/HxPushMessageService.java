@@ -60,7 +60,7 @@ public class HxPushMessageService {
         HashMap extra = new HashMap();
         if ("907".equals(message.getType())) {
             extra.put("content", JSON.parse(systemMessage.getContent()));
-            message.setContent(" ");
+            message.setContent(systemMessage.getTitle());
         }
         return !"false".equals(sendMessage(message, userIds, extra));
     }
