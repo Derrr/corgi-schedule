@@ -278,7 +278,7 @@ public class CorgiFakeTask {
             String commentUserId = comment.getCommentUserId();
             String activityId = comment.getActivityId();
             String userId = comment.getUserId();
-            if (userId.equals(commentUserId)) {
+            if (userId == null || userId.equals(commentUserId)) {
                 continue;
             }
             String influencerUserKey = influencerKey + userId;
