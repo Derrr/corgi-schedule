@@ -91,7 +91,7 @@ public class HxPushMessageService {
 
         extra.put("type", systemMessage.getType());
         extra.put("em_apns_ext", apnsContent);
-        extra.put("alertTitle", systemMessage.getTitle());
+        //extra.put("alertTitle", systemMessage.getTitle());
         if (!StringUtils.isEmpty(systemMessage.getPicUrl())) {
             extra.put("title", systemMessage.getTitle());
             extra.put("desc", systemMessage.getContent());
