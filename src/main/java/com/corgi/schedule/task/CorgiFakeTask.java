@@ -275,6 +275,9 @@ public class CorgiFakeTask {
         List<ActivityComment> activityComments = corgiCommentService.listComment(queryComment, 100);
         List<String> commentUserIds = new ArrayList<>();
         for (ActivityComment comment : activityComments) {
+            if ("fake".equals(comment.getStatus())) {
+                continue;
+            }
             String commentUserId = comment.getCommentUserId();
             String activityId = comment.getActivityId();
             String userId = comment.getUserId();
