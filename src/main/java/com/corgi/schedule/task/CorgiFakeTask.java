@@ -143,6 +143,13 @@ public class CorgiFakeTask {
             if (CorgiActivity.CAT_PAYING.equals(activity.getCategory())) {
                 continue;
             }
+            if ("check".equals(activity.getCheckStatus())) {
+                continue;
+            }
+            if ("fail".equals(activity.getCheckStatus())) {
+                continue;
+            }
+
             if (!StringUtils.isEmpty(activity.getId()) && Math.random() < 50.0 / DAY_MINUTE) {
                 likeActivity(userDetail, activity.getId(), activity.getUserId());
             }
@@ -173,6 +180,9 @@ public class CorgiFakeTask {
                 String activityId = corgiActivity.getId();
                 String category = corgiActivity.getCategory();
                 if (!CorgiActivity.CAT_IMAGE.equals(category) && !CorgiActivity.CAT_VIDEO.equals(category) && !CorgiActivity.CAT_TEXT.equals(category)) {
+                    continue;
+                }
+                if ("check".equals(corgiActivity.getCheckStatus())) {
                     continue;
                 }
                 if (c1.compareTo(corgiActivity.getCreateTime()) < 0) {
