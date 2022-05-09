@@ -110,9 +110,12 @@ public class CorgiSystemMessageTask {
         int pageSize = 100;
         if (!CollectionUtils.isEmpty(messageRules)) {
             UserDetail userDetail = getUserQuery(messageRules);
+            String pageMaxUserId = "0";
             do {
                 List<UserProfile> userProfiles = new ArrayList<>();
-                if (!StringUtils.isEmpty(userDetail.getNickname())) {
+                if (userDetail == null) {
+                    corgiUserService.getAllUsers(pageMaxUserId, pageSize);
+                } else if (!StringUtils.isEmpty(userDetail.getNickname())) {
                     List<UserProfile> userProfilesTmp = corgiUserService.searchUsers(userDetail, null, page, pageSize);
                     for (UserProfile userProfile : userProfilesTmp) {
                         if (userDetail.getNickname().equals(userProfile.getNickname())) {
@@ -126,6 +129,7 @@ public class CorgiSystemMessageTask {
                 if (CollectionUtils.isEmpty(userProfiles)) {
                     break;
                 }
+                pageMaxUserId = userProfiles.get(userProfiles.size() - 1).getUserId();
                 log.info("sending user profiles... {} ", userProfiles.size());
                 List<String> userIds = new ArrayList<>();
                 List<String> ids = new ArrayList<>();
@@ -179,20 +183,23 @@ public class CorgiSystemMessageTask {
 
     public UserDetail getUserQuery(List<MessageRule> messageRules) {
         UserDetail userDetail = new UserDetail();
-        userDetail.setVersion("1.4.4");
+        boolean allUsers = true;
         for (MessageRule messageRule : messageRules) {
             if ("nickname".equals(messageRule.getRuleKey())) {
                 userDetail.setNickname(messageRule.getRuleValue());
+                allUsers = false;
             } else if ("userId".equals(messageRule.getRuleKey())) {
                 if (messageRule.getRuleValue() == null) {
                     messageRule.setRuleValue("null");
                 }
                 userDetail.setUserId(messageRule.getRuleValue());
+                allUsers = false;
             } else if ("avatarStatus".equals(messageRule.getRuleKey())) {
                 userDetail.setAvatarStatus(messageRule.getRuleValue());
+                allUsers = false;
             }
         }
-        return userDetail;
+        return allUsers ? null : userDetail;
     }
 
 }
