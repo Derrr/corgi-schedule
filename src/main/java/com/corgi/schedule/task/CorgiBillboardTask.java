@@ -67,7 +67,7 @@ public class CorgiBillboardTask {
         String date = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
         calendar.add(Calendar.DATE, -6);
         String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
-        calendar.add(Calendar.DATE, 57);
+        //calendar.add(Calendar.DATE, -57);
         String startDate = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
 
         ActivityQuery query = new ActivityQuery();
