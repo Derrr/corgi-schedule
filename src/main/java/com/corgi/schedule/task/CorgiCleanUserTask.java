@@ -4,6 +4,7 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
+import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserRecommendService;
 import com.corgi.user.api.CorgiUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,6 +29,8 @@ public class CorgiCleanUserTask {
 
     @Reference
     private CorgiActivityService corgiActivityService;
+    @Reference
+    private CorgiUserMatchService corgiUserMatchService;
 
 
     @Async
@@ -52,5 +56,8 @@ public class CorgiCleanUserTask {
                 }
             }
         }
+        calendar.add(Calendar.DATE, -7);
+        corgiUserMatchService.clearMatchByDate(sdf.format(calendar.getTime()));
+        corgiUserMatchService.clearMatchViewByDate(sdf.format(new Date()));
     }
 }
