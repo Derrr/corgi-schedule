@@ -114,7 +114,7 @@ public class CorgiSystemMessageTask {
             do {
                 List<UserProfile> userProfiles = new ArrayList<>();
                 if (userDetail == null) {
-                    corgiUserService.getAllUsers(pageMaxUserId, pageSize);
+                    userProfiles = corgiUserService.getAllUsers(pageMaxUserId, pageSize);
                 } else if (!StringUtils.isEmpty(userDetail.getNickname())) {
                     List<UserProfile> userProfilesTmp = corgiUserService.searchUsers(userDetail, null, page, pageSize);
                     for (UserProfile userProfile : userProfilesTmp) {
