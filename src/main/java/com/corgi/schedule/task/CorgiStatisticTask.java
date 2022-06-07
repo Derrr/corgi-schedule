@@ -58,7 +58,7 @@ public class CorgiStatisticTask {
         Long time = calendar.getTimeInMillis();
         Date date = calendar.getTime();
         String today = dau_sdf.format(date);
-        String activityToday = activity_sdf.format(date);
+//        String activityToday = activity_sdf.format(date);
         long zero = time / (1000 * 3600 * 24) * (1000 * 3600 * 24) - TimeZone.getDefault().getRawOffset();
 
         long dau = corgiUserService.countActiveUser(zero, zero + 1000 * 3600 * 24);
@@ -72,7 +72,7 @@ public class CorgiStatisticTask {
         //corgiStatisticService.addCount(CorgiStatistic.ACTIVITY, today, activity);
 
         countPushLog(today);
-        countActivity(today, activityToday);
+//        countActivity(today, activityToday);
         //countSilentUser(zero, today);
         countUserRole(today);
         countUserGroup(today);
@@ -270,52 +270,52 @@ public class CorgiStatisticTask {
 
     void countActivity(String date, String activityDate) {
         //统计动态
-        long postCount = corgiUserActivityService.countActivity(date, CorgiActivity.CAT_IMAGE);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "count", postCount);
+//        long postCount = corgiUserActivityService.countActivity(date, CorgiActivity.CAT_IMAGE);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "count", postCount);
+//
+//        long postUserCount = corgiUserActivityService.countActivityUser(date, CorgiActivity.CAT_IMAGE);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "usercount", postUserCount);
+//
+//        long postCommentCount = corgiCommentService.countCommentByDate(date, CorgiActivity.CAT_IMAGE);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "commentcount", postCommentCount);
+//
+//        long postCommentUserCount = corgiCommentService.countCommentUserByDate(date, CorgiActivity.CAT_IMAGE);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "commentuser", postCommentUserCount);
+//
+//        long postLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_IMAGE);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likecount", postLikeCount);
+//
+//        long postLikeUserCount = corgiLikeService.countLikeUserByDate(date, CorgiActivity.CAT_IMAGE);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likeuser", postLikeUserCount);
+//
+//        //统计面基
+//        long meetCount = corgiUserActivityService.countActivity(date, CorgiActivity.CAT_ACTIVITY);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "count", meetCount);
+//
+//        long meetUserCount = corgiUserActivityService.countActivityUser(date, CorgiActivity.CAT_ACTIVITY);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "usercount", meetUserCount);
 
-        long postUserCount = corgiUserActivityService.countActivityUser(date, CorgiActivity.CAT_IMAGE);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "usercount", postUserCount);
+//        CorgiActivity countActivity = new CorgiActivity();
+//        countActivity.setCategory(CorgiActivity.CAT_ACTIVITY);
+//        countActivity.setStatus(CorgiActivity.FULL);
+//        countActivity.setUpdateTime(activityDate);
+//        long fullCount = corgiActivityService.countCorgiActivity(countActivity);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "fullcount", fullCount);
+//
+//        long signUpCount = corgiUserActivityService.countSignUpUser(date);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "signcount", signUpCount);
 
-        long postCommentCount = corgiCommentService.countCommentByDate(date, CorgiActivity.CAT_IMAGE);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "commentcount", postCommentCount);
-
-        long postCommentUserCount = corgiCommentService.countCommentUserByDate(date, CorgiActivity.CAT_IMAGE);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "commentuser", postCommentUserCount);
-
-        long postLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_IMAGE);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likecount", postLikeCount);
-
-        long postLikeUserCount = corgiLikeService.countLikeUserByDate(date, CorgiActivity.CAT_IMAGE);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_POST, date, "likeuser", postLikeUserCount);
-
-        //统计面基
-        long meetCount = corgiUserActivityService.countActivity(date, CorgiActivity.CAT_ACTIVITY);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "count", meetCount);
-
-        long meetUserCount = corgiUserActivityService.countActivityUser(date, CorgiActivity.CAT_ACTIVITY);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "usercount", meetUserCount);
-
-        CorgiActivity countActivity = new CorgiActivity();
-        countActivity.setCategory(CorgiActivity.CAT_ACTIVITY);
-        countActivity.setStatus(CorgiActivity.FULL);
-        countActivity.setUpdateTime(activityDate);
-        long fullCount = corgiActivityService.countCorgiActivity(countActivity);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "fullcount", fullCount);
-
-        long signUpCount = corgiUserActivityService.countSignUpUser(date);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "signcount", signUpCount);
-
-        long meetCommentCount = corgiCommentService.countCommentByDate(date, CorgiActivity.CAT_ACTIVITY);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "commentcount", meetCommentCount);
-
-        long meetCommentUserCount = corgiCommentService.countCommentUserByDate(date, CorgiActivity.CAT_ACTIVITY);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "commentuser", meetCommentUserCount);
-
-        long meetLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_ACTIVITY);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likecount", meetLikeCount);
-
-        long meetLikeUserCount = corgiLikeService.countLikeUserByDate(date, CorgiActivity.CAT_ACTIVITY);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likeuser", meetLikeUserCount);
+//        long meetCommentCount = corgiCommentService.countCommentByDate(date, CorgiActivity.CAT_ACTIVITY);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "commentcount", meetCommentCount);
+//
+//        long meetCommentUserCount = corgiCommentService.countCommentUserByDate(date, CorgiActivity.CAT_ACTIVITY);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "commentuser", meetCommentUserCount);
+//
+//        long meetLikeCount = corgiLikeService.countLikeByDate(date, CorgiActivity.CAT_ACTIVITY);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likecount", meetLikeCount);
+//
+//        long meetLikeUserCount = corgiLikeService.countLikeUserByDate(date, CorgiActivity.CAT_ACTIVITY);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVITY_EVENT, date, "likeuser", meetLikeUserCount);
 
 
     }
