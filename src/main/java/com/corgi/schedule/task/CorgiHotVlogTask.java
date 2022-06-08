@@ -79,8 +79,8 @@ public class CorgiHotVlogTask {
                     continue;
                 }
 
-                //Long totalCount = corgiLikeService.countActivityLike(activityId);
-                //corgiActivityService.updateByColumn(activityId, "likeCount", totalCount + "");
+                Long totalCount = corgiLikeService.countActivityLike(activityId);
+                corgiActivityService.updateByColumn(activityId, "likeCount", totalCount + "");
 
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
                 queryHot.setActivityId(activityId);
