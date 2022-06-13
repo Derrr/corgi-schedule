@@ -99,7 +99,7 @@ public class HxPushMessageService {
         }
         extra.put("urlType", systemMessage.getUrlType());
         extra.put("url", systemMessage.getUrl());
-
+        message.put("title", "Corgi");
         message.put("target_type", "users");
         message.put("target", userIds);
         message.put("from", from);
