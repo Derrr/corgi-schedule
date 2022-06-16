@@ -71,6 +71,7 @@ public class CorgiFakeTask {
     private static final String creatorKey = "activity_creator";
     private static final String influencerKey = "is_influencer";
     private static final String publishDate = "publish_date_";
+    private static final String commentActivity = "comment_activity_";
 
     private Cache<String, List<String>> userListCache = CacheBuilder.newBuilder()
             .expireAfterWrite(1L, TimeUnit.HOURS)
@@ -156,15 +157,22 @@ public class CorgiFakeTask {
             if (Math.random() < 10.0 / DAY_MINUTE) {
                 followUser(userDetail, activity.getUserId());
             }
-            try {
-                if (Math.random() < 0.02 && sdfActivity.parse(activity.getCreateTime()).getTime() > System.currentTimeMillis() - 10000 * 60L) {
+            String commentActivityId = redisTemplate.opsForValue().get(commentActivity + activity.getUserId());
+            if (StringUtils.isEmpty(commentActivityId)) {
+                redisTemplate.opsForValue().set(commentActivity + activity.getUserId(), activity.getId(), 30L, TimeUnit.DAYS);
+                commentActivityId = activity.getId();
+            }
+            if (commentActivityId.equals(activity.getId())) {
+                try {
+                    if (Math.random() < 0.02 && sdfActivity.parse(activity.getCreateTime()).getTime() > System.currentTimeMillis() - 10000 * 60L) {
+                        commentActivity(userDetail, activity.getId());
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (Math.random() < 5.0 / DAY_MINUTE) {
                     commentActivity(userDetail, activity.getId());
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            if (Math.random() < 5.0 / DAY_MINUTE) {
-                commentActivity(userDetail, activity.getId());
             }
         }
 
