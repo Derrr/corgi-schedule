@@ -88,6 +88,7 @@ public class HxPushMessageService {
             HxPushMessageService.RESULT.set(e.getMessage());
         }
         apnsContent.put("em_push_content", title);
+        apnsContent.put("em_alert_title", "Corgi");
 
         extra.put("type", systemMessage.getType());
         extra.put("em_apns_ext", apnsContent);
