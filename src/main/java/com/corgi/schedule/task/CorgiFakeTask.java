@@ -117,12 +117,12 @@ public class CorgiFakeTask {
         calendar.add(Calendar.DATE, -4);
         String c7 = sdf.format(calendar.getTime());
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-//        List<String> users = this.getOnBoardUsers();
-//        for (String userId : users) {
-//            if (Math.random() < 1.0 / DAY_MINUTE) {
-//                followUser(userDetail, userId);
-//            }
-//        }
+        List<String> users = this.getOnBoardUsers();
+        for (String userId : users) {
+            if (Math.random() < 1.0 / DAY_MINUTE) {
+                followUser(userDetail, userId);
+            }
+        }
 
         String date = sdf1.format(new Date());
         List<String> onBoardActivityIds = corgiBillboardService.getActivityBillboard(date);
@@ -347,10 +347,6 @@ public class CorgiFakeTask {
             userDetail.setCtime(sdf.format(calendar.getTime()));
             List<UserProfile> newUsers = corgiUserService.searchUsers(userDetail, null, 1, 10000);
             List<String> users = newUsers.stream().map(u -> u.getUserId()).collect(Collectors.toList());
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-//            Calendar calendar = Calendar.getInstance();
-//            List<UserProfile> onBoardUsers = corgiBillboardService.getBillboard(sdf.format(calendar.getTime()));
-//            List<String> users = onBoardUsers.stream().map(u -> u.getUserId()).collect(Collectors.toList());
             redisTemplate.opsForList().rightPushAll(key, users);
             redisTemplate.expire(key, 1l, TimeUnit.HOURS);
         }
