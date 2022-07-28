@@ -117,12 +117,12 @@ public class CorgiFakeTask {
         calendar.add(Calendar.DATE, -4);
         String c7 = sdf.format(calendar.getTime());
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
-        List<String> users = this.getOnBoardUsers();
-        for (String userId : users) {
-            if (Math.random() < 1.0 / DAY_MINUTE) {
-                followUser(userDetail, userId);
-            }
-        }
+//        List<String> users = this.getOnBoardUsers();
+//        for (String userId : users) {
+//            if (Math.random() < 1.0 / DAY_MINUTE) {
+//                followUser(userDetail, userId);
+//            }
+//        }
 
         String date = sdf1.format(new Date());
         List<String> onBoardActivityIds = corgiBillboardService.getActivityBillboard(date);
