@@ -138,6 +138,17 @@ public class CorgiFakeTask {
                 }
             }
         }
+        PaidBillboard billboardQuery = new PaidBillboard();
+        billboardQuery.setDate(date);
+        billboardQuery.setStatus(PaidBillboard.PASS);
+        List<PaidBillboard> billboards = corgiBillboardService.queryPaidBillboard(billboardQuery, 1, 100);
+        if (!CollectionUtils.isEmpty(billboards)) {
+            for (PaidBillboard billboard : billboards) {
+                if (!onBoardActivityIds.contains(billboard.getActivityId())) {
+                    onBoardActivityIds.add(billboard.getActivityId());
+                }
+            }
+        }
         SimpleDateFormat sdfActivity = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         List<CorgiActivity> onBoardActivity = corgiActivityService.getActivityByIds(onBoardActivityIds);
         for (CorgiActivity activity : onBoardActivity) {
