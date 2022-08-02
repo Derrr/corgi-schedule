@@ -52,8 +52,8 @@ public class CorgiRecommendTask {
     }
 
     @Async
-    //@Scheduled(cron = "0 0 4 * * *")
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 0 4 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void runUser() {
         log.info("refreshing user...........");
         List<UserPosition> userPositionList;
