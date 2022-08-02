@@ -74,15 +74,15 @@ public class CorgiRecommendTask {
 //                        continue;
 //                    }
 //                    redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
-//                    if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
-//                        continue;
-//                    }
-//                    if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
-//                        continue;
-//                    }
-//                    if (StringUtils.isEmpty(userPosition.getUserId())) {
-//                        continue;
-//                    }
+                    if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
+                        continue;
+                    }
+                    if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
+                        continue;
+                    }
+                    if (StringUtils.isEmpty(userPosition.getUserId())) {
+                        continue;
+                    }
 //                    if (userPosition.getUptime() == null) {
 //                        continue;
 //                    }
