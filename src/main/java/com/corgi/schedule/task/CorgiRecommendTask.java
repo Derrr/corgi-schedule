@@ -85,6 +85,9 @@ public class CorgiRecommendTask {
                         continue;
                     }
                     UserDetail detail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
+                    if (detail == null) {
+                        continue;
+                    }
                     if (!"influencer".equals(detail.getAvatarStatus())) {
                         String expire = corgiUserService.getUserVipExpire(userPosition.getUserId());
                         if (StringUtils.isEmpty(expire) || "-".equals(expire)) {
