@@ -66,6 +66,10 @@ public class CorgiRecommendTask {
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
                     log.info("checking ... " + userPosition.getUserId() + " page = " + page);
+                    List<Point> points = redisTemplate.opsForGeo().position("user", userPosition.getUserId());
+                    if (CollectionUtils.isEmpty(points)) {
+                        continue;
+                    }
                     redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
                     if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
                         continue;
@@ -79,8 +83,14 @@ public class CorgiRecommendTask {
                     if (userPosition.getUptime() == null) {
                         continue;
                     }
-                    if (userPosition.getUptime() < threshold) {
-                        continue;
+                    UserDetail detail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
+                    if (!"influencer".equals(detail.getAvatarStatus())) {
+                        String expire = corgiUserService.getUserVipExpire(userPosition.getUserId());
+                        if (StringUtils.isEmpty(expire) || "-".equals(expire)) {
+                            if (userPosition.getUptime() < threshold) {
+                                continue;
+                            }
+                        }
                     }
                     log.info("checking ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
