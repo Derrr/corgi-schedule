@@ -52,21 +52,21 @@ public class CorgiRecommendTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0 4 * * *")
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 4 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void runUser() {
         log.info("refreshing user...........");
         List<UserPosition> userPositionList;
         int page = 1;
-        int pageSize = 1000;
+        int pageSize = 5000;
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
-            log.info("page ={}, size={} ", page, userPositionList.size());
+            //log.info("page ={}, size={} ", page, userPositionList.size());
             Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
-                    log.info("checking ... " + userPosition.getUserId() + " page = " + page);
+                    //log.info("checking ... " + userPosition.getUserId() + " page = " + page);
                     List<Point> points = redisTemplate.opsForGeo().position("user", userPosition.getUserId());
                     if (CollectionUtils.isEmpty(points)) {
                         continue;
@@ -96,7 +96,7 @@ public class CorgiRecommendTask {
                             }
                         }
                     }
-                    log.info("checking ... " + userPosition.getUserId());
+                    log.info("checkinginto ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
                 }
             }
