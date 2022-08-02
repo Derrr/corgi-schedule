@@ -56,12 +56,7 @@ public class CorgiRecommendTask {
     @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void runUser() {
         log.info("refreshing user...........");
-        List<Point> points = redisTemplate.opsForGeo().position("user", "42746");
-        log.info("point:{}", points);
-        redisTemplate.opsForGeo().remove("user", "42746");
-        points = redisTemplate.opsForGeo().position("user", "42746");
-        log.info("point:{}", points);
-        GeoResults<RedisGeoCommands.GeoLocation<String>> geoResults = redisTemplate.opsForGeo().radius("user", new Circle(new Point(116.410145, 39.966783), new Distance(10, Metrics.KILOMETERS)), RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().limit(2).sortAscending());
+        GeoResults<RedisGeoCommands.GeoLocation<String>> geoResults = redisTemplate.opsForGeo().radius("user", new Circle(new Point(116.410145, 39.966783), new Distance(1000, Metrics.KILOMETERS)), RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().limit(200).sortAscending());
         for (GeoResult<RedisGeoCommands.GeoLocation<String>> result : geoResults.getContent()) {
             log.info("geo:{}", result.getContent().getName());
         }
