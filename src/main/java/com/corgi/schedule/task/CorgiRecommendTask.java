@@ -12,11 +12,14 @@ import com.corgi.user.entity.UserPosition;
 import com.corgi.user.entity.UserProfile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.*;
+import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,8 +34,10 @@ import java.util.List;
 public class CorgiRecommendTask {
     @Reference(retries = 1, timeout = 100000)
     private CorgiUserRecommendService corgiUserRecommendService;
+    @Reference
+    private CorgiUserService corgiUserService;
     @Autowired
-    private MQService mqService;
+    private StringRedisTemplate redisTemplate;
     @Autowired
     private TaskService taskService;
 
@@ -45,6 +50,46 @@ public class CorgiRecommendTask {
         taskService.calculateRecommendActivity();
         taskService.clearFeed();
     }
+
+    @Async
+    @Scheduled(cron = "0 0 4 * * *")
+    public void runUser() {
+        log.info("refreshing user...........");
+        List<UserPosition> userPositionList;
+        int page = 1;
+        int pageSize = 1000;
+        do {
+            userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
+            page++;
+            log.info("page ={}, size={} ", page, userPositionList.size());
+            Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000;
+            if (userPositionList != null) {
+                for (UserPosition userPosition : userPositionList) {
+                    log.info("checking ... " + userPosition.getUserId() + " page = " + page);
+                    redisTemplate.opsForGeo().remove("user", userPosition.getUserId());
+                    if (userPosition.getLng() == null || userPosition.getLng() > 180 || userPosition.getLng() < -180) {
+                        continue;
+                    }
+                    if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
+                        continue;
+                    }
+                    if (StringUtils.isEmpty(userPosition.getUserId())) {
+                        continue;
+                    }
+                    if (userPosition.getUptime() == null) {
+                        continue;
+                    }
+                    if (userPosition.getUptime() < threshold) {
+                        continue;
+                    }
+                    log.info("checking ... " + userPosition.getUserId());
+                    redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
+                }
+            }
+        } while (!CollectionUtils.isEmpty(userPositionList));
+        log.info("end refreshing user...........");
+    }
+
 
     @Async
     @Scheduled(cron = "0 0 5 * * *")
