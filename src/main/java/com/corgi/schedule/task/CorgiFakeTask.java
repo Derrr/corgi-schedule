@@ -365,6 +365,9 @@ public class CorgiFakeTask {
     }
 
     private Double countAllLikeChance(String activityId, String userId) {
+        if (StringUtils.isEmpty(userId)) {
+            return 0.0;
+        }
         String likeChanceKey = "activity_chance_like_" + activityId;
         String chanceStr = redisTemplate.opsForValue().get(likeChanceKey);
         String datesKey = publishDate.concat(userId);
