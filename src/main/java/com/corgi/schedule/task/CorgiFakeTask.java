@@ -169,7 +169,7 @@ public class CorgiFakeTask {
                 followUser(userDetail, activity.getUserId());
             }
             String commentActivityId = redisTemplate.opsForValue().get(commentActivity + activity.getUserId());
-            if (StringUtils.isEmpty(commentActivityId)) {
+            if (StringUtils.isEmpty(commentActivityId) && !StringUtils.isEmpty(activity.getId())) {
                 redisTemplate.opsForValue().set(commentActivity + activity.getUserId(), activity.getId(), 30L, TimeUnit.DAYS);
                 commentActivityId = activity.getId();
             }
