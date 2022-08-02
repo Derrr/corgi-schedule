@@ -63,7 +63,7 @@ public class CorgiRecommendTask {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
             //log.info("page ={}, size={} ", page, userPositionList.size());
-            Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000;
+            Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
                     //log.info("checking ... " + userPosition.getUserId() + " page = " + page);
