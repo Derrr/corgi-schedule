@@ -56,23 +56,19 @@ public class CorgiRecommendTask {
     @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void runUser() {
         log.info("refreshing user...........");
-        GeoResults<RedisGeoCommands.GeoLocation<String>> geoResults = redisTemplate.opsForGeo().radius("user", new Circle(new Point(116.410145, 39.966783), new Distance(1000, Metrics.KILOMETERS)), RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().limit(200).sortAscending());
-        for (GeoResult<RedisGeoCommands.GeoLocation<String>> result : geoResults.getContent()) {
-            log.info("geo:{}", result.getContent().getName());
-        }
 
 
-//        List<UserPosition> userPositionList;
-//        int page = 1;
-//        int pageSize = 5000;
-//        do {
-//            userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
-//            page++;
-//            //log.info("page ={}, size={} ", page, userPositionList.size());
-//            Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
-//            if (userPositionList != null) {
-//                for (UserPosition userPosition : userPositionList) {
-//                    //log.info("checking ... " + userPosition.getUserId() + " page = " + page);
+        List<UserPosition> userPositionList;
+        int page = 1;
+        int pageSize = 5000;
+        do {
+            userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
+            page++;
+            //log.info("page ={}, size={} ", page, userPositionList.size());
+            Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
+            if (userPositionList != null) {
+                for (UserPosition userPosition : userPositionList) {
+                    //log.info("checking ... " + userPosition.getUserId() + " page = " + page);
 //                    List<Point> points = redisTemplate.opsForGeo().position("user", userPosition.getUserId());
 //                    if (CollectionUtils.isEmpty(points)) {
 //                        continue;
@@ -102,12 +98,13 @@ public class CorgiRecommendTask {
 //                            }
 //                        }
 //                    }
-//                    log.info("checkinginto ... " + userPosition.getUserId());
-//                    redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
-//                }
-//            }
-//        } while (!CollectionUtils.isEmpty(userPositionList));
-//        log.info("end refreshing user...........");
+                    log.info("checkinginto ... " + userPosition.getUserId());
+                    redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
+                }
+            }
+            break;
+        } while (!CollectionUtils.isEmpty(userPositionList));
+        log.info("end refreshing user...........");
     }
 
 
