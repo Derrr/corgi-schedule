@@ -173,7 +173,7 @@ public class CorgiFakeTask {
                 redisTemplate.opsForValue().set(commentActivity + activity.getUserId(), activity.getId(), 30L, TimeUnit.DAYS);
                 commentActivityId = activity.getId();
             }
-            if (commentActivityId.equals(activity.getId())) {
+            if (!StringUtils.isEmpty(commentActivityId) && commentActivityId.equals(activity.getId())) {
                 try {
                     if (Math.random() < 0.02 && sdfActivity.parse(activity.getCreateTime()).getTime() > System.currentTimeMillis() - 10000 * 60L) {
                         commentActivity(userDetail, activity.getId());
