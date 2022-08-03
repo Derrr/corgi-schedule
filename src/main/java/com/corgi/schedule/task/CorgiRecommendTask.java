@@ -53,7 +53,7 @@ public class CorgiRecommendTask {
 
     @Async
     //@Scheduled(cron = "0 0 4 * * *")
-//    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void runUser() {
         log.info("refreshing user...........");
 
@@ -83,26 +83,25 @@ public class CorgiRecommendTask {
                     if (StringUtils.isEmpty(userPosition.getUserId())) {
                         continue;
                     }
-//                    if (userPosition.getUptime() == null) {
-//                        continue;
-//                    }
-//                    UserDetail detail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
-//                    if (detail == null) {
-//                        continue;
-//                    }
-//                    if (!"influencer".equals(detail.getAvatarStatus())) {
-//                        String expire = corgiUserService.getUserVipExpire(userPosition.getUserId());
-//                        if (StringUtils.isEmpty(expire) || "-".equals(expire)) {
-//                            if (userPosition.getUptime() < threshold) {
-//                                continue;
-//                            }
-//                        }
-//                    }
+                    if (userPosition.getUptime() == null) {
+                        continue;
+                    }
+                    UserDetail detail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
+                    if (detail == null) {
+                        continue;
+                    }
+                    if (!"influencer".equals(detail.getAvatarStatus())) {
+                        String expire = corgiUserService.getUserVipExpire(userPosition.getUserId());
+                        if (StringUtils.isEmpty(expire) || "-".equals(expire)) {
+                            if (userPosition.getUptime() < threshold) {
+                                continue;
+                            }
+                        }
+                    }
                     log.info("checkinginto ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
                 }
             }
-            break;
         } while (!CollectionUtils.isEmpty(userPositionList));
         log.info("end refreshing user...........");
     }
