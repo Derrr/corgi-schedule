@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -62,6 +63,7 @@ public class CorgiRecommendTask {
         do {
             userPositionList = corgiUserService.getUserPositionByPage(page, pageSize);
             page++;
+            String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
@@ -91,6 +93,9 @@ public class CorgiRecommendTask {
                         if (!"influencer".equals(detail.getAvatarStatus())) {
                             String expire = corgiUserService.getUserVipExpire(userPosition.getUserId());
                             if (StringUtils.isEmpty(expire) || "-".equals(expire)) {
+                                continue;
+                            }
+                            if (expire.compareTo(nowDate) < 0) {
                                 continue;
                             }
                         }
