@@ -5,12 +5,15 @@ import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
 import com.corgi.user.api.CorgiBillboardService;
+import com.corgi.user.api.CorgiFeedService;
 import com.corgi.user.api.CorgiUserRecommendService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.CorgiFeed;
 import com.corgi.user.entity.UserDetail;
 import com.corgi.user.entity.UserPosition;
 import com.corgi.user.entity.UserProfile;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
@@ -37,6 +40,8 @@ public class CorgiRecommendTask {
     private CorgiUserRecommendService corgiUserRecommendService;
     @Reference
     private CorgiUserService corgiUserService;
+    @Reference
+    private CorgiFeedService corgiFeedService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -53,8 +58,8 @@ public class CorgiRecommendTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0 2 * * *")
-//    @Scheduled(fixedRate = 24 * 3600 * 1000)
+//    @Scheduled(cron = "0 0 2 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void runUser() {
         log.info("refreshing user...........");
         List<UserPosition> userPositionList;
@@ -65,8 +70,21 @@ public class CorgiRecommendTask {
             page++;
             String nowDate = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
             Long threshold = System.currentTimeMillis() - 30 * 24 * 3600 * 1000L;
+            Long threshold2 = System.currentTimeMillis() - 90 * 24 * 3600 * 1000L;
             if (userPositionList != null) {
                 for (UserPosition userPosition : userPositionList) {
+                    if (StringUtils.isEmpty(userPosition.getUserId())) {
+                        continue;
+                    }
+                    if (userPosition.getUptime() == null) {
+                        continue;
+                    }
+                    if (userPosition.getUptime() < threshold2){
+                        log.info("deleting feed...{} ",userPosition.getUserId());
+                        CorgiFeed query = new CorgiFeed();
+                        query.setUserId(userPosition.getUserId());
+                        corgiFeedService.deleteFeed(query);
+                    }
                     List<Point> points = redisTemplate.opsForGeo().position("user", userPosition.getUserId());
                     if (CollectionUtils.isEmpty(points)) {
                         continue;
@@ -78,13 +96,6 @@ public class CorgiRecommendTask {
                     if (userPosition.getLat() == null || userPosition.getLat() > 90 || userPosition.getLat() < -90) {
                         continue;
                     }
-                    if (StringUtils.isEmpty(userPosition.getUserId())) {
-                        continue;
-                    }
-                    if (userPosition.getUptime() == null) {
-                        continue;
-                    }
-
                     if (userPosition.getUptime() < threshold) {
                         UserDetail detail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
                         if (detail == null) {
