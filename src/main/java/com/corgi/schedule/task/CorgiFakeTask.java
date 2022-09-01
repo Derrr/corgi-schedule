@@ -138,7 +138,7 @@ public class CorgiFakeTask {
                 }
             }
         }
-        log.info("running fake task1...");
+
         PaidBillboard billboardQuery = new PaidBillboard();
         billboardQuery.setDate(date);
         billboardQuery.setStatus(PaidBillboard.PASS);
@@ -188,7 +188,6 @@ public class CorgiFakeTask {
             }
         }
 
-        log.info("running fake task2...");
         List<String> activityIds = redisTemplate.opsForList().range(activityKey, 0, -1);
         if (CollectionUtils.isEmpty(activityIds)) {
             redisTemplate.delete(activityAllKey);
@@ -220,12 +219,12 @@ public class CorgiFakeTask {
             redisTemplate.expire(activityKey, 10l, TimeUnit.MINUTES);
             activityIds = redisTemplate.opsForList().range(activityKey, 0, -1);
         }
-        log.info("running fake task3...");
+
         List<String> creatorIds = new ArrayList<>();
         for (String activityId : activityIds) {
 
             String userId = redisTemplate.opsForValue().get(creatorKey + activityId);
-            if (!creatorIds.contains(userId)) {
+            if (!StringUtils.isEmpty(userId) && !creatorIds.contains(userId)) {
                 creatorIds.add(userId);
                 String datesKey = publishDate.concat(userId);
                 String dateCountStr = redisTemplate.opsForValue().get(datesKey);
