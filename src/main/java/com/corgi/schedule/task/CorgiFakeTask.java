@@ -252,7 +252,6 @@ public class CorgiFakeTask {
 //            if (topics.contains("57") && Math.random() < 20.0 / DAY_MINUTE) {
 //                likeActivity(userDetail, activityId, userId);
 //            }
-            log.info("running fake task4...");
             Double likeChance = this.countLikeChance(activityId, userId, userDetail);
             String influencerUserKey = influencerKey + userId;
             String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
