@@ -138,6 +138,7 @@ public class CorgiFakeTask {
                 }
             }
         }
+        log.info("running fake task1...");
         PaidBillboard billboardQuery = new PaidBillboard();
         billboardQuery.setDate(date);
         billboardQuery.setStatus(PaidBillboard.PASS);
@@ -187,7 +188,7 @@ public class CorgiFakeTask {
             }
         }
 
-
+        log.info("running fake task2...");
         List<String> activityIds = redisTemplate.opsForList().range(activityKey, 0, -1);
         if (CollectionUtils.isEmpty(activityIds)) {
             redisTemplate.delete(activityAllKey);
@@ -219,6 +220,7 @@ public class CorgiFakeTask {
             redisTemplate.expire(activityKey, 10l, TimeUnit.MINUTES);
             activityIds = redisTemplate.opsForList().range(activityKey, 0, -1);
         }
+        log.info("running fake task3...");
         List<String> creatorIds = new ArrayList<>();
         for (String activityId : activityIds) {
 
@@ -251,10 +253,7 @@ public class CorgiFakeTask {
 //            if (topics.contains("57") && Math.random() < 20.0 / DAY_MINUTE) {
 //                likeActivity(userDetail, activityId, userId);
 //            }
-            CorgiActivity activity = corgiActivityFeedService.getActivityById(activityId);
-            if (CorgiActivity.CAT_ACTIVITY.equals(activity.getCategory())) {
-                log.info(activityId);
-            }
+            log.info("running fake task4...");
             Double likeChance = this.countLikeChance(activityId, userId, userDetail);
             String influencerUserKey = influencerKey + userId;
             String avatarStatus = redisTemplate.opsForValue().get(influencerUserKey);
