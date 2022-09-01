@@ -204,6 +204,9 @@ public class CorgiFakeTask {
                 if ("check".equals(corgiActivity.getCheckStatus())) {
                     continue;
                 }
+                if ("fail".equals(corgiActivity.getCheckStatus())) {
+                    continue;
+                }
                 if (c1.compareTo(corgiActivity.getCreateTime()) < 0) {
                     redisTemplate.opsForList().rightPush(activityKey, activityId);
                 } else if (c3.compareTo(corgiActivity.getCreateTime()) < 0) {
