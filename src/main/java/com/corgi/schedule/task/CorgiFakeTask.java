@@ -162,6 +162,9 @@ public class CorgiFakeTask {
             if ("fail".equals(activity.getCheckStatus())) {
                 continue;
             }
+            if ("not_good".equals(activity.getCheckStatus())) {
+                continue;
+            }
 
             if (!StringUtils.isEmpty(activity.getId()) && Math.random() < 50.0 / DAY_MINUTE) {
                 likeActivity(userDetail, activity.getId(), activity.getUserId());
@@ -205,6 +208,9 @@ public class CorgiFakeTask {
                     continue;
                 }
                 if ("fail".equals(corgiActivity.getCheckStatus())) {
+                    continue;
+                }
+                if ("not_good".equals(corgiActivity.getCheckStatus())) {
                     continue;
                 }
                 if (c1.compareTo(corgiActivity.getCreateTime()) < 0) {
