@@ -224,7 +224,10 @@ public class CorgiFakeTask {
         for (String activityId : activityIds) {
 
             String userId = redisTemplate.opsForValue().get(creatorKey + activityId);
-            if (!StringUtils.isEmpty(userId) && !creatorIds.contains(userId)) {
+            if (StringUtils.isEmpty(userId)) {
+                continue;
+            }
+            if (!creatorIds.contains(userId)) {
                 creatorIds.add(userId);
                 String datesKey = publishDate.concat(userId);
                 String dateCountStr = redisTemplate.opsForValue().get(datesKey);
