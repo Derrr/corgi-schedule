@@ -108,7 +108,7 @@ public class CorgiHotVlogTask {
                 }
                 queryHot.setType(CorgiVlogHot.TYPE.MANUAL);
                 List<CorgiVlogHot> manualList = corgiVlogService.getHotVlog(queryHot, 1, 10);
-                if (!CollectionUtils.isEmpty(manualList)) {
+                if (!CollectionUtils.isEmpty(manualList) && likeCount > 0) {
                     for (CorgiVlogHot hot : manualList) {
                         CorgiVlogHot updateHot = new CorgiVlogHot();
                         updateHot.setId(hot.getId());
