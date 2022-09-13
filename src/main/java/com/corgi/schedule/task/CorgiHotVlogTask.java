@@ -82,7 +82,9 @@ public class CorgiHotVlogTask {
 
                 Long totalCount = corgiLikeService.countActivityLike(activityId);
                 corgiActivityService.updateByColumn(activityId, "likeCount", totalCount + "");
-
+                if ("deleted".equals(activity.getStatus()) || "not_good".equals(activity.getStatus()) || "fail".equals(activity.getCheckStatus())) {
+                    continue;
+                }
                 Integer likeCount = corgiLikeService.countRealActivityLike(activityId);
                 queryHot.setActivityId(activityId);
                 List<CorgiVlogHot> tmpList = corgiVlogService.getHotVlog(queryHot, 1, 1);
