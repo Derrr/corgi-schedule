@@ -12,6 +12,8 @@ import com.corgi.user.entity.ActivityLike;
 import com.corgi.user.entity.CorgiVlog;
 import com.corgi.user.entity.CorgiVlogHot;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author tairanliu
@@ -37,6 +40,8 @@ public class CorgiHotVlogTask {
     private CorgiActivityService corgiActivityService;
     @Reference
     private CorgiActivityFeedService corgiActivityFeedService;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
 
     @Async
@@ -98,13 +103,14 @@ public class CorgiHotVlogTask {
                         updateHot.setExpectView(expectView);
                         corgiVlogService.updateHotVlog(updateHot);
                     }
-                } else if (likeCount >= 4) {
+                } else if (likeCount >= 4 && !redisTemplate.hasKey("vlog_hot_" + activity.getUserId())) {
                     CorgiVlogHot addHot = new CorgiVlogHot();
                     addHot.setActivityId(activityId);
                     addHot.setExpectView(expectView);
                     addHot.setLikeCount(likeCount);
                     addHot.setType(CorgiVlogHot.TYPE.AUTO);
                     corgiVlogService.addHotVlog(addHot);
+                    redisTemplate.opsForValue().set("vlog_hot_" + activity.getUserId(), activityId, 10l, TimeUnit.MINUTES);
                 }
                 queryHot.setType(CorgiVlogHot.TYPE.MANUAL);
                 List<CorgiVlogHot> manualList = corgiVlogService.getHotVlog(queryHot, 1, 10);
