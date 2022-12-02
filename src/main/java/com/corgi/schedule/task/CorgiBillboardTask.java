@@ -16,6 +16,7 @@ import com.corgi.common.messages.PushMessage;
 import com.corgi.entity.ActivityQuery;
 import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiBillboardService;
+import com.corgi.user.api.CorgiBlacklistService;
 import com.corgi.user.api.CorgiUserActivityService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.*;
@@ -51,6 +52,8 @@ public class CorgiBillboardTask {
     private CorgiBillboardService corgiBillboardService;
     @Reference
     private CorgiActivityFeedService corgiActivityFeedService;
+    @Reference
+    private CorgiBlacklistService corgiBlacklistService;
     @Autowired
     private MQService mqService;
     @Autowired
@@ -95,6 +98,20 @@ public class CorgiBillboardTask {
                 continue;
             }
             if (StringUtils.isEmpty(activity.getId())) {
+                continue;
+            }
+            CorgiReport reportQuery = new CorgiReport();
+            reportQuery.setAccuseId(activity.getUserId());
+            reportQuery.setReportStatus("normal");
+            Integer count = corgiBlacklistService.countReport(reportQuery);
+            if (count > 0) {
+                userIds.add(activity.getUserId());
+                continue;
+            }
+            reportQuery.setReportStatus("darkroom");
+            count = corgiBlacklistService.countReport(reportQuery);
+            if (count > 0) {
+                userIds.add(activity.getUserId());
                 continue;
             }
             total++;
