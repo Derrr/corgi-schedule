@@ -14,11 +14,9 @@ import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.messages.PushMessage;
 import com.corgi.entity.ActivityQuery;
+import com.corgi.entity.CorgiTopic;
 import com.corgi.schedule.service.MQService;
-import com.corgi.user.api.CorgiBillboardService;
-import com.corgi.user.api.CorgiBlacklistService;
-import com.corgi.user.api.CorgiUserActivityService;
-import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.api.*;
 import com.corgi.user.entity.*;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +52,8 @@ public class CorgiBillboardTask {
     private CorgiActivityFeedService corgiActivityFeedService;
     @Reference
     private CorgiBlacklistService corgiBlacklistService;
+    @Reference
+    private CorgiToolService corgiToolService;
     @Autowired
     private MQService mqService;
     @Autowired
@@ -130,98 +130,66 @@ public class CorgiBillboardTask {
         }
     }
 
-    //@Async
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    //@Scheduled(cron = "0 0 10 * * *")
-    public void run() {
-        log.info("adding billboard...........");
-        List<String> userIds = new ArrayList<>();
-        userIds.add("7");
-        userIds.add("8");
-        userIds.add("9");
-
+    @Async
+    //@Scheduled(cron = "0 12 3 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    public void runTopic() {
+        log.info("adding topic billboard...........");
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 3);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String date = sdf.format(calendar.getTime());
-        calendar.add(Calendar.DATE, -30);
-        String pastDate = sdf.format(calendar.getTime());
-        calendar.add(Calendar.DATE, -60);
-        String pastTimesDate = sdf.format(calendar.getTime());
-        calendar.add(Calendar.DATE, -90);
-        String pastPopularDate = sdf.format(calendar.getTime());
-        List<UserProfile> pastUsers = corgiBillboardService.getPastBillboard(pastDate);
-        List<UserProfile> pastTimesUsers = corgiBillboardService.getPastBillboard(pastTimesDate);
-        List<UserProfile> pastPopularUsers = corgiBillboardService.getPastBillboard(pastPopularDate);
-        for (UserProfile userProfile : pastUsers) {
-            if (userIds.contains(userProfile.getUserId())) {
-                continue;
-            }
-            userIds.add(userProfile.getUserId());
-        }
+        calendar.add(Calendar.DATE, -7);
+        String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
 
-        for (UserProfile userProfile : pastPopularUsers) {
-            if (userIds.contains(userProfile.getUserId())) {
-                continue;
+        List<CorgiTopic> topics = corgiToolService.searchTopic(null, "release");
+        for (CorgiTopic topic : topics) {
+            ActivityQuery query = new ActivityQuery();
+            query.setStartTime(startTime);
+            query.setTopic(topic.getTopicId());
+            List<CorgiActivity> corgiActivities = corgiBillboardService.getPopularActivity(query, 30);
+            int total = 0;
+            List<TopicBillboard> topicBillboards = new ArrayList<>();
+            for (CorgiActivity activity : corgiActivities) {
+                if (StringUtils.isEmpty(activity.getUserId())) {
+                    continue;
+                }
+                if (StringUtils.isEmpty(activity.getId())) {
+                    continue;
+                }
+                if (activity.getLikeCount() < 4) {
+                    break;
+                }
+                CorgiReport reportQuery = new CorgiReport();
+                reportQuery.setAccuseId(activity.getUserId());
+                reportQuery.setReportStatus("normal");
+                Integer count = corgiBlacklistService.countReport(reportQuery);
+                if (count > 0) {
+                    continue;
+                }
+                reportQuery.setReportStatus("darkroom");
+                count = corgiBlacklistService.countReport(reportQuery);
+                if (count > 0) {
+                    continue;
+                }
+                total++;
+                if (total > 21) {
+                    break;
+                }
+                TopicBillboard topicBillboard = new TopicBillboard();
+                topicBillboard.setActivityId(activity.getId());
+                topicBillboard.setTopic(topic.getTopicId());
+                topicBillboard.setOrder(total);
+                topicBillboards.add(topicBillboard);
+                if (total == 1) {
+                    redisTemplate.opsForValue().set(TopicBillboard.PREFIX.concat(topic.getTopicId()), activity.getId(), 7L, TimeUnit.DAYS);
+                }
             }
-            userIds.add(userProfile.getUserId());
-        }
-
-        for (UserProfile userProfile : pastTimesUsers) {
-            if (userIds.contains(userProfile.getUserId())) {
-                continue;
-            }
-            Integer count = corgiBillboardService.countOnBoard(userProfile.getUserId());
-            if (count != null && count > 6) {
-                userIds.add(userProfile.getUserId());
+            if (topicBillboards.size() > 0) {
+                TopicBillboard topicQuery = new TopicBillboard();
+                topicQuery.setTopic(topic.getTopicId());
+                corgiBillboardService.deleteTopicBillboard(topicQuery);
+                for (TopicBillboard topicBillboard : topicBillboards) {
+                    corgiBillboardService.addTopicBillboard(topicBillboard);
+                }
             }
         }
-
-        UserDetail searchUser = new UserDetail();
-//        searchUser.setRole("1");
-        List<UserProfile> userProfiles = corgiBillboardService.getPopularUser(searchUser, 500);
-        int i = 0;
-        for (UserProfile userProfile : userProfiles) {
-            if (checkUser(userIds, userProfile.getUserId())) {
-                continue;
-            }
-
-            i++;
-            log.info("popular..." + userProfile.getUserId());
-            userIds.add(userProfile.getUserId());
-            corgiBillboardService.addBillboard(userProfile, date, "popular");
-            if (i >= 10) {
-                break;
-            }
-        }
-    }
-
-    //@Async
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
-    //@Scheduled(cron = "0 0 8 * * *")
-    public void notice() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String date = sdf.format(new Date());
-        List<UserProfile> userProfiles = corgiBillboardService.getBillboard(date);
-        for (UserProfile userProfile : userProfiles) {
-            mqService.sendBillboardMessage(PushMessage.builder()
-                    .targetUserId(userProfile.getUserId()).build());
-        }
-    }
-
-    private boolean checkUser(List<String> userIds, String userId) {
-        if (userId == null) {
-            return true;
-        }
-        if (userIds.contains(userId)) {
-            return true;
-        }
-        if (redisTemplate.hasKey("billboard_block_".concat(userId))) {
-            return true;
-        }
-        if (userId.startsWith("B")) {
-            return true;
-        }
-        return false;
     }
 }
