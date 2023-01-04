@@ -131,8 +131,7 @@ public class CorgiBillboardTask {
     }
 
     @Async
-    //@Scheduled(cron = "0 12 3 * * *")
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 12 3 * * *")
     public void runTopic() {
         log.info("adding topic billboard...........");
         Calendar calendar = Calendar.getInstance();
