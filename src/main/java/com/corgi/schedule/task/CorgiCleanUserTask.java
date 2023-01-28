@@ -4,9 +4,11 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
+import com.corgi.user.api.CorgiFeedService;
 import com.corgi.user.api.CorgiUserMatchService;
 import com.corgi.user.api.CorgiUserRecommendService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.CorgiFeed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -31,6 +33,8 @@ public class CorgiCleanUserTask {
     private CorgiActivityService corgiActivityService;
     @Reference
     private CorgiUserMatchService corgiUserMatchService;
+    @Reference
+    private CorgiFeedService corgiFeedService;
 
 
     @Async
@@ -51,6 +55,9 @@ public class CorgiCleanUserTask {
                 try {
                     corgiUserService.deleteUser(userId);
                     corgiActivityService.deleteUserActivity(userId);
+                    CorgiFeed query = new CorgiFeed();
+                    query.setUserId(userId);
+                    corgiFeedService.deleteFeed(query);
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
