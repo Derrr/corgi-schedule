@@ -197,6 +197,9 @@ public class CorgiSystemMessageTask {
             } else if ("avatarStatus".equals(messageRule.getRuleKey())) {
                 userDetail.setAvatarStatus(messageRule.getRuleValue());
                 allUsers = false;
+            } else if ("channel".equals(messageRule.getRuleKey())) {
+                userDetail.setVersion(messageRule.getRuleKey());
+                allUsers = false;
             }
         }
         return allUsers ? null : userDetail;
