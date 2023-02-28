@@ -129,8 +129,9 @@ public class CorgiFakeTask {
         CorgiVlogHot hot = new CorgiVlogHot();
         hot.setStatus(CorgiVlogHot.STATUS.OPEN);
         hot.setType(CorgiVlogHot.TYPE.MANUAL);
-        hot.setCtime(c3);
+        hot.setCtime(c1);
         List<CorgiVlogHot> manualHots = corgiVlogService.getHotVlog(hot, 1, 1000);
+        hot.setCtime(c3);
         hot.setType(CorgiVlogHot.TYPE.AUTO);
         List<CorgiVlogHot> autoHots = corgiVlogService.getHotVlog(hot, 1, 1000);
 //        if (!CollectionUtils.isEmpty(hotIds)) {
