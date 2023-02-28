@@ -195,7 +195,7 @@ public class CorgiFakeTask {
         List<String> manualIds = new ArrayList<>();
         for (CorgiVlogHot vlogHot : manualHots) {
             if (manualIds.contains(vlogHot.getActivityId())) {
-                likeHot(vlogHot, userDetail, 33);
+                likeHot(vlogHot, userDetail, vlogHot.getExpectView() * 11 / 1000);
                 manualIds.add(vlogHot.getActivityId());
             }
         }
