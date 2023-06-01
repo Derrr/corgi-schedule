@@ -667,10 +667,9 @@ public class ScriptController {
                 if (CollectionUtils.isEmpty(pics)) {
                     continue;
                 }
-                log.info("pics=" + pics);
-//                if (!aliyunGreenService.checkPic(pics, "crazy_check")) {
-//                    corgiActivityService.updateByColumn(corgiActivity.getId(), "strictStatus", "check");
-//                }
+                if (!aliyunGreenService.checkPic(pics, "crazy_check")) {
+                    corgiActivityService.updateByColumn(corgiActivity.getId(), "strictStatus", "check");
+                }
             }
         }
         return "success";
