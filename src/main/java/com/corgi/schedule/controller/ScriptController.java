@@ -4,16 +4,16 @@ import com.alibaba.dubbo.config.annotation.Reference;
 import com.alibaba.fastjson.JSON;
 import com.corgi.activity.api.CorgiActivityFeedService;
 import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.activity.entity.ActivityPic;
 import com.corgi.activity.entity.CorgiActivity;
 import com.corgi.common.CorgiQueueName;
 import com.corgi.common.messages.MatchRefresher;
 import com.corgi.common.messages.PushMessage;
 import com.corgi.common.messages.RecommendCalculater;
-import com.corgi.entity.CheckPic;
+import com.corgi.entity.ActivityQuery;
 import com.corgi.entity.CorgiPic;
 import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.*;
-import com.corgi.schedule.task.CorgiStatisticTask;
 import com.corgi.user.api.*;
 import com.corgi.user.entity.*;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -41,6 +40,8 @@ public class ScriptController {
     private CorgiUserMatchService corgiUserMatchService;
     @Reference
     private CorgiUserService corgiUserService;
+    @Reference
+    private CorgiUserActivityService corgiUserActivityService;
     @Reference
     private CorgiPicService corgiPicService;
     @Reference
@@ -75,6 +76,8 @@ public class ScriptController {
     private MQService mqService;
     @Autowired
     private FaceDetectedService faceDetectedService;
+    @Autowired
+    private AliyunGreenService aliyunGreenService;
 
     @GetMapping("init_station")
     public String initStation(@RequestParam("city") String city) {
@@ -640,6 +643,36 @@ public class ScriptController {
             }
             page++;
         } while (shouldContinue);
+        return "success";
+    }
+
+    @GetMapping("refresh_activity_pic")
+    public String refreshActivityPic() {
+        ActivityQuery query = new ActivityQuery();
+        query.setPageSize(1000);
+        String activityId = "";
+        while (true) {
+            query.setActivityId(activityId);
+            List<CorgiActivity> activityList = corgiUserActivityService.queryActivity(query);
+            if (CollectionUtils.isEmpty(activityList)) {
+                break;
+            }
+            for (CorgiActivity corgiActivity : activityList) {
+                log.info("checking...{} category:{}", corgiActivity.getId(), corgiActivity.getCategory());
+                activityId = corgiActivity.getId();
+                if (!CorgiActivity.CAT_IMAGE.equals(corgiActivity.getCategory()) && !CorgiActivity.CAT_PAYING.equals(corgiActivity.getCategory())) {
+                    continue;
+                }
+                List<ActivityPic> pics = corgiPicService.getActivityPic(corgiActivity.getId());
+                if (CollectionUtils.isEmpty(pics)) {
+                    continue;
+                }
+                log.info("pics=" + pics);
+//                if (!aliyunGreenService.checkPic(pics, "crazy_check")) {
+//                    corgiActivityService.updateByColumn(corgiActivity.getId(), "strictStatus", "check");
+//                }
+            }
+        }
         return "success";
     }
 }
