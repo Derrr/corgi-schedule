@@ -115,7 +115,6 @@ public class CorgiFakeTask {
         calendar.add(Calendar.DATE, -2);
         String c3 = sdf.format(calendar.getTime());
         calendar.add(Calendar.DATE, -4);
-        String c7 = sdf.format(calendar.getTime());
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd");
         List<String> users = this.getOnBoardUsers();
         for (String userId : users) {
