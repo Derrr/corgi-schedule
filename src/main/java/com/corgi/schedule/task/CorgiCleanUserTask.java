@@ -38,14 +38,14 @@ public class CorgiCleanUserTask {
     @Reference
     private CorgiFeedService corgiFeedService;
 
-    @Async
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
-    public void run1() {
-        List<String> userExtras = corgiExtraService.getExtraUserIds(1, 5000);
-        for (String userId : userExtras) {
-            corgiMatchService.updateUser(corgiUserService.getUserDetailBasic(userId));
-        }
-    }
+//    @Async
+//    @Scheduled(fixedRate = 24 * 3600 * 1000)
+//    public void run1() {
+//        List<String> userExtras = corgiExtraService.getExtraUserIds(1, 5000);
+//        for (String userId : userExtras) {
+//            corgiMatchService.updateUser(corgiUserService.getUserDetailBasic(userId));
+//        }
+//    }
 
     @Async
     @Scheduled(cron = "0 0 4 * * *")
