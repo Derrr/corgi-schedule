@@ -2,13 +2,12 @@ package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.activity.api.CorgiMatchService;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
-import com.corgi.user.api.CorgiFeedService;
-import com.corgi.user.api.CorgiUserMatchService;
-import com.corgi.user.api.CorgiUserRecommendService;
-import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.api.*;
 import com.corgi.user.entity.CorgiFeed;
+import com.corgi.user.entity.UserExtra;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -28,7 +27,10 @@ import java.util.List;
 public class CorgiCleanUserTask {
     @Reference(retries = 1, timeout = 300000)
     private CorgiUserService corgiUserService;
-
+    @Reference
+    private CorgiExtraService corgiExtraService;
+    @Reference
+    private CorgiMatchService corgiMatchService;
     @Reference
     private CorgiActivityService corgiActivityService;
     @Reference
@@ -36,6 +38,14 @@ public class CorgiCleanUserTask {
     @Reference
     private CorgiFeedService corgiFeedService;
 
+    @Async
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    public void run1() {
+        List<String> userExtras = corgiExtraService.getExtraUserIds(1, 5000);
+        for (String userId : userExtras) {
+            corgiMatchService.updateUser(corgiUserService.getUserDetailBasic(userId));
+        }
+    }
 
     @Async
     @Scheduled(cron = "0 0 4 * * *")
