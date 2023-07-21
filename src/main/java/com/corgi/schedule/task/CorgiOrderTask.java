@@ -78,6 +78,7 @@ public class CorgiOrderTask {
             }
             for (CorgiOrder order : orders) {
                 if (CorgiOrder.STATUS.CREATED.equals(order.getStatus())) {
+                    log.info("querying order:{} ", order);
                     if (CorgiOrder.PAY_TYPE.WX.equals(order.getPayType())) {
                         this.queryWXOrder(order);
                     }

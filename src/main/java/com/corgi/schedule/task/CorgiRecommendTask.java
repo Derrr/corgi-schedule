@@ -1,6 +1,7 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.corgi.activity.api.CorgiMatchService;
 import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.schedule.service.MQService;
 import com.corgi.schedule.service.TaskService;
@@ -42,6 +43,8 @@ public class CorgiRecommendTask {
     private CorgiUserService corgiUserService;
     @Reference
     private CorgiFeedService corgiFeedService;
+    @Reference
+    private CorgiMatchService corgiMatchService;
     @Autowired
     private StringRedisTemplate redisTemplate;
     @Autowired
@@ -103,17 +106,21 @@ public class CorgiRecommendTask {
                     if (userPosition.getUptime() < threshold) {
                         UserDetail detail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
                         if (detail == null) {
+                            corgiMatchService.deleteUser(userPosition.getUserId());
                             continue;
                         }
                         if (!"influencer".equals(detail.getAvatarStatus())) {
                             String expire = corgiUserService.getUserVipExpire(userPosition.getUserId());
                             if (StringUtils.isEmpty(expire) || "-".equals(expire)) {
+                                corgiMatchService.deleteUser(userPosition.getUserId());
                                 continue;
                             }
                             if (expire.compareTo(nowDate) < 0) {
+                                corgiMatchService.deleteUser(userPosition.getUserId());
                                 continue;
                             }
                         }
+                        corgiMatchService.updateUser(detail);
                     }
                     log.info("checkinginto ... " + userPosition.getUserId());
                     redisTemplate.opsForGeo().add("user", new Point(userPosition.getLng(), userPosition.getLat()), userPosition.getUserId());
