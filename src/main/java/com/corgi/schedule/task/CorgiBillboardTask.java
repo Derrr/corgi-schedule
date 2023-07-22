@@ -60,14 +60,14 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    @Scheduled(cron = "0 0 10 * * *")
-    //@Scheduled(fixedRate = 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 10 * * *")
+    @Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run2() {
         log.info("adding activity billboard...........");
         List<String> userIds = Lists.newArrayList("7", "8", "9");
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 3);
-        String date = new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
+        String date = "2023-07-23";//new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime());
         calendar.add(Calendar.DATE, -6);
         String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(calendar.getTime());
         //calendar.add(Calendar.DATE, -57);
