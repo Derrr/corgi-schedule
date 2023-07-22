@@ -60,8 +60,8 @@ public class CorgiBillboardTask {
     private StringRedisTemplate redisTemplate;
 
     @Async
-    //@Scheduled(cron = "0 0 10 * * *")
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 0 10 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run2() {
         log.info("adding activity billboard...........");
         List<String> userIds = Lists.newArrayList("7", "8", "9");
