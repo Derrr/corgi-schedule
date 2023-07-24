@@ -144,6 +144,10 @@ public class CorgiOrderTask {
     private void queryWXOrder(CorgiOrder order) {
         Map<String, String> orderQuery = new HashMap<>();
         orderQuery.put("out_trade_no", order.getTradeNo());
+        if ("com.duke.corgi.mi".equals(order.getPackageName())) {
+            orderQuery.put("secretKey", "89368b1bb82fa6940a455255bf9a1089");
+            orderQuery.put("appid", "wx0040995027e19688");
+        }
         try {
             Map<String, String> result = wxPay.orderQuery(orderQuery);
             order.setResult(JSON.toJSONString(result));
@@ -165,7 +169,13 @@ public class CorgiOrderTask {
                 Calendar calendar = Calendar.getInstance();
                 calendar.add(Calendar.MINUTE, -5);
                 if (order.getCtime().compareTo(order_sdf.format(calendar.getTime())) < 0) {
-                    wxPay.closeOrder(orderQuery);
+                    if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
+                        if ("com.duke.corgi.mi".equals(order.getPackageName())) {
+                            orderQuery.put("secretKey", "89368b1bb82fa6940a455255bf9a1089");
+                            orderQuery.put("appid", "wx0040995027e19688");
+                        }
+                        wxPay.closeOrder(orderQuery);
+                    }
                     order.setStatus(CorgiOrder.STATUS.CLOSE);
                 }
             }
