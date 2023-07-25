@@ -145,7 +145,6 @@ public class CorgiOrderTask {
         Map<String, String> orderQuery = new HashMap<>();
         orderQuery.put("out_trade_no", order.getTradeNo());
         if ("com.duke.corgi.mi".equals(order.getPackageName())) {
-            orderQuery.put("secretKey", "89368b1bb82fa6940a455255bf9a1089");
             orderQuery.put("appid", "wx0040995027e19688");
         }
         try {
@@ -171,7 +170,6 @@ public class CorgiOrderTask {
                 if (order.getCtime().compareTo(order_sdf.format(calendar.getTime())) < 0) {
                     if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
                         if ("com.duke.corgi.mi".equals(order.getPackageName())) {
-                            orderQuery.put("secretKey", "89368b1bb82fa6940a455255bf9a1089");
                             orderQuery.put("appid", "wx0040995027e19688");
                         }
                         wxPay.closeOrder(orderQuery);

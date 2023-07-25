@@ -52,7 +52,7 @@ public class WXPay {
      * @throws Exception
      */
     public Map<String, String> fillRequestData(Map<String, String> reqData) throws Exception {
-        if (StringUtils.isEmpty(reqData.get("secretKey"))) {
+        if (StringUtils.isEmpty(reqData.get("appid"))) {
             reqData.put("appid", config.getAppID());
         }
         reqData.put("mch_id", config.getMchID());
@@ -62,14 +62,7 @@ public class WXPay {
         } else if (SignType.HMACSHA256.equals(this.signType)) {
             reqData.put("sign_type", WXPayConstants.HMACSHA256);
         }
-
-        if (StringUtils.isEmpty(reqData.get("secretKey"))) {
-            reqData.put("sign", WXPayUtil.generateSignature(reqData, config.getKey(), this.signType));
-        } else {
-            String secretKey = reqData.get("secretKey");
-            reqData.remove("secretKey");
-            reqData.put("sign", WXPayUtil.generateSignature(reqData, secretKey, this.signType));
-        }
+        reqData.put("sign", WXPayUtil.generateSignature(reqData, config.getKey(), this.signType));
         return reqData;
     }
 
