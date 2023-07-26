@@ -170,9 +170,6 @@ public class CorgiOrderTask {
                 calendar.add(Calendar.MINUTE, -5);
                 if (order.getCtime().compareTo(order_sdf.format(calendar.getTime())) < 0) {
                     if (order.getCtime().compareTo(sdf.format(calendar.getTime())) < 0) {
-                        if ("com.duke.corgi.mi".equals(order.getPackageName())) {
-                            orderQuery.put("appid", "wx0040995027e19688");
-                        }
                         wxPay.closeOrder(orderQuery);
                     }
                     order.setStatus(CorgiOrder.STATUS.CLOSE);
