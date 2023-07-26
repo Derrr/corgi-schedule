@@ -152,6 +152,7 @@ public class CorgiOrderTask {
             order.setResult(JSON.toJSONString(result));
             if (WXPayConstants.FAIL.equals(result.get("return_code"))
                     || WXPayConstants.FAIL.equals(result.get("result_code"))) {
+                order.setStatus(CorgiOrder.STATUS.FAIL);
                 corgiOrderService.updateOrder(order);
                 return;
             }
