@@ -48,8 +48,8 @@ public class CorgiCleanUserTask {
 //    }
 
     @Async
-    //@Scheduled(cron = "0 0 4 * * *")
-    @Scheduled(fixedRate = 24 * 3600 * 1000)
+    @Scheduled(cron = "0 0 4 * * *")
+    //@Scheduled(fixedRate = 24 * 3600 * 1000)
     public void run() {
         log.info("cleaning user...........");
         Calendar calendar = Calendar.getInstance();
