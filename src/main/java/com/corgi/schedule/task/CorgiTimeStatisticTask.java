@@ -58,7 +58,7 @@ public class CorgiTimeStatisticTask {
 //                }
                 RecommendCalculater recommendCalculater = new RecommendCalculater();
                 recommendCalculater.setUserId(userPosition.getUserId());
-                mqService.sendGroup(recommendCalculater);
+                mqService.sendPreferGroup(recommendCalculater);
             }
 
         }
