@@ -53,9 +53,9 @@ public class CorgiTimeStatisticTask {
             page++;
             for (UserPosition userPosition : userPositionList) {
                 log.info("user --- " + userPosition.getUserId());
-                if (userPosition.getUptime() < time) {
-                    continue;
-                }
+//                if (userPosition.getUptime() < time) {
+//                    continue;
+//                }
                 RecommendCalculater recommendCalculater = new RecommendCalculater();
                 recommendCalculater.setUserId(userPosition.getUserId());
                 mqService.sendGroup(recommendCalculater);
