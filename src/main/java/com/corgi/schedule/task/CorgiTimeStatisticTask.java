@@ -39,11 +39,16 @@ public class CorgiTimeStatisticTask {
     @Async
     @Scheduled(fixedRate = 1000 * 24 * 3600)
     public void run() {
+        int page = 1;
         while (true) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -90);
             long time = calendar.getTimeInMillis();
-            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(1, 1000);
+            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
+            if (CollectionUtils.isEmpty(userPositionList)) {
+                break;
+            }
+            page++;
             for (UserPosition userPosition : userPositionList) {
                 if (userPosition.getUptime() < time) {
                     continue;
@@ -52,6 +57,7 @@ public class CorgiTimeStatisticTask {
                 recommendCalculater.setUserId(userPosition.getUserId());
                 mqService.sendGroup(recommendCalculater);
             }
+
         }
 
 //        Calendar calendar = Calendar.getInstance();
