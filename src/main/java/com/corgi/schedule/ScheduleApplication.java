@@ -35,9 +35,18 @@ public class ScheduleApplication implements SchedulingConfigurer {
 	}
 
 	@Bean
-	public Queue userRecommednQueue() {
+	public Queue userRecommedQueue() {
 		return new Queue(CorgiQueueName.USER_RECOMMEND_QUEUE);
 	}
+
+	public Queue groupRecommedQueue() {
+		return new Queue(CorgiQueueName.USER_GROUP_QUEUE);
+	}
+
+	public Queue preferRecommedQueue() {
+		return new Queue(CorgiQueueName.USER_PREFER_QUEUE);
+	}
+
 
 	@Override
 	public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
