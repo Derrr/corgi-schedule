@@ -2,9 +2,14 @@ package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.entity.CorgiStatistic;
+import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiUserService;
+import com.corgi.user.entity.UserPosition;
+import org.checkerframework.checker.units.qual.C;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,31 +29,48 @@ public class CorgiTimeStatisticTask {
     private CorgiActivityService corgiActivityService;
     @Reference
     private CorgiStatisticService corgiStatisticService;
+    @Autowired
+    private MQService mqService;
 
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
-    //@Async
-    //@Scheduled(cron = "0 0 0/3 * * *")
+    @Async
+    @Scheduled(fixedRate = 1000 * 24 * 3600)
     public void run() {
-        Calendar calendar = Calendar.getInstance();
-        String date = dau_sdf.format(calendar.getTime());
-        long time = calendar.getTimeInMillis();
-
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        String endHour = hour_sdf.format(calendar.getTime());
-
-
-        calendar.add(Calendar.HOUR_OF_DAY, -3);
-        String beginHour = hour_sdf.format(calendar.getTime());
-        if (hour == 0) {
-            date = dau_sdf.format(calendar.getTime());
+        while (true) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DATE, -90);
+            long time = calendar.getTimeInMillis();
+            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(1, 1000);
+            for (UserPosition userPosition : userPositionList) {
+                if (userPosition.getUptime() < time) {
+                    continue;
+                }
+                RecommendCalculater recommendCalculater = new RecommendCalculater();
+                recommendCalculater.setUserId(userPosition.getUserId());
+                mqService.sendGroup(recommendCalculater);
+            }
         }
-        String key = beginHour + "-" + endHour;
 
-        long count = corgiUserService.countActiveUser(calendar.getTimeInMillis(), time);
-        corgiStatisticService.updateMap(CorgiStatistic.ACTIVE, date, key, count);
+//        Calendar calendar = Calendar.getInstance();
+//        String date = dau_sdf.format(calendar.getTime());
+//        long time = calendar.getTimeInMillis();
+//
+//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        String endHour = hour_sdf.format(calendar.getTime());
+//
+//
+//        calendar.add(Calendar.HOUR_OF_DAY, -3);
+//        String beginHour = hour_sdf.format(calendar.getTime());
+//        if (hour == 0) {
+//            date = dau_sdf.format(calendar.getTime());
+//        }
+//        String key = beginHour + "-" + endHour;
+//
+//        long count = corgiUserService.countActiveUser(calendar.getTimeInMillis(), time);
+//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVE, date, key, count);
 
     }
 

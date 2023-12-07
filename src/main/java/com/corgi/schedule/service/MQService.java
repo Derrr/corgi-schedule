@@ -40,4 +40,11 @@ public class MQService {
         rabbitTemplate.convertAndSend(CorgiQueueName.USER_DATE_QUEUE, pushMessage);
     }
 
+    public void sendPreferGroup(RecommendCalculater calculater) {
+        rabbitTemplate.convertAndSend(CorgiQueueName.USER_PREFER_QUEUE, calculater);
+    }
+
+    public void sendGroup(RecommendCalculater calculater) {
+        rabbitTemplate.convertAndSend(CorgiQueueName.USER_GROUP_QUEUE, calculater);
+    }
 }
