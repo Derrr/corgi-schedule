@@ -2,6 +2,8 @@ package com.corgi.schedule;
 
 import com.alibaba.dubbo.spring.boot.annotation.EnableDubboConfiguration;
 import com.corgi.common.CorgiQueueName;
+import com.easemob.im.server.EMProperties;
+import com.easemob.im.server.EMService;
 import org.springframework.amqp.core.Queue;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -53,5 +55,17 @@ public class ScheduleApplication implements SchedulingConfigurer {
 		executor.setThreadNamePrefix("asyncTaskExecutor-");
 		executor.initialize();
 		return executor;
+	}
+
+	@Bean
+	public EMService service() {
+
+		EMProperties properties = EMProperties.builder()
+				.setAppkey("1101200130181163#corgi")
+				.setClientId("YXA6NW6WhxTlSd6PW28d8s2geQ")
+				.setClientSecret("YXA6bXC8NAPVUHKlxTlhCSSZOVwyiAQ")
+				.build();
+
+		return new EMService(properties);
 	}
 }
