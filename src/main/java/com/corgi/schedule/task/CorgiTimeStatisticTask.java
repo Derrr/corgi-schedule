@@ -8,6 +8,7 @@ import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiStatisticService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserPosition;
+import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -22,6 +23,7 @@ import java.util.*;
  * @author tairanliu
  */
 @Component
+@Slf4j
 public class CorgiTimeStatisticTask {
     @Reference
     private CorgiUserService corgiUserService;
@@ -50,6 +52,7 @@ public class CorgiTimeStatisticTask {
             }
             page++;
             for (UserPosition userPosition : userPositionList) {
+                log.info("user --- " + userPosition.getUserId());
                 if (userPosition.getUptime() < time) {
                     continue;
                 }
