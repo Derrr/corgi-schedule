@@ -45,22 +45,16 @@ public class CorgiTimeStatisticTask {
         while (true) {
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.DATE, -90);
-            long time = calendar.getTimeInMillis();
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             if (CollectionUtils.isEmpty(userPositionList)) {
                 break;
             }
             page++;
             for (UserPosition userPosition : userPositionList) {
-                log.info("user --- " + userPosition.getUserId());
-//                if (userPosition.getUptime() < time) {
-//                    continue;
-//                }
                 RecommendCalculater recommendCalculater = new RecommendCalculater();
                 recommendCalculater.setUserId(userPosition.getUserId());
-                mqService.sendPreferGroup(recommendCalculater);
+                mqService.sendGroup(recommendCalculater);
             }
-
         }
 
 //        Calendar calendar = Calendar.getInstance();
