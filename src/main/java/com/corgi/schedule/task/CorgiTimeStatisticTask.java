@@ -53,7 +53,7 @@ public class CorgiTimeStatisticTask {
             for (UserPosition userPosition : userPositionList) {
                 RecommendCalculater recommendCalculater = new RecommendCalculater();
                 recommendCalculater.setUserId(userPosition.getUserId());
-                mqService.sendGroup(recommendCalculater);
+                mqService.sendPreferGroup(recommendCalculater);
             }
         }
 
