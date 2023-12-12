@@ -6,6 +6,7 @@ import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.entity.CorgiStatistic;
 import com.corgi.schedule.service.MQService;
 import com.corgi.user.api.CorgiStatisticService;
+import com.corgi.user.api.CorgiUserRecommendService;
 import com.corgi.user.api.CorgiUserService;
 import com.corgi.user.entity.UserPosition;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,7 @@ public class CorgiTimeStatisticTask {
     @Reference
     private CorgiUserService corgiUserService;
     @Reference
-    private CorgiActivityService corgiActivityService;
-    @Reference
-    private CorgiStatisticService corgiStatisticService;
+    private CorgiUserRecommendService corgiUserRecommendService;
     @Autowired
     private MQService mqService;
 
@@ -39,12 +38,10 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
     @Async
-    @Scheduled(fixedRate = 1000 * 24 * 3600)
-    public void run() {
+    @Scheduled(cron = "0 0 0/6 * * *")
+    public void runPreferGroup() {
         int page = 1;
         while (true) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DATE, -90);
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             if (CollectionUtils.isEmpty(userPositionList)) {
                 break;
@@ -75,6 +72,25 @@ public class CorgiTimeStatisticTask {
 //        long count = corgiUserService.countActiveUser(calendar.getTimeInMillis(), time);
 //        corgiStatisticService.updateMap(CorgiStatistic.ACTIVE, date, key, count);
 
+    }
+
+    @Async
+    @Scheduled(cron = "0 0 3/6 * * *")
+    public void runGroup() {
+        corgiUserRecommendService.clearPreferCor("");
+        int page = 1;
+        while (true) {
+            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
+            if (CollectionUtils.isEmpty(userPositionList)) {
+                break;
+            }
+            page++;
+            for (UserPosition userPosition : userPositionList) {
+                RecommendCalculater recommendCalculater = new RecommendCalculater();
+                recommendCalculater.setUserId(userPosition.getUserId());
+                mqService.sendGroup(recommendCalculater);
+            }
+        }
     }
 
 }
