@@ -38,7 +38,7 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
     @Async
-    @Scheduled(cron = "0 0 0/6 * * *")
+    @Scheduled(cron = "0 0 0/4 * * *")
     public void runPreferGroup() {
         int page = 1;
         while (true) {
@@ -75,7 +75,7 @@ public class CorgiTimeStatisticTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0 3/6 * * *")
+    @Scheduled(cron = "0 0 2/4 * * *")
     public void runGroup() {
         corgiUserRecommendService.clearPreferCor("");
         int page = 1;
