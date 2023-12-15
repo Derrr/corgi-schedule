@@ -43,7 +43,7 @@ public class CorgiTimeStatisticTask {
 
     @Async
     //@Scheduled(cron = "0 0 0/4 * * *")
-    @Scheduled(fixRate = 7*24*3600*1000)
+    @Scheduled(fixedRate = 7*24*3600*1000)
     public void runPreferGroup() {
         int page = 1;
         HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
