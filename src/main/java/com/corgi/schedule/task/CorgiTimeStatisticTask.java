@@ -42,7 +42,8 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
     @Async
-    @Scheduled(cron = "0 0 0/4 * * *")
+    //@Scheduled(cron = "0 0 0/4 * * *")
+    @Scheduled(fixRate = 7*24*3600*1000)
     public void runPreferGroup() {
         int page = 1;
         HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
@@ -88,7 +89,7 @@ public class CorgiTimeStatisticTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0 2/4 * * *")
+    //@Scheduled(cron = "0 0 2/4 * * *")
     public void runGroup() {
         corgiUserRecommendService.clearPreferCor("");
         int page = 1;
