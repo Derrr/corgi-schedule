@@ -43,8 +43,9 @@ public class CorgiTimeStatisticTask {
 
     @Async
     //@Scheduled(cron = "0 0 0/4 * * *")
-    @Scheduled(fixedRate = 7*24*3600*1000)
+    @Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runPreferGroup() {
+        log.info("into prefer group.....");
         int page = 1;
         HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
         if (!CollectionUtils.isEmpty(result)) {
@@ -57,6 +58,7 @@ public class CorgiTimeStatisticTask {
         }
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
+            log.info("into prefer group.....page" + page);
             if (CollectionUtils.isEmpty(userPositionList)) {
                 break;
             }
