@@ -12,6 +12,7 @@ import com.corgi.user.entity.UserPosition;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author tairanliu
@@ -31,6 +33,8 @@ public class CorgiTimeStatisticTask {
     @Reference
     private CorgiUserRecommendService corgiUserRecommendService;
     @Autowired
+    private StringRedisTemplate redisTemplate;
+    @Autowired
     private MQService mqService;
 
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -41,6 +45,15 @@ public class CorgiTimeStatisticTask {
     @Scheduled(cron = "0 0 0/4 * * *")
     public void runPreferGroup() {
         int page = 1;
+        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
+        if (!CollectionUtils.isEmpty(result)) {
+            Double total = result.values().stream().reduce((m, n) -> m + n).get();
+            if (total != 0) {
+                for (String key : result.keySet()) {
+                    redisTemplate.opsForHash().put("group_total", key, result.get(key) / total);
+                }
+            }
+        }
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             if (CollectionUtils.isEmpty(userPositionList)) {
