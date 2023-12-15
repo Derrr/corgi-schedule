@@ -50,7 +50,7 @@ public class CorgiTimeStatisticTask {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
             if (total != 0) {
                 for (String key : result.keySet()) {
-                    redisTemplate.opsForHash().put("group_total", key, result.get(key) / total);
+                    redisTemplate.opsForHash().put("group_total", key, result.get(key) * 100 / total);
                 }
             }
         }
