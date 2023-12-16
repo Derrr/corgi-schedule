@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -47,15 +48,6 @@ public class CorgiTimeStatisticTask {
     public void runPreferGroup() {
         log.info("into prefer group.....");
         int page = 1;
-        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
-        if (!CollectionUtils.isEmpty(result)) {
-            Double total = result.values().stream().reduce((m, n) -> m + n).get();
-            if (total != 0) {
-                for (String key : result.keySet()) {
-                    redisTemplate.opsForHash().put("group_weight", key, (result.get(key) * 100 / total) + "");
-                }
-            }
-        }
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             log.info("into prefer group.....page" + page);
@@ -95,6 +87,16 @@ public class CorgiTimeStatisticTask {
     public void runGroup() {
         corgiUserRecommendService.clearPreferCor("");
         int page = 1;
+        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
+        if (!CollectionUtils.isEmpty(result)) {
+            Double total = result.values().stream().reduce((m, n) -> m + n).get();
+            if (total != 0) {
+                for (String key : result.keySet()) {
+                    redisTemplate.opsForHash().put("group_weight", key, (result.get(key) / total) + "");
+                }
+            }
+            redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
+        }
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             if (CollectionUtils.isEmpty(userPositionList)) {
