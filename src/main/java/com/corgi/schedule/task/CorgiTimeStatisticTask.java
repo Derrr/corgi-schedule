@@ -43,7 +43,7 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
     @Async
-    @Scheduled(cron = "0 0 0/4 * * *")
+    //@Scheduled(cron = "0 0 0/4 * * *")
     //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runPreferGroup() {
         log.info("into prefer group.....");
@@ -65,7 +65,8 @@ public class CorgiTimeStatisticTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0 2/4 * * *")
+    //@Scheduled(cron = "0 0 2/4 * * *")
+    @Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runGroup() {
         corgiUserRecommendService.clearPreferCor("");
         int page = 1;
@@ -76,10 +77,11 @@ public class CorgiTimeStatisticTask {
                 for (String key : result.keySet()) {
                     String value = "1.0";
                     try {
-                        value = Math.sqrt(result.get(key) / total) + "";
+                        value = Math.pow(result.get(key) / total, 0.8) + "";
                     } catch (Exception e) {
                         log.info(e.getMessage(), e);
                     }
+                    log.info("group:" + key + " value:" + value);
                     redisTemplate.opsForHash().put("group_weight", key, value);
                 }
             }
