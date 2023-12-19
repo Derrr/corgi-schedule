@@ -68,7 +68,6 @@ public class CorgiTimeStatisticTask {
     //@Scheduled(cron = "0 0 2/4 * * *")
     @Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runGroup() {
-        corgiUserRecommendService.clearPreferCor("");
         int page = 1;
         HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
         if (!CollectionUtils.isEmpty(result)) {
