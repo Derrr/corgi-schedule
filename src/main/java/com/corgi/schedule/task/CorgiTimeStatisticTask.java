@@ -48,6 +48,20 @@ public class CorgiTimeStatisticTask {
     public void runPreferGroup() {
         log.info("into prefer group.....");
         int page = 1;
+        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
+        if (!CollectionUtils.isEmpty(result)) {
+            Double total = result.values().stream().reduce((m, n) -> m + n).get();
+            Double count = corgiUserRecommendService.getGroupWeight(0, "");
+            if (total != 0) {
+                for (String key : result.keySet()) {
+                    Double value = result.get(key) / total;
+                    Double weight = corgiUserRecommendService.getGroupWeight((int)(Math.floor(value * count)), key);
+                    redisTemplate.opsForHash().put("group_weight", key, weight);
+                }
+            }
+            redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
+        }
+
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             log.info("into prefer group.....page" + page);
@@ -69,23 +83,6 @@ public class CorgiTimeStatisticTask {
     //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runGroup() {
         int page = 1;
-//        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
-//        if (!CollectionUtils.isEmpty(result)) {
-//            Double total = result.values().stream().reduce((m, n) -> m + n).get();
-//            if (total != 0) {
-//                for (String key : result.keySet()) {
-//                    String value = "1.0";
-//                    try {
-//                        value = Math.pow(result.get(key) / total, 1.5) + "";
-//                    } catch (Exception e) {
-//                        log.info(e.getMessage(), e);
-//                    }
-//                    log.info("group:" + key + " value:" + value);
-//                    redisTemplate.opsForHash().put("group_weight", key, value);
-//                }
-//            }
-//            redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
-//        }
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             if (CollectionUtils.isEmpty(userPositionList)) {
