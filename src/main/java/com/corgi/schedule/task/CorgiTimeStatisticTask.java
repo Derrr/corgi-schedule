@@ -76,7 +76,7 @@ public class CorgiTimeStatisticTask {
                 for (String key : result.keySet()) {
                     String value = "1.0";
                     try {
-                        value = Math.pow(result.get(key) / total, 2) + "";
+                        value = Math.pow(result.get(key) / total, 1.5) + "";
                     } catch (Exception e) {
                         log.info(e.getMessage(), e);
                     }
