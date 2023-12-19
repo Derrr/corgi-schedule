@@ -62,24 +62,6 @@ public class CorgiTimeStatisticTask {
             }
         }
 
-//        Calendar calendar = Calendar.getInstance();
-//        String date = dau_sdf.format(calendar.getTime());
-//        long time = calendar.getTimeInMillis();
-//
-//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//        String endHour = hour_sdf.format(calendar.getTime());
-//
-//
-//        calendar.add(Calendar.HOUR_OF_DAY, -3);
-//        String beginHour = hour_sdf.format(calendar.getTime());
-//        if (hour == 0) {
-//            date = dau_sdf.format(calendar.getTime());
-//        }
-//        String key = beginHour + "-" + endHour;
-//
-//        long count = corgiUserService.countActiveUser(calendar.getTimeInMillis(), time);
-//        corgiStatisticService.updateMap(CorgiStatistic.ACTIVE, date, key, count);
-
     }
 
     @Async
@@ -92,7 +74,13 @@ public class CorgiTimeStatisticTask {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
             if (total != 0) {
                 for (String key : result.keySet()) {
-                    redisTemplate.opsForHash().put("group_weight", key, (result.get(key) / total) + "");
+                    String value = "1.0";
+                    try {
+                        value = Math.sqrt(result.get(key) / total) + "";
+                    } catch (Exception e) {
+                        log.info(e.getMessage(), e);
+                    }
+                    redisTemplate.opsForHash().put("group_weight", key, value);
                 }
             }
             redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
