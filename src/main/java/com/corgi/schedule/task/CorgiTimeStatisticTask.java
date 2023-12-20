@@ -51,12 +51,14 @@ public class CorgiTimeStatisticTask {
         HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
         if (!CollectionUtils.isEmpty(result)) {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
-            Double count = corgiUserRecommendService.getGroupWeight(0, "");
+            Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
             if (total != 0) {
                 for (String key : result.keySet()) {
                     Double value = result.get(key) / total;
-                    Double weight = corgiUserRecommendService.getGroupWeight((int)(Math.floor(value * count)), key);
+                    Integer groupCount = (int) (Math.floor(value * totalCount));
+                    Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
                     redisTemplate.opsForHash().put("group_weight", key, weight);
+                    redisTemplate.opsForHash().put("group_count", key, groupCount);
                 }
             }
             redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
