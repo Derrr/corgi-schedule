@@ -43,8 +43,8 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
 
     @Async
-    @Scheduled(cron = "0 0 0/4 * * *")
-    //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 0/4 * * *")
+    @Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runPreferGroup() {
         log.info("into prefer group.....");
         int page = 1;
