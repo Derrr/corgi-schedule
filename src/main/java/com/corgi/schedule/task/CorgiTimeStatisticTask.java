@@ -67,7 +67,7 @@ public class CorgiTimeStatisticTask {
 
                     String incrementKey = "group_weight_" + key;
                     redisTemplate.delete(incrementKey);
-                    redisTemplate.opsForValue().increment(incrementKey);
+                    redisTemplate.opsForValue().decrement(incrementKey);
                     redisTemplate.expire(incrementKey, 3l, TimeUnit.HOURS);
                 }
             }
