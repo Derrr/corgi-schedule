@@ -49,7 +49,6 @@ public class CorgiTimeStatisticTask {
         log.info("into prefer group.....");
         int page = 1;
         HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
-        log.info("result:" + result);
         if (!CollectionUtils.isEmpty(result)) {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
             Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
@@ -62,8 +61,8 @@ public class CorgiTimeStatisticTask {
                         log.info("wrong weight:" + key);
                         weight = 1.0;
                     }
-                    redisTemplate.opsForHash().put("group_weight", key, weight);
-                    redisTemplate.opsForHash().put("group_count", key, groupCount);
+                    redisTemplate.opsForHash().put("group_weight", key, weight + "");
+                    redisTemplate.opsForHash().put("group_count", key, groupCount + "");
 
                     String incrementKey = "group_weight_" + key;
                     redisTemplate.delete(incrementKey);
