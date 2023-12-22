@@ -52,11 +52,10 @@ public class CorgiTimeStatisticTask {
         if (!CollectionUtils.isEmpty(result)) {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
             Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
-            log.info("totalCount:" + totalCount);
             if (total != 0) {
                 for (String key : result.keySet()) {
                     Double value = result.get(key) / total;
-                    Integer groupCount = (int) (Math.floor(value * totalCount));
+                    Integer groupCount = (int) (Math.round(value * totalCount));
                     Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
                     if (weight == null) {
                         log.info("wrong weight:" + key);
@@ -67,7 +66,7 @@ public class CorgiTimeStatisticTask {
 
                     String incrementKey = "group_weight_" + key;
                     redisTemplate.delete(incrementKey);
-                    redisTemplate.opsForValue().decrement(incrementKey);
+                    redisTemplate.opsForValue().increment(incrementKey);
                     redisTemplate.expire(incrementKey, 3l, TimeUnit.HOURS);
                 }
             }
