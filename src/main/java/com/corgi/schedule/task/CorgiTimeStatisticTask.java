@@ -60,7 +60,7 @@ public class CorgiTimeStatisticTask {
                     Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
                     if (weight == null) {
                         log.info("wrong weight:" + key);
-                        weight = 10000.0;
+                        weight = 1.0;
                     }
                     redisTemplate.opsForHash().put("group_weight", key, weight);
                     redisTemplate.opsForHash().put("group_count", key, groupCount);
