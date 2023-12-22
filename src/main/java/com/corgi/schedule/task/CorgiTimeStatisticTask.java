@@ -52,6 +52,7 @@ public class CorgiTimeStatisticTask {
         if (!CollectionUtils.isEmpty(result)) {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
             Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
+            log.info("totalCount:" + totalCount);
             if (total != 0) {
                 for (String key : result.keySet()) {
                     Double value = result.get(key) / total;
