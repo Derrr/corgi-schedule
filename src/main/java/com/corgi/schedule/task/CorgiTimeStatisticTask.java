@@ -44,8 +44,8 @@ public class CorgiTimeStatisticTask {
     private static List<String> groupOrder = Arrays.asList("匀称", "肉壮", "肌肉", "偏胖", "精壮", "偏瘦");
 
     @Async
-    @Scheduled(cron = "0 0 0/4 * * *")
-    //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
+    //@Scheduled(cron = "0 0 0/4 * * *")
+    @Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runPreferGroup() {
         log.info("into prefer group.....");
         int page = 1;
