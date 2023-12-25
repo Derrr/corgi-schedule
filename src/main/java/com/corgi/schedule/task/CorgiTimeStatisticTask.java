@@ -41,6 +41,7 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
+    private static List<String> groupOrder = Arrays.asList("匀称", "肉壮", "肌肉", "偏胖", "精壮", "偏瘦");
 
     @Async
     @Scheduled(cron = "0 0 0/4 * * *")
@@ -53,8 +54,8 @@ public class CorgiTimeStatisticTask {
             Double total = result.values().stream().reduce((m, n) -> m + n).get();
             Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
             if (total != 0) {
-                for (String key : result.keySet()) {
-                    Double value = result.get(key) / total;
+                for (String key : groupOrder) {
+                    Double value = result.get(key) == null ? 0.0 : result.get(key) / total;
                     Integer groupCount = (int) (Math.round(value * totalCount));
                     Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
                     if (weight == null) {
