@@ -57,7 +57,9 @@ public class CorgiTimeStatisticTask {
                 for (String key : groupOrder) {
                     Double value = result.get(key) == null ? 0.0 : result.get(key) / total;
                     Integer groupCount = (int) (Math.round(value * totalCount));
+                    log.info(key + " count: " + groupCount);
                     Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
+                    log.info(key + " weight: " + weight);
                     if (weight == null) {
                         log.info("wrong weight:" + key);
                         weight = 1.0;
