@@ -49,31 +49,31 @@ public class CorgiTimeStatisticTask {
     public void runPreferGroup() {
         log.info("into prefer group.....");
         int page = 1;
-//        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
-//        if (!CollectionUtils.isEmpty(result)) {
-//            Double total = result.values().stream().reduce((m, n) -> m + n).get();
-//            Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
-//            if (total != 0) {
-//                for (String key : groupOrder) {
-//                    Double value = result.get(key) == null ? 0.0 : result.get(key) / total;
-//                    Integer groupCount = (int) (Math.round(value * totalCount));
-//                    Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
-//                    if (weight == null) {
-//                        log.info("wrong weight:" + key);
-//                        weight = 1.0;
-//                    }
-//                    redisTemplate.opsForHash().put("group_weight", key, weight + "");
-//                    redisTemplate.opsForHash().put("group_count", key, groupCount + "");
-//
-//                    String incrementKey = "group_weight_" + key;
-//                    redisTemplate.delete(incrementKey);
-//                    redisTemplate.opsForValue().increment(incrementKey);
-//                    redisTemplate.expire(incrementKey, 3l, TimeUnit.HOURS);
-//                }
-//            }
-//            redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
-//            redisTemplate.expire("group_count", 12l, TimeUnit.HOURS);
-//        }
+        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
+        if (!CollectionUtils.isEmpty(result)) {
+            Double total = result.values().stream().reduce((m, n) -> m + n).get();
+            Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
+            if (total != 0) {
+                for (String key : groupOrder) {
+                    Double value = result.get(key) == null ? 0.0 : result.get(key) / total;
+                    Integer groupCount = (int) (Math.round(value * totalCount));
+                    Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
+                    if (weight == null) {
+                        log.info("wrong weight:" + key);
+                        weight = 1.0;
+                    }
+                    redisTemplate.opsForHash().put("group_weight", key, weight + "");
+                    redisTemplate.opsForHash().put("group_count", key, groupCount + "");
+
+                    String incrementKey = "group_weight_" + key;
+                    redisTemplate.delete(incrementKey);
+                    redisTemplate.opsForValue().increment(incrementKey);
+                    redisTemplate.expire(incrementKey, 3l, TimeUnit.HOURS);
+                }
+            }
+            redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
+            redisTemplate.expire("group_count", 12l, TimeUnit.HOURS);
+        }
 
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
