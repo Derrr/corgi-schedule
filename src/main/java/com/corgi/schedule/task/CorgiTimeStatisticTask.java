@@ -41,7 +41,7 @@ public class CorgiTimeStatisticTask {
     private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
     private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
     private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
-    private static List<String> groupOrder = Arrays.asList("匀称", "肉壮", "肌肉", "偏胖", "精壮", "偏瘦");
+    private static List<String> groupOrder = Arrays.asList("偏瘦", "偏胖", "肌肉", "肉壮", "精壮", "匀称");
 
     @Async
     @Scheduled(cron = "0 0 0/4 * * *")
