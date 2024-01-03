@@ -44,7 +44,7 @@ public class CorgiTimeStatisticTask {
     private static List<String> groupOrder = Arrays.asList("偏瘦", "偏胖", "肌肉", "肉壮", "精壮", "匀称");
 
     @Async
-    @Scheduled(cron = "0 0 0/4 * * *")
+    @Scheduled(cron = "0 0 2 * * *")
     //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runPreferGroup() {
         log.info("into prefer group.....");
@@ -70,11 +70,11 @@ public class CorgiTimeStatisticTask {
                     String incrementKey = "group_weight_" + key;
                     redisTemplate.delete(incrementKey);
                     redisTemplate.opsForValue().increment(incrementKey);
-                    redisTemplate.expire(incrementKey, 3l, TimeUnit.HOURS);
+                    redisTemplate.expire(incrementKey, 12l, TimeUnit.HOURS);
                 }
             }
-            redisTemplate.expire("group_weight", 12l, TimeUnit.HOURS);
-            redisTemplate.expire("group_count", 12l, TimeUnit.HOURS);
+            redisTemplate.expire("group_weight", 25l, TimeUnit.HOURS);
+            redisTemplate.expire("group_count", 25l, TimeUnit.HOURS);
         }
 
         while (true) {
@@ -94,7 +94,7 @@ public class CorgiTimeStatisticTask {
     }
 
     @Async
-    @Scheduled(cron = "0 0 2/4 * * *")
+    @Scheduled(cron = "0 0 4 * * *")
     //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runGroup() {
         int page = 1;
