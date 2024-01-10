@@ -48,35 +48,9 @@ public class CorgiTimeStatisticTask {
     //@Scheduled(fixedRate = 7 * 24 * 3600 * 1000)
     public void runPreferGroup() {
         log.info("into prefer group.....");
+        this.refreshWeight();
+        this.refreshGroupBound();
         int page = 1;
-        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
-        if (!CollectionUtils.isEmpty(result)) {
-            Double total = result.values().stream().reduce((m, n) -> m + n).get();
-            Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
-            if (total != 0) {
-                for (String key : groupOrder) {
-                    Double value = result.get(key) == null ? 0.0 : result.get(key) / total;
-                    Integer groupCount = (int) (Math.round(value * totalCount));
-                    log.info(key + " count: " + groupCount);
-                    Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
-                    log.info(key + " weight: " + weight);
-                    if (weight == null) {
-                        log.info("wrong weight:" + key);
-                        weight = 1.0;
-                    }
-                    redisTemplate.opsForHash().put("group_weight", key, weight + "");
-                    redisTemplate.opsForHash().put("group_count", key, groupCount + "");
-
-                    String incrementKey = "group_weight_" + key;
-                    redisTemplate.delete(incrementKey);
-                    redisTemplate.opsForValue().increment(incrementKey);
-                    redisTemplate.expire(incrementKey, 12l, TimeUnit.HOURS);
-                }
-            }
-            redisTemplate.expire("group_weight", 25l, TimeUnit.HOURS);
-            redisTemplate.expire("group_count", 25l, TimeUnit.HOURS);
-        }
-
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             log.info("into prefer group.....page" + page);
@@ -112,4 +86,53 @@ public class CorgiTimeStatisticTask {
         }
     }
 
+    private void refreshWeight() {
+        HashMap<String, Double> result = corgiUserRecommendService.getGroupCor("all");
+        if (!CollectionUtils.isEmpty(result)) {
+            Double total = result.values().stream().reduce((m, n) -> m + n).get();
+            Double totalCount = corgiUserRecommendService.getGroupWeight(0, "");
+            if (total != 0) {
+                for (String key : groupOrder) {
+                    Double value = result.get(key) == null ? 0.0 : result.get(key) / total;
+                    Integer groupCount = (int) (Math.round(value * totalCount));
+                    log.info(key + " count: " + groupCount);
+                    Double weight = corgiUserRecommendService.getGroupWeight(groupCount, key);
+                    log.info(key + " weight: " + weight);
+                    if (weight == null) {
+                        log.info("wrong weight:" + key);
+                        weight = 1.0;
+                    }
+                    redisTemplate.opsForHash().put("group_weight", key, weight + "");
+                    redisTemplate.opsForHash().put("group_count", key, groupCount + "");
+
+                    String incrementKey = "group_weight_" + key;
+                    redisTemplate.delete(incrementKey);
+                    redisTemplate.opsForValue().increment(incrementKey);
+                    redisTemplate.expire(incrementKey, 12l, TimeUnit.HOURS);
+                }
+            }
+            redisTemplate.expire("group_weight", 25l, TimeUnit.HOURS);
+            redisTemplate.expire("group_count", 25l, TimeUnit.HOURS);
+        }
+    }
+
+    private void refreshGroupBound() {
+        this.refreshGroupCor("1099", "偏胖");
+        this.refreshGroupCor("1638", "匀称");
+        this.refreshGroupCor("207151", "肉壮");
+        this.refreshGroupCor("256144", "肌肉");
+        this.refreshGroupCor("361673", "精壮");
+        this.refreshGroupCor("522428", "偏瘦");
+    }
+
+    private void refreshGroupCor(String userId, String group) {
+        HashMap<String, Double> groupWeight = corgiUserRecommendService.getGroupCor(userId);
+        for (String weightGroup : groupWeight.keySet()) {
+            if (group.equals(weightGroup)) {
+                corgiUserRecommendService.updateGroupCor(userId, weightGroup, 10000.0);
+            } else {
+                corgiUserRecommendService.updateGroupCor(userId, weightGroup, 0.0);
+            }
+        }
+    }
 }
