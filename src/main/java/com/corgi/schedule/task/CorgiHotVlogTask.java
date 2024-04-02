@@ -103,7 +103,7 @@ public class CorgiHotVlogTask {
                         updateHot.setExpectView(expectView);
                         corgiVlogService.updateHotVlog(updateHot);
                     }
-                } else if (likeCount >= 4 && !redisTemplate.hasKey("vlog_hot_" + activity.getUserId())) {
+                } else if (likeCount >= 10 && !redisTemplate.hasKey("vlog_hot_" + activity.getUserId())) {
                     CorgiVlogHot addHot = new CorgiVlogHot();
                     addHot.setActivityId(activityId);
                     addHot.setExpectView(expectView);

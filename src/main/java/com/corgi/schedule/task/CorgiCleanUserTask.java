@@ -3,13 +3,9 @@ package com.corgi.schedule.task;
 import com.alibaba.dubbo.config.annotation.Reference;
 import com.corgi.activity.api.CorgiActivityService;
 import com.corgi.activity.api.CorgiMatchService;
-import com.corgi.schedule.service.MQService;
-import com.corgi.schedule.service.TaskService;
 import com.corgi.user.api.*;
 import com.corgi.user.entity.CorgiFeed;
-import com.corgi.user.entity.UserExtra;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -38,15 +34,6 @@ public class CorgiCleanUserTask {
     @Reference
     private CorgiFeedService corgiFeedService;
 
-//    @Async
-//    @Scheduled(fixedRate = 24 * 3600 * 1000)
-//    public void run1() {
-//        List<String> userExtras = corgiExtraService.getExtraUserIds(1, 5000);
-//        for (String userId : userExtras) {
-//            corgiMatchService.updateUser(corgiUserService.getUserDetailBasic(userId));
-//        }
-//    }
-
     @Async
     @Scheduled(cron = "0 0 4 * * *")
     //@Scheduled(fixedRate = 24 * 3600 * 1000)
@@ -56,7 +43,7 @@ public class CorgiCleanUserTask {
         calendar.add(Calendar.DATE, -7);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         List<String> userIds = corgiUserService.getUnregisterUsers(sdf.format(calendar.getTime()));
-        if (userIds.size() > 1000) {
+        if (userIds.size() > 5000) {
             log.error(" too many unregister users:{}! ", userIds.size());
             return;
         }

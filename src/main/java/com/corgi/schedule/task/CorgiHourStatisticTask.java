@@ -1,54 +1,92 @@
 package com.corgi.schedule.task;
 
 import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.corgi.activity.api.CorgiActivityService;
+import com.corgi.common.messages.PushMessage;
+import com.corgi.common.messages.RecommendCalculater;
 import com.corgi.entity.CorgiStatistic;
-import com.corgi.user.api.CorgiStatisticService;
-import com.corgi.user.api.CorgiUserService;
+import com.corgi.schedule.service.MQService;
+import com.corgi.user.api.*;
+import com.corgi.user.entity.UserDetail;
+import com.corgi.user.entity.UserPosition;
+import com.corgi.user.entity.UserWechat;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author tairanliu
  */
 @Component
+@Slf4j
 public class CorgiHourStatisticTask {
     @Reference
     private CorgiUserService corgiUserService;
     @Reference
-    private CorgiActivityService corgiActivityService;
+    private CorgiUserFollowService corgiUserFollowService;
     @Reference
-    private CorgiStatisticService corgiStatisticService;
-
-    private static SimpleDateFormat dau_sdf = new SimpleDateFormat("yyyy-MM-dd");
-    private static SimpleDateFormat activity_sdf = new SimpleDateFormat("yyyy/MM/dd");
-    private static SimpleDateFormat hour_sdf = new SimpleDateFormat("HH");
+    private CorgiUserActivityService corgiUserActivityService;
+    @Reference
+    private CorgiUserWechatService corgiUserWechatService;
+    @Autowired
+    private MQService mqService;
 
     //@Async
     //@Scheduled(cron = "0 0 * * * *")
     public void run() {
-        Calendar calendar = Calendar.getInstance();
-        String date = dau_sdf.format(calendar.getTime());
-
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        String endHour = hour_sdf.format(calendar.getTime());
-        String endDate = activity_sdf.format(calendar.getTime()) + " " + endHour;
-
-
-        calendar.add(Calendar.HOUR_OF_DAY, -1);
-        String beginHour = hour_sdf.format(calendar.getTime());
-        String beginDate = activity_sdf.format(calendar.getTime()) + " " + beginHour;
-        if (hour == 0) {
-            date = dau_sdf.format(calendar.getTime());
+        log.info("check user wechat.....");
+        int page = 1;
+        while (true) {
+            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
+            log.info("into prefer group.....page" + page);
+            if (CollectionUtils.isEmpty(userPositionList)) {
+                break;
+            }
+            page++;
+            for (UserPosition userPosition : userPositionList) {
+                UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
+                if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
+                    continue;
+                }
+                if (corgiUserWechatService.getUserWechat(userPosition.getUserId()) != null) {
+                    continue;
+                }
+                if (corgiUserFollowService.countFollowed(userPosition.getUserId()) < 100) {
+                    continue;
+                }
+                if (corgiUserActivityService.countUserActivity(userPosition.getUserId()) < 3) {
+                    continue;
+                }
+                UserWechat userWechat = new UserWechat();
+                userWechat.setUserId(userPosition.getUserId());
+                userWechat.setStatus("0");
+                corgiUserWechatService.updateUserWechat(userWechat);
+                HashMap<String, Object> extra = new HashMap<>();
+                extra.put("type", "907");
+                JSONArray content = new JSONArray();
+                content.add(new JSONObject().fluentPut("text", " 恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~"));
+                extra.put("content", content);
+                extra.put("bottomText", "去上传>>");
+                extra.put("bottomUrlType", "11");
+                mqService.sendMessage(PushMessage.builder()
+                        .type(PushMessage.DEFAULT)
+                        .sourceUserId("corgihelper")
+                        .targetUserId(userPosition.getUserId())
+                        .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
+                        .extra(extra)
+                        .build());
+            }
         }
-
-        long count = corgiActivityService.countRangePublishActivity(beginDate, endDate);
-        corgiStatisticService.addList(CorgiStatistic.PUBLISH, date, beginHour, count);
-
     }
 
 }
