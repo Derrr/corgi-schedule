@@ -82,7 +82,7 @@ public class CorgiHourStatisticTask {
         extra.put("bottomText", "去上传>>");
         extra.put("bottomUrl", userPosition.getUserId());
         extra.put("bottomUrlType", "15");
-        extra.put("title", "");
+        extra.put("title", "您可以上传微信啦");
         extra.put("desc", "");
         mqService.sendMessage(PushMessage.builder()
                 .type(PushMessage.DEFAULT)
