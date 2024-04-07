@@ -56,7 +56,7 @@ public class CorgiHourStatisticTask {
 //            page++;
 //            for (UserPosition userPosition : userPositionList) {
         UserPosition userPosition = new UserPosition();
-        userPosition.setUserId("1");
+        userPosition.setUserId("7");
 //        UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
 //        if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
 //            continue;
