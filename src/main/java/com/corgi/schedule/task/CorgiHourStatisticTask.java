@@ -54,39 +54,39 @@ public class CorgiHourStatisticTask {
             }
             page++;
             for (UserPosition userPosition : userPositionList) {
-        UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
-        if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
-            continue;
-        }
-        if (corgiUserWechatService.getUserWechat(userPosition.getUserId()) != null) {
-            continue;
-        }
-        if (corgiUserFollowService.countFollowed(userPosition.getUserId()) < 100) {
-            continue;
-        }
-        if (corgiUserActivityService.countUserActivity(userPosition.getUserId()) < 3) {
-            continue;
-        }
-        UserWechat userWechat = new UserWechat();
-        userWechat.setUserId(userPosition.getUserId());
-        userWechat.setStatus("0");
-        corgiUserWechatService.updateUserWechat(userWechat);
-        HashMap<String, Object> extra = new HashMap<>();
-        extra.put("type", "907");
-        JSONArray content = new JSONArray();
-        content.add(new JSONObject().fluentPut("text", " 恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~"));
-        extra.put("content", content);
-        extra.put("bottomText", "去上传>>");
-        extra.put("bottomUrl", userPosition.getUserId());
-        extra.put("bottomUrlType", "15");
-        extra.put("alertTitle", "您可以上传微信啦");
-        mqService.sendMessage(PushMessage.builder()
-                .type(PushMessage.DEFAULT)
-                .sourceUserId("corgihelper")
-                .targetUserId(userPosition.getUserId())
-                .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
-                .extra(extra)
-                .build());
+                UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
+                if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
+                    continue;
+                }
+                if (corgiUserWechatService.getUserWechat(userPosition.getUserId()) != null) {
+                    continue;
+                }
+                if (corgiUserFollowService.countFollowed(userPosition.getUserId()) < 100) {
+                    continue;
+                }
+                if (corgiUserActivityService.countUserActivity(userPosition.getUserId()) < 3) {
+                    continue;
+                }
+                UserWechat userWechat = new UserWechat();
+                userWechat.setUserId(userPosition.getUserId());
+                userWechat.setStatus("0");
+                corgiUserWechatService.updateUserWechat(userWechat);
+                HashMap<String, Object> extra = new HashMap<>();
+                extra.put("type", "907");
+                JSONArray content = new JSONArray();
+                content.add(new JSONObject().fluentPut("text", " 恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~"));
+                extra.put("content", content);
+                extra.put("bottomText", "去上传>>");
+                extra.put("bottomUrl", userPosition.getUserId());
+                extra.put("bottomUrlType", "15");
+                extra.put("alertTitle", "您可以上传微信啦");
+                mqService.sendMessage(PushMessage.builder()
+                        .type(PushMessage.DEFAULT)
+                        .sourceUserId("corgihelper")
+                        .targetUserId(userPosition.getUserId())
+                        .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
+                        .extra(extra)
+                        .build());
             }
         }
     }
