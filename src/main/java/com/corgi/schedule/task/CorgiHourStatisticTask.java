@@ -56,7 +56,7 @@ public class CorgiHourStatisticTask {
 //            page++;
 //            for (UserPosition userPosition : userPositionList) {
         UserPosition userPosition = new UserPosition();
-        userPosition.setUserId("7");
+        userPosition.setUserId("1");
 //        UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
 //        if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
 //            continue;
@@ -82,7 +82,7 @@ public class CorgiHourStatisticTask {
         extra.put("bottomText", "去上传>>");
         extra.put("bottomUrl", userPosition.getUserId());
         extra.put("bottomUrlType", "15");
-        extra.put("title", "您可以上传微信啦");
+        extra.put("alertTitle", "您可以上传微信啦");
         extra.put("desc", "");
         mqService.sendMessage(PushMessage.builder()
                 .type(PushMessage.DEFAULT)
