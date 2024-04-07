@@ -43,7 +43,7 @@ public class CorgiHourStatisticTask {
 
     //@Async
     //@Scheduled(cron = "0 0 * * * *")
-    @Scheduled(fixedRate = 1000 * 24 * 3600)
+    //@Scheduled(fixedRate = 1000 * 24 * 3600)
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
@@ -56,7 +56,7 @@ public class CorgiHourStatisticTask {
 //            page++;
 //            for (UserPosition userPosition : userPositionList) {
         UserPosition userPosition = new UserPosition();
-        userPosition.setUserId("1");
+        userPosition.setUserId("8");
 //        UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
 //        if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
 //            continue;
