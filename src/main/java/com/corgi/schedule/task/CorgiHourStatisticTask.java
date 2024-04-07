@@ -77,7 +77,8 @@ public class CorgiHourStatisticTask {
                 content.add(new JSONObject().fluentPut("text", " 恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~"));
                 extra.put("content", content);
                 extra.put("bottomText", "去上传>>");
-                extra.put("bottomUrlType", "11");
+                extra.put("bottomUrl", userPosition.getUserId());
+                extra.put("bottomUrlType", "15");
                 mqService.sendMessage(PushMessage.builder()
                         .type(PushMessage.DEFAULT)
                         .sourceUserId("corgihelper")
