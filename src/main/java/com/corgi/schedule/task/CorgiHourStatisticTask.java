@@ -43,7 +43,7 @@ public class CorgiHourStatisticTask {
 
     //@Async
     //@Scheduled(cron = "0 0 * * * *")
-    //@Scheduled(fixedRate = 1000 * 24 * 3600)
+    @Scheduled(fixedRate = 1000 * 24 * 3600)
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
