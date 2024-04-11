@@ -43,6 +43,7 @@ public class CorgiHourStatisticTask {
 
     //@Async
     //@Scheduled(cron = "0 0 * * * *")
+    @Scheduled(fixedRate = 3600 * 24 * 1000)
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
@@ -82,7 +83,7 @@ public class CorgiHourStatisticTask {
                 extra.put("alertTitle", "您可以上传微信啦");
                 mqService.sendMessage(PushMessage.builder()
                         .type(PushMessage.DEFAULT)
-                        .sourceUserId("corgihelper")
+                        .sourceUserId("corgi1")
                         .targetUserId(userPosition.getUserId())
                         .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
                         .extra(extra)
