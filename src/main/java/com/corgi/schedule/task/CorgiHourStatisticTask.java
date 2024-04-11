@@ -83,7 +83,7 @@ public class CorgiHourStatisticTask {
                 extra.put("alertTitle", "您可以上传微信啦");
                 mqService.sendMessage(PushMessage.builder()
                         .type(PushMessage.DEFAULT)
-                        .sourceUserId("corgi1")
+                        .sourceUserId("corgi4")
                         .targetUserId(userPosition.getUserId())
                         .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
                         .extra(extra)
