@@ -43,37 +43,37 @@ public class CorgiHourStatisticTask {
 
     //@Async
     //@Scheduled(cron = "0 0 * * * *")
-    @Scheduled(fixedRate = 3600 * 24 * 1000)
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
-//        while (true) {
-//            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
-//            log.info("into prefer group.....page" + page);
-//            if (CollectionUtils.isEmpty(userPositionList)) {
-//                break;
-//            }
-//            page++;
-//            for (UserPosition userPosition : userPositionList) {
-        UserPosition userPosition = new UserPosition();
-        userPosition.setUserId("1");
-//                UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
-//                if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
-//                    continue;
-//                }
-//                if (corgiUserWechatService.getUserWechat(userPosition.getUserId()) != null) {
-//                    continue;
-//                }
-//                if (corgiUserFollowService.countFollowed(userPosition.getUserId()) < 100) {
-//                    continue;
-//                }
-//                if (corgiUserActivityService.countUserActivity(userPosition.getUserId()) < 3) {
-//                    continue;
-//                }
-//                UserWechat userWechat = new UserWechat();
-//                userWechat.setUserId(userPosition.getUserId());
-//                userWechat.setStatus("0");
-//                corgiUserWechatService.updateUserWechat(userWechat);
+        while (true) {
+            List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
+            log.info("into prefer group.....page" + page);
+            if (CollectionUtils.isEmpty(userPositionList)) {
+                break;
+            }
+            page++;
+            for (UserPosition userPosition : userPositionList) {
+                UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
+                if (userDetail == null) {
+                    continue;
+                }
+                if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
+                    continue;
+                }
+                if (corgiUserWechatService.getUserWechat(userPosition.getUserId()) != null) {
+                    continue;
+                }
+                if (corgiUserFollowService.countFollowed(userPosition.getUserId()) < 100) {
+                    continue;
+                }
+                if (corgiUserActivityService.countUserActivity(userPosition.getUserId()) < 3) {
+                    continue;
+                }
+                UserWechat userWechat = new UserWechat();
+                userWechat.setUserId(userPosition.getUserId());
+                userWechat.setStatus("0");
+                corgiUserWechatService.updateUserWechat(userWechat);
                 HashMap<String, Object> extra = new HashMap<>();
                 extra.put("type", "907");
                 JSONArray content = new JSONArray();
@@ -90,8 +90,8 @@ public class CorgiHourStatisticTask {
                         .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
                         .extra(extra)
                         .build());
-            //}
-        //}
+            }
+        }
     }
 
 }
