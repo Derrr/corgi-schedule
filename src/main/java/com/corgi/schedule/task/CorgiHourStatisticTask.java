@@ -42,7 +42,7 @@ public class CorgiHourStatisticTask {
     private MQService mqService;
 
     //@Async
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0 9-22 * * *")
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
