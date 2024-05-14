@@ -107,6 +107,7 @@ public class CorgiFakeTask {
         if (userDetail == null) {
             return;
         }
+        corgiFakeService.updateFakeTime(userDetail.getUserId());
         log.info("running fake task...");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Calendar calendar = Calendar.getInstance();
