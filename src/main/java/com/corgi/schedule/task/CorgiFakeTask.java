@@ -71,26 +71,26 @@ public class CorgiFakeTask {
     private static final String creatorKey = "activity_creator";
     private static final String influencerKey = "is_influencer";
     private static final String publishDate = "publish_date_";
-    private static final String commentActivity = "comment_activity_";
+    //private static final String commentActivity = "comment_activity_";
 
-    private Cache<String, List<String>> userListCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1L, TimeUnit.HOURS)
-            .initialCapacity(100)
-            .build();
-
-    private Cache<String, UserProfile> userDetailCache = CacheBuilder.newBuilder()
-            .initialCapacity(150000)
-            .build();
-
-    private Cache<String, HashMap<String, String>> activityCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(10L, TimeUnit.MINUTES)
-            .initialCapacity(100)
-            .build();
-
-    private Cache<String, String> userDateCache = CacheBuilder.newBuilder()
-            .initialCapacity(150000)
-            .expireAfterWrite(10L, TimeUnit.MINUTES)
-            .build();
+//    private Cache<String, List<String>> userListCache = CacheBuilder.newBuilder()
+//            .expireAfterWrite(1L, TimeUnit.HOURS)
+//            .initialCapacity(100)
+//            .build();
+//
+//    private Cache<String, UserProfile> userDetailCache = CacheBuilder.newBuilder()
+//            .initialCapacity(150000)
+//            .build();
+//
+//    private Cache<String, HashMap<String, String>> activityCache = CacheBuilder.newBuilder()
+//            .expireAfterWrite(10L, TimeUnit.MINUTES)
+//            .initialCapacity(100)
+//            .build();
+//
+//    private Cache<String, String> userDateCache = CacheBuilder.newBuilder()
+//            .initialCapacity(150000)
+//            .expireAfterWrite(10L, TimeUnit.MINUTES)
+//            .build();
 
     //@Async(value = "asyncExecutor")
     @Scheduled(cron = "0/6 * 9-22 * * *")
@@ -175,23 +175,23 @@ public class CorgiFakeTask {
             if (Math.random() < 10.0 / DAY_MINUTE) {
                 followUser(userDetail, activity.getUserId());
             }
-            String commentActivityId = redisTemplate.opsForValue().get(commentActivity + activity.getUserId());
-            if (StringUtils.isEmpty(commentActivityId) && !StringUtils.isEmpty(activity.getId())) {
-                redisTemplate.opsForValue().set(commentActivity + activity.getUserId(), activity.getId(), 30L, TimeUnit.DAYS);
-                commentActivityId = activity.getId();
-            }
-            if (!StringUtils.isEmpty(commentActivityId) && commentActivityId.equals(activity.getId())) {
-                try {
-                    if (Math.random() < 0.02 && sdfActivity.parse(activity.getCreateTime()).getTime() > System.currentTimeMillis() - 10000 * 60L) {
-                        commentActivity(userDetail, activity.getId());
-                    }
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-                if (Math.random() < 5.0 / DAY_MINUTE) {
-                    commentActivity(userDetail, activity.getId());
-                }
-            }
+//            String commentActivityId = redisTemplate.opsForValue().get(commentActivity + activity.getUserId());
+//            if (StringUtils.isEmpty(commentActivityId) && !StringUtils.isEmpty(activity.getId())) {
+//                redisTemplate.opsForValue().set(commentActivity + activity.getUserId(), activity.getId(), 30L, TimeUnit.DAYS);
+//                commentActivityId = activity.getId();
+//            }
+//            if (!StringUtils.isEmpty(commentActivityId) && commentActivityId.equals(activity.getId())) {
+//                try {
+//                    if (Math.random() < 0.02 && sdfActivity.parse(activity.getCreateTime()).getTime() > System.currentTimeMillis() - 10000 * 60L) {
+//                        commentActivity(userDetail, activity.getId());
+//                    }
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//                if (Math.random() < 5.0 / DAY_MINUTE) {
+//                    commentActivity(userDetail, activity.getId());
+//                }
+//            }
         }
         List<String> manualIds = new ArrayList<>();
         for (CorgiVlogHot vlogHot : manualHots) {
