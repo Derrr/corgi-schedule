@@ -38,6 +38,8 @@ public class CorgiHourStatisticTask {
     private CorgiUserActivityService corgiUserActivityService;
     @Reference
     private CorgiUserWechatService corgiUserWechatService;
+    @Reference
+    private CorgiLikeService corgiLikeService;
     @Autowired
     private MQService mqService;
 
@@ -54,14 +56,20 @@ public class CorgiHourStatisticTask {
             }
             page++;
             for (UserPosition userPosition : userPositionList) {
+                UserWechat userWechat = corgiUserWechatService.getUserWechat(userPosition.getUserId());
                 UserDetail userDetail = corgiUserService.getUserDetailBasic(userPosition.getUserId());
                 if (userDetail == null) {
+                    if (userWechat != null && "1".equals(userWechat.getStatus())) {
+                        userWechat.setStatus("0");
+                        corgiUserWechatService.updateUserWechat(userWechat);
+                    }
+                    continue;
+                }
+                if (userWechat != null) {
+                    this.countWeight(userWechat);
                     continue;
                 }
                 if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
-                    continue;
-                }
-                if (corgiUserWechatService.getUserWechat(userPosition.getUserId()) != null) {
                     continue;
                 }
                 if (corgiUserFollowService.countFollowed(userPosition.getUserId()) < 100) {
@@ -70,7 +78,7 @@ public class CorgiHourStatisticTask {
                 if (corgiUserActivityService.countUserActivity(userPosition.getUserId()) < 3) {
                     continue;
                 }
-                UserWechat userWechat = new UserWechat();
+                userWechat = new UserWechat();
                 userWechat.setUserId(userPosition.getUserId());
                 userWechat.setStatus("0");
                 corgiUserWechatService.updateUserWechat(userWechat);
@@ -94,4 +102,16 @@ public class CorgiHourStatisticTask {
         }
     }
 
+    private void countWeight(UserWechat userWechat) {
+        UserDetail query = new UserDetail();
+        query.setCheckStatus("real");
+        query.setUserId(userWechat.getUserId());
+        int total = (int) corgiLikeService.countLikeByUser(query);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DATE, -7);
+        query.setCtime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
+        int period = (int) corgiLikeService.countLikeByUser(query);
+        Integer weight = total / 3 + period + Integer.valueOf(userWechat.getId()) / 100;
+        corgiUserWechatService.updateUserWechatCount(query.getUserId(), total, period, weight);
+    }
 }
