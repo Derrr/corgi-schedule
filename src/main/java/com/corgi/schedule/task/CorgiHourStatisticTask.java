@@ -44,7 +44,8 @@ public class CorgiHourStatisticTask {
     private MQService mqService;
 
     //@Async
-    @Scheduled(cron = "0 0 9-22 * * *")
+    @Scheduled(fixedRate = 3600 * 1000)
+    //@Scheduled(cron = "0 0 9-22 * * *")
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
