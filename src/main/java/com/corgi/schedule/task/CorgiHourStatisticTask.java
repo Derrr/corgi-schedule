@@ -49,6 +49,7 @@ public class CorgiHourStatisticTask {
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
+        HashMap<Integer, Integer> indexMap = new HashMap<>();
         while (true) {
             List<UserPosition> userPositionList = corgiUserService.getUserPositionByPage(page, 1000);
             log.info("into prefer group.....page" + page);
@@ -68,7 +69,7 @@ public class CorgiHourStatisticTask {
                 }
                 if (userWechat != null) {
                     if ("1".equals(userWechat.getStatus())) {
-                        this.countWeight(userWechat);
+                        this.countWeight(userWechat, indexMap);
                     }
                     continue;
                 }
@@ -101,12 +102,12 @@ public class CorgiHourStatisticTask {
                         .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
                         .extra(extra)
                         .build());
-                this.countWeight(userWechat);
+                this.countWeight(userWechat, indexMap);
             }
         }
     }
 
-    private void countWeight(UserWechat userWechat) {
+    private void countWeight(UserWechat userWechat, HashMap<Integer, Integer> indexMap) {
         UserDetail query = new UserDetail();
         query.setCheckStatus("real");
         query.setUserId(userWechat.getUserId());
@@ -115,7 +116,14 @@ public class CorgiHourStatisticTask {
         calendar.add(Calendar.DATE, -7);
         query.setCtime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
         int period = (int) corgiLikeService.countLikeByUser(query);
-        Integer weight = total / 3 + period + Integer.valueOf(userWechat.getId()) / 100;
+        Integer weight = (total / 10 + period * 2) * 100;
+        Integer index = indexMap.get(weight);
+        if (index == null) {
+            index = 0;
+        }
+        index++;
+        indexMap.put(weight, index);
+        weight += index;
         corgiUserWechatService.updateUserWechatCount(query.getUserId(), total, period, weight);
     }
 }
