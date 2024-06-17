@@ -44,8 +44,8 @@ public class CorgiHourStatisticTask {
     private MQService mqService;
 
     //@Async
-    @Scheduled(fixedRate = 3600 * 1000)
-    //@Scheduled(cron = "0 0 9-22 * * *")
+    //@Scheduled(fixedRate = 3600 * 1000)
+    @Scheduled(cron = "0 0 9-22 * * *")
     public void run() {
         log.info("check user wechat.....");
         int page = 1;
@@ -67,7 +67,9 @@ public class CorgiHourStatisticTask {
                     continue;
                 }
                 if (userWechat != null) {
-                    this.countWeight(userWechat);
+                    if ("1".equals(userWechat.getStatus())) {
+                        this.countWeight(userWechat);
+                    }
                     continue;
                 }
                 if (!UserDetail.VERIFIED.equals(userDetail.getAvatarCheckStatus())) {
@@ -99,6 +101,7 @@ public class CorgiHourStatisticTask {
                         .message("恭喜！你已满足上传微信的条件，现在去上传可赚取零花钱哦~")
                         .extra(extra)
                         .build());
+                this.countWeight(userWechat);
             }
         }
     }
