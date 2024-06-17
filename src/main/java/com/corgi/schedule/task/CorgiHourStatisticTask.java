@@ -116,7 +116,7 @@ public class CorgiHourStatisticTask {
         calendar.add(Calendar.DATE, -7);
         query.setCtime(new SimpleDateFormat("yyyy-MM-dd").format(calendar.getTime()));
         int period = (int) corgiLikeService.countLikeByUser(query);
-        Integer weight = (total / 10 + period * 2) * 100;
+        Integer weight = (total / 10 + period * 20) * 100;
         Integer index = indexMap.get(weight);
         if (index == null) {
             index = 0;
