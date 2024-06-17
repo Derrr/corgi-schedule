@@ -120,8 +120,9 @@ public class CorgiHourStatisticTask {
         Integer index = indexMap.get(weight);
         if (index == null) {
             index = 0;
+        } else {
+            index++;
         }
-        index++;
         indexMap.put(weight, index);
         weight += index;
         corgiUserWechatService.updateUserWechatCount(query.getUserId(), total, period, weight);
